@@ -1,26 +1,9 @@
 {
   "name": "vscode-maven",
   "displayName": "Maven for Java",
-  "description": "%description%",
   "version": "0.0.1",
-  "icon": "resources/logo.png",
-  "publisher": "vscjava",
-  "preview": false,
-  "aiKey": "7c4292ac-8ca8-4e02-9f1c-0b73e1eeeca4",
-  "engines": {
-    "vscode": "1.75.0"
-  },
-  "enabledApiProposals": [],
-  "capabilities": {
-    "virtualWorkspaces": false,
-    "untrustedWorkspaces": {
-      "supported": "limited",
-      "restrictedConfigurations": [
-        "maven.executable.options",
-        "maven.terminal.customEnv"
-      ]
-    }
-  },
+  "private": "false",
+  "description": "%description%",
   "categories": [
     "Programming Languages",
     "Other"
@@ -29,20 +12,36 @@
     "Maven",
     "Java"
   ],
-  "license": "MIT",
   "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
+  "bugs": {
+    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CodeEditorLand/CodeEditorLand.git"
   },
-  "activationEvents": [
-    "workspaceContains:**/pom.xml"
-  ],
+  "license": "MIT",
+  "author": {
+    "name": "Nikola Hristov",
+    "email": "nikola@nikolahristov.tech",
+    "url": "https://nikolahristov.tech"
+  },
+  "publisher": "playform",
+  "type": "module",
   "main": "./dist/extension",
+  "scripts": {
+    "build-plugin": "node scripts/build-jdtls-ext.js",
+    "compile": "tsc -p ./",
+    "prepublishOnly": "TypeScriptESBuild Source/**/*.ts",
+    "test": "tsc -p ./ && node ./out/test/index.js",
+    "tslint": "eslint .",
+    "update-tpn": "node scripts/update-third-party-notice.js",
+    "update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js",
+    "vscode:prepublish": "webpack --mode production",
+    "watch": "webpack --mode development --watch --progress",
+    "webpack": "webpack --mode development"
+  },
   "contributes": {
-    "javaExtensions": [
-      "./jdtls.ext/com.microsoft.java.maven.plugin/target/com.microsoft.java.maven.plugin-0.39.0.jar"
-    ],
     "commands": [
       {
         "command": "maven.explorer.refresh",
@@ -239,29 +238,180 @@
         "category": "Maven"
       }
     ],
-    "views": {
-      "explorer": [
-        {
-          "id": "mavenProjects",
-          "name": "%contributes.views.explorer.mavenProjects%",
-          "when": "workbenchState == empty || vscode-maven:activated",
-          "contextualTitle": "%contributes.views.explorer.mavenProjects%",
-          "icon": "resources/icons/dark/project.svg"
-        }
-      ]
-    },
-    "viewsWelcome": [
+    "configuration": [
       {
-        "view": "mavenProjects",
-        "contents": "%contributes.viewsWelcome.mavenProjects.untrustedWorkspaces%",
-        "when": "!isWorkspaceTrusted"
+        "title": "Maven for Java",
+        "properties": {
+          "maven.settingsFile": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null,
+            "description": "%configuration.maven.settingsFile%",
+            "scope": "machine"
+          },
+          "maven.excludedFolders": {
+            "type": "array",
+            "default": [
+              "**/.*",
+              "**/node_modules",
+              "**/target",
+              "**/bin",
+              "**/archetype-resources"
+            ],
+            "description": "%configuration.maven.excludedFolders%",
+            "scope": "resource"
+          },
+          "maven.executable.preferMavenWrapper": {
+            "type": "boolean",
+            "default": "true",
+            "description": "%configuration.maven.executable.preferMavenWrapper%",
+            "scope": "resource"
+          },
+          "maven.executable.path": {
+            "type": "string",
+            "default": "",
+            "description": "%configuration.maven.executable.path%",
+            "scope": "machine"
+          },
+          "maven.executable.options": {
+            "type": "string",
+            "default": "",
+            "description": "%configuration.maven.executable.options%",
+            "scope": "machine-overridable"
+          },
+          "maven.terminal.useJavaHome": {
+            "type": "boolean",
+            "default": false,
+            "description": "%configuration.maven.terminal.useJavaHome%",
+            "scope": "window"
+          },
+          "maven.terminal.customEnv": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "environment setting",
+              "required": [
+                "environmentVariable",
+                "value"
+              ],
+              "properties": {
+                "environmentVariable": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "%configuration.maven.terminal.customEnv.environmentVariable%"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "%configuration.maven.terminal.customEnv.value%"
+                }
+              }
+            },
+            "default": [],
+            "description": "%configuration.maven.terminal.customEnv%",
+            "scope": "resource"
+          },
+          "maven.terminal.favorites": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "Favorite commands",
+              "required": [
+                "command"
+              ],
+              "properties": {
+                "alias": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "%configuration.maven.terminal.favorites.alias%"
+                },
+                "command": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "%configuration.maven.terminal.favorites.command%"
+                },
+                "debug": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "%configuration.maven.terminal.favorites.debug%"
+                }
+              }
+            },
+            "default": [],
+            "description": "%configuration.maven.terminal.favorites%",
+            "scope": "resource"
+          },
+          "maven.view": {
+            "type": "string",
+            "enum": [
+              "flat",
+              "hierarchical"
+            ],
+            "default": "flat",
+            "scope": "window",
+            "description": "%configuration.maven.view%"
+          },
+          "maven.showInExplorerContextMenu": {
+            "type": "boolean",
+            "default": "true",
+            "description": "%configuration.maven.showInExplorerContextMenu%",
+            "scope": "resource"
+          },
+          "maven.pomfile.globPattern": {
+            "type": "string",
+            "default": "**/pom.xml",
+            "description": "%configuration.maven.pomfile.globPattern%",
+            "scope": "window"
+          },
+          "maven.pomfile.autoUpdateEffectivePOM": {
+            "type": "boolean",
+            "default": false,
+            "description": "%configuration.maven.pomfile.autoUpdateEffectivePOM%",
+            "scope": "window"
+          },
+          "maven.pomfile.prefetchEffectivePom": {
+            "type": "boolean",
+            "default": false,
+            "description": "%configuration.maven.pomfile.prefetchEffectivePom%",
+            "scope": "application"
+          },
+          "maven.dependency.enableConflictDiagnostics": {
+            "type": "boolean",
+            "default": "true",
+            "description": "%configuration.maven.dependency.enableConflictDiagnostics%",
+            "scope": "window"
+          },
+          "maven.projectOpenBehavior": {
+            "default": "Interactive",
+            "type": "string",
+            "scope": "window",
+            "description": "%configuration.maven.projectOpenBehavior%",
+            "enum": [
+              "Interactive",
+              "Open",
+              "Add to Workspace",
+              "None"
+            ]
+          },
+          "maven.explorer.projectName": {
+            "default": "${project.name}",
+            "type": "string",
+            "scope": "window",
+            "description": "%configuration.maven.explorer.projectName%",
+            "enum": [
+              "${project.name}",
+              "${project.artifactId}",
+              "${project.artifactId}-${project.version}",
+              "${project.groupId}.${project.artifactId}",
+              "${project.groupId}.${project.artifactId}-${project.version}"
+            ]
+          }
+        }
       }
     ],
-    "submenus": [
-      {
-        "id": "maven/run",
-        "label": "Run Maven Commands..."
-      }
+    "javaExtensions": [
+      "./jdtls.ext/com.microsoft.java.maven.plugin/target/com.microsoft.java.maven.plugin-0.39.0.jar"
     ],
     "menus": {
       "commandPalette": [
@@ -605,216 +755,34 @@
         }
       ]
     },
-    "configuration": [
+    "submenus": [
       {
-        "title": "Maven for Java",
-        "properties": {
-          "maven.settingsFile": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "default": null,
-            "description": "%configuration.maven.settingsFile%",
-            "scope": "machine"
-          },
-          "maven.excludedFolders": {
-            "type": "array",
-            "default": [
-              "**/.*",
-              "**/node_modules",
-              "**/target",
-              "**/bin",
-              "**/archetype-resources"
-            ],
-            "description": "%configuration.maven.excludedFolders%",
-            "scope": "resource"
-          },
-          "maven.executable.preferMavenWrapper": {
-            "type": "boolean",
-            "default": "true",
-            "description": "%configuration.maven.executable.preferMavenWrapper%",
-            "scope": "resource"
-          },
-          "maven.executable.path": {
-            "type": "string",
-            "default": "",
-            "description": "%configuration.maven.executable.path%",
-            "scope": "machine"
-          },
-          "maven.executable.options": {
-            "type": "string",
-            "default": "",
-            "description": "%configuration.maven.executable.options%",
-            "scope": "machine-overridable"
-          },
-          "maven.terminal.useJavaHome": {
-            "type": "boolean",
-            "default": false,
-            "description": "%configuration.maven.terminal.useJavaHome%",
-            "scope": "window"
-          },
-          "maven.terminal.customEnv": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "title": "environment setting",
-              "required": [
-                "environmentVariable",
-                "value"
-              ],
-              "properties": {
-                "environmentVariable": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "%configuration.maven.terminal.customEnv.environmentVariable%"
-                },
-                "value": {
-                  "type": "string",
-                  "description": "%configuration.maven.terminal.customEnv.value%"
-                }
-              }
-            },
-            "default": [],
-            "description": "%configuration.maven.terminal.customEnv%",
-            "scope": "resource"
-          },
-          "maven.terminal.favorites": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "title": "Favorite commands",
-              "required": [
-                "command"
-              ],
-              "properties": {
-                "alias": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "%configuration.maven.terminal.favorites.alias%"
-                },
-                "command": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "%configuration.maven.terminal.favorites.command%"
-                },
-                "debug": {
-                  "type": "boolean",
-                  "default": false,
-                  "description": "%configuration.maven.terminal.favorites.debug%"
-                }
-              }
-            },
-            "default": [],
-            "description": "%configuration.maven.terminal.favorites%",
-            "scope": "resource"
-          },
-          "maven.view": {
-            "type": "string",
-            "enum": [
-              "flat",
-              "hierarchical"
-            ],
-            "default": "flat",
-            "scope": "window",
-            "description": "%configuration.maven.view%"
-          },
-          "maven.showInExplorerContextMenu": {
-            "type": "boolean",
-            "default": "true",
-            "description": "%configuration.maven.showInExplorerContextMenu%",
-            "scope": "resource"
-          },
-          "maven.pomfile.globPattern": {
-            "type": "string",
-            "default": "**/pom.xml",
-            "description": "%configuration.maven.pomfile.globPattern%",
-            "scope": "window"
-          },
-          "maven.pomfile.autoUpdateEffectivePOM": {
-            "type": "boolean",
-            "default": false,
-            "description": "%configuration.maven.pomfile.autoUpdateEffectivePOM%",
-            "scope": "window"
-          },
-          "maven.pomfile.prefetchEffectivePom": {
-            "type": "boolean",
-            "default": false,
-            "description": "%configuration.maven.pomfile.prefetchEffectivePom%",
-            "scope": "application"
-          },
-          "maven.dependency.enableConflictDiagnostics": {
-            "type": "boolean",
-            "default": "true",
-            "description": "%configuration.maven.dependency.enableConflictDiagnostics%",
-            "scope": "window"
-          },
-          "maven.projectOpenBehavior": {
-            "default": "Interactive",
-            "type": "string",
-            "scope": "window",
-            "description": "%configuration.maven.projectOpenBehavior%",
-            "enum": [
-              "Interactive",
-              "Open",
-              "Add to Workspace",
-              "None"
-            ]
-          },
-          "maven.explorer.projectName": {
-            "default": "${project.name}",
-            "type": "string",
-            "scope": "window",
-            "description": "%configuration.maven.explorer.projectName%",
-            "enum": [
-              "${project.name}",
-              "${project.artifactId}",
-              "${project.artifactId}-${project.version}",
-              "${project.groupId}.${project.artifactId}",
-              "${project.groupId}.${project.artifactId}-${project.version}"
-            ]
-          }
+        "id": "maven/run",
+        "label": "Run Maven Commands..."
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "mavenProjects",
+          "name": "%contributes.views.explorer.mavenProjects%",
+          "when": "workbenchState == empty || vscode-maven:activated",
+          "contextualTitle": "%contributes.views.explorer.mavenProjects%",
+          "icon": "resources/icons/dark/project.svg"
         }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "mavenProjects",
+        "contents": "%contributes.viewsWelcome.mavenProjects.untrustedWorkspaces%",
+        "when": "!isWorkspaceTrusted"
       }
     ]
   },
-  "scripts": {
-    "vscode:prepublish": "webpack --mode production",
-    "build-plugin": "node scripts/build-jdtls-ext.js",
-    "compile": "tsc -p ./",
-    "tslint": "eslint .",
-    "watch": "webpack --mode development --watch --progress",
-    "test": "tsc -p ./ && node ./out/test/index.js",
-    "webpack": "webpack --mode development",
-    "update-tpn": "node scripts/update-third-party-notice.js",
-    "update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js",
-    "prepublishOnly": "TypeScriptESBuild Source/**/*.ts"
-  },
-  "devDependencies": {
-    "@types/fs-extra": "11.0.3",
-    "@types/glob": "8.1.0",
-    "@types/lodash": "4.14.200",
-    "@types/lru-cache": "7.10.9",
-    "@types/md5": "2.3.4",
-    "@types/minimatch": "5.1.2",
-    "@types/mocha": "10.0.3",
-    "@types/node": "20.8.9",
-    "@types/semver": "7.5.4",
-    "@types/vscode": "1.83.1",
-    "@types/which": "3.0.1",
-    "@types/xml2js": "0.4.13",
-    "@vscode/test-electron": "2.3.6",
-    "glob": "10.3.10",
-    "mocha": "10.2.0",
-    "ts-loader": "9.5.0",
-    "typescript": "5.2.2",
-    "webpack": "5.89.0",
-    "eslint": "8.52.0",
-    "@typescript-eslint/eslint-plugin": "6.9.0",
-    "@typescript-eslint/parser": "6.9.0",
-    "webpack-cli": "5.1.4",
-    "typescript-esbuild": "0.3.1"
-  },
+  "activationEvents": [
+    "workspaceContains:**/pom.xml"
+  ],
   "dependencies": {
     "domhandler": "5.0.3",
     "expand-home-dir": "0.0.3",
@@ -835,17 +803,49 @@
     "which": "4.0.0",
     "xml2js": "0.6.2"
   },
-  "bugs": {
-    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
+  "devDependencies": {
+    "@types/fs-extra": "11.0.3",
+    "@types/glob": "8.1.0",
+    "@types/lodash": "4.14.200",
+    "@types/lru-cache": "7.10.9",
+    "@types/md5": "2.3.4",
+    "@types/minimatch": "5.1.2",
+    "@types/mocha": "10.0.3",
+    "@types/node": "20.8.9",
+    "@types/semver": "7.5.4",
+    "@types/vscode": "1.83.1",
+    "@types/which": "3.0.1",
+    "@types/xml2js": "0.4.13",
+    "@typescript-eslint/eslint-plugin": "6.9.0",
+    "@typescript-eslint/parser": "6.9.0",
+    "@vscode/test-electron": "2.3.6",
+    "eslint": "8.52.0",
+    "glob": "10.3.10",
+    "mocha": "10.2.0",
+    "ts-loader": "9.5.0",
+    "typescript": "5.2.2",
+    "typescript-esbuild": "0.3.1",
+    "webpack": "5.89.0",
+    "webpack-cli": "5.1.4"
   },
-  "type": "module",
-  "private": "false",
+  "engines": {
+    "vscode": "1.75.0"
+  },
   "publishConfig": {
     "access": "public"
   },
-  "author": {
-    "name": "Nikola Hristov",
-    "email": "nikola@nikolahristov.tech",
-    "url": "https://nikolahristov.tech"
-  }
+  "icon": "resources/logo.png",
+  "preview": false,
+  "aiKey": "7c4292ac-8ca8-4e02-9f1c-0b73e1eeeca4",
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "restrictedConfigurations": [
+        "maven.executable.options",
+        "maven.terminal.customEnv"
+      ]
+    }
+  },
+  "enabledApiProposals": []
 }
