@@ -2,7 +2,7 @@
   "name": "vscode-maven",
   "displayName": "Maven for Java",
   "description": "%description%",
-  "version": "0.42.0",
+  "version": "0.0.1",
   "icon": "resources/logo.png",
   "publisher": "vscjava",
   "preview": false,
@@ -30,10 +30,10 @@
     "Java"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/Microsoft/vscode-maven/",
+  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-maven.git"
+    "url": "git+https://github.com/CodeEditorLand/CodeEditorLand.git"
   },
   "activationEvents": [
     "workspaceContains:**/pom.xml"
@@ -787,7 +787,8 @@
     "test": "tsc -p ./ && node ./out/test/index.js",
     "webpack": "webpack --mode development",
     "update-tpn": "node scripts/update-third-party-notice.js",
-    "update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js"
+    "update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js",
+    "prepublishOnly": "TypeScriptESBuild Source/**/*.ts"
   },
   "devDependencies": {
     "@types/fs-extra": "11.0.3",
@@ -811,7 +812,8 @@
     "eslint": "8.52.0",
     "@typescript-eslint/eslint-plugin": "6.9.0",
     "@typescript-eslint/parser": "6.9.0",
-    "webpack-cli": "5.1.4"
+    "webpack-cli": "5.1.4",
+    "typescript-esbuild": "0.3.1"
   },
   "dependencies": {
     "domhandler": "5.0.3",
@@ -832,5 +834,18 @@
     "vscode-tas-client": "0.1.63",
     "which": "4.0.0",
     "xml2js": "0.6.2"
+  },
+  "bugs": {
+    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
+  },
+  "type": "module",
+  "private": "false",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "Nikola Hristov",
+    "email": "nikola@nikolahristov.tech",
+    "url": "https://nikolahristov.tech"
   }
 }
