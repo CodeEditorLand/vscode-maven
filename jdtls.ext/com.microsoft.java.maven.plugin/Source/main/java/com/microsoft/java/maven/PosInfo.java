@@ -14,7 +14,7 @@ package com.microsoft.java.maven;
 import org.eclipse.lsp4j.Position;
 
 class PosInfo {
-    Position pos = null;
-    Boolean alreadyHasDependencies = false;
-    Boolean needAddDependency = true;
+	Position pos = null;
+	Boolean alreadyHasDependencies = false;
+	Boolean needAddDependency = true;
 }

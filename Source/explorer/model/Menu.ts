@@ -8,25 +8,29 @@ import { MavenProject } from "./MavenProject";
 const CONTEXT_VALUE = "maven:menu";
 
 export abstract class Menu implements ITreeItem {
-    protected name: string;
+	protected name: string;
 
-    public abstract getChildren(): ITreeItem[] | undefined | Promise<ITreeItem[] | undefined>;
+	public abstract getChildren():
+		| ITreeItem[]
+		| undefined
+		| Promise<ITreeItem[] | undefined>;
 
-    public getContextValue(): string {
-        return CONTEXT_VALUE;
-    }
+	public getContextValue(): string {
+		return CONTEXT_VALUE;
+	}
 
-    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
-        const treeItem: vscode.TreeItem = new vscode.TreeItem(this.name, vscode.TreeItemCollapsibleState.Collapsed);
-        treeItem.iconPath = new vscode.ThemeIcon("folder");
-        return treeItem;
-    }
+	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+		const treeItem: vscode.TreeItem = new vscode.TreeItem(
+			this.name,
+			vscode.TreeItemCollapsibleState.Collapsed
+		);
+		treeItem.iconPath = new vscode.ThemeIcon("folder");
+		return treeItem;
+	}
 }
 
 export abstract class ProjectMenu extends Menu {
-    constructor(
-        public project: MavenProject,
-    ) {
-        super();
-    }
+	constructor(public project: MavenProject) {
+		super();
+	}
 }

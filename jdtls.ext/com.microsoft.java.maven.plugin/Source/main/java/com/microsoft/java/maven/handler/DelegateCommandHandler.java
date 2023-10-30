@@ -24,36 +24,34 @@ import java.util.Objects;
 
 @SuppressWarnings("restriction")
 public class DelegateCommandHandler implements IDelegateCommandHandler {
-    
-    @Override
-    public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
-        if (Objects.equals(commandId, "java.maven.initializeSearcher")) {
-            ArtifactSearcher.initialize((String) arguments.get(0));
-        } else if (Objects.equals(commandId, "java.maven.searchArtifact")) {
-            final Map<String, Object> param = (Map<String, Object>) arguments.get(0);
-            if (param.get("searchType").equals("CLASSNAME")) {
-                return ArtifactSearcher.searchByClassName((String) param.get("className"), monitor);
-            } else if (param.get("searchType").equals("IDENTIFIER")) {
-                return ArtifactSearcher.searchByIdentifier(
-                    (String) param.get("groupId"), (String) param.get("artifactId"), monitor
-                );
-            } else {
-                return new ArrayList<>();
-            }
-        } else if (Objects.equals(commandId, "java.maven.addDependency")) {
-            final AddDependencyHandler.AddDependencyParams params = new AddDependencyHandler.AddDependencyParams(
-                (String) arguments.get(0), 
-                (String) arguments.get(1), 
-                (String) arguments.get(2), 
-                ((Double) arguments.get(3)).intValue(), 
-                ((Double) arguments.get(4)).intValue(), 
-                ((Double) arguments.get(5)).intValue()
-            );
-            return AddDependencyHandler.addDependency(params, monitor);
-        } else if (Objects.equals(commandId, "java.maven.controlContext")) {
-            return ArtifactSearcher.controlIndexerContext((boolean) arguments.get(0), monitor);
-        } 
-        return null;
-    }
+
+	@Override
+	public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
+		if (Objects.equals(commandId, "java.maven.initializeSearcher")) {
+			ArtifactSearcher.initialize((String) arguments.get(0));
+		} else if (Objects.equals(commandId, "java.maven.searchArtifact")) {
+			final Map<String, Object> param = (Map<String, Object>) arguments.get(0);
+			if (param.get("searchType").equals("CLASSNAME")) {
+				return ArtifactSearcher.searchByClassName((String) param.get("className"), monitor);
+			} else if (param.get("searchType").equals("IDENTIFIER")) {
+				return ArtifactSearcher.searchByIdentifier(
+						(String) param.get("groupId"), (String) param.get("artifactId"), monitor);
+			} else {
+				return new ArrayList<>();
+			}
+		} else if (Objects.equals(commandId, "java.maven.addDependency")) {
+			final AddDependencyHandler.AddDependencyParams params = new AddDependencyHandler.AddDependencyParams(
+					(String) arguments.get(0),
+					(String) arguments.get(1),
+					(String) arguments.get(2),
+					((Double) arguments.get(3)).intValue(),
+					((Double) arguments.get(4)).intValue(),
+					((Double) arguments.get(5)).intValue());
+			return AddDependencyHandler.addDependency(params, monitor);
+		} else if (Objects.equals(commandId, "java.maven.controlContext")) {
+			return ArtifactSearcher.controlIndexerContext((boolean) arguments.get(0), monitor);
+		}
+		return null;
+	}
 
 }

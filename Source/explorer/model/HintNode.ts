@@ -5,18 +5,18 @@ import * as vscode from "vscode";
 import { ITreeItem } from "./ITreeItem";
 
 export class HintNode implements ITreeItem {
-    private _msg: string;
-    constructor(msg: string) {
-        this._msg = msg;
-    }
+	private _msg: string;
+	constructor(msg: string) {
+		this._msg = msg;
+	}
 
-    public getContextValue(): string {
-        return "maven:hint";
-    }
+	public getContextValue(): string {
+		return "maven:hint";
+	}
 
-    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
-        const treeItem: vscode.TreeItem = new vscode.TreeItem("");
-        treeItem.description = this._msg;
-        return treeItem;
-    }
+	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+		const treeItem: vscode.TreeItem = new vscode.TreeItem("");
+		treeItem.description = this._msg;
+		return treeItem;
+	}
 }

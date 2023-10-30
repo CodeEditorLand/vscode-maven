@@ -16,16 +16,16 @@ import org.osgi.framework.BundleContext;
 
 public class PluginActivator implements BundleActivator {
 
-    public static final String PLUGIN_ID = "com.microsoft.java.maven.plugin";
-    public static BundleContext context = null;
+	public static final String PLUGIN_ID = "com.microsoft.java.maven.plugin";
+	public static BundleContext context = null;
 
-    @Override
-    public void start(BundleContext context) throws Exception {
-        PluginActivator.context = context;
-    }
+	@Override
+	public void start(BundleContext context) throws Exception {
+		PluginActivator.context = context;
+	}
 
-    @Override
-    public void stop(BundleContext context) throws Exception {
-    }
+	@Override
+	public void stop(BundleContext context) throws Exception {
+	}
 
 }

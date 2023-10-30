@@ -9,23 +9,25 @@ import { FavoriteCommand } from "./FavoriteCommand";
 import { Settings } from "../../Settings";
 
 export class FavoritesMenu extends ProjectMenu implements ITreeItem {
+	constructor(project: MavenProject) {
+		super(project);
+		this.name = "Favorites";
+	}
 
-    constructor(project: MavenProject) {
-        super(project);
-        this.name = "Favorites";
-    }
+	public getContextValue(): string {
+		return "maven:favoritesMenu";
+	}
 
-    public getContextValue(): string {
-        return "maven:favoritesMenu";
-    }
+	public async getChildren(): Promise<FavoriteCommand[] | undefined> {
+		return Settings.Terminal.favorites(this.project);
+	}
 
-    public async getChildren(): Promise<FavoriteCommand[] | undefined> {
-        return Settings.Terminal.favorites(this.project);
-    }
-
-    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
-        const treeItem: vscode.TreeItem = new vscode.TreeItem(this.name, vscode.TreeItemCollapsibleState.Collapsed);
-        treeItem.iconPath = new vscode.ThemeIcon("star-empty");
-        return treeItem;
-    }
+	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+		const treeItem: vscode.TreeItem = new vscode.TreeItem(
+			this.name,
+			vscode.TreeItemCollapsibleState.Collapsed
+		);
+		treeItem.iconPath = new vscode.ThemeIcon("star-empty");
+		return treeItem;
+	}
 }

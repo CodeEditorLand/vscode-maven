@@ -7,18 +7,24 @@ import { ITreeItem } from "./ITreeItem";
 import { MavenProject } from "./MavenProject";
 
 export class FavoriteCommand implements ITreeItem {
+	constructor(
+		public project: MavenProject,
+		public command: string,
+		public alias: string,
+		public debug?: boolean
+	) {}
 
-    constructor(public project: MavenProject, public command: string, public alias: string, public debug?: boolean) {}
+	getContextValue(): string {
+		return "maven:favorites";
+	}
 
-    getContextValue(): string {
-        return "maven:favorites";
-    }
-
-    getTreeItem(): TreeItem | Thenable<TreeItem> {
-        const treeItem: vscode.TreeItem = new vscode.TreeItem(this.command, vscode.TreeItemCollapsibleState.None);
-        treeItem.description = this.alias;
-        treeItem.iconPath = new vscode.ThemeIcon("gear");
-        return treeItem;
-    }
-
+	getTreeItem(): TreeItem | Thenable<TreeItem> {
+		const treeItem: vscode.TreeItem = new vscode.TreeItem(
+			this.command,
+			vscode.TreeItemCollapsibleState.None
+		);
+		treeItem.description = this.alias;
+		treeItem.iconPath = new vscode.ThemeIcon("gear");
+		return treeItem;
+	}
 }
