@@ -8,17 +8,15 @@ import { ensureExtensionActivated } from "../shared";
 
 // tslint:disable: only-arrow-functions
 suite("Maven Project View Tests", () => {
-	suiteSetup(ensureExtensionActivated);
 
-	test("Can list maven projects", async () => {
-		const roots = await MavenExplorerProvider.getInstance().getChildren();
-		assert.equal(roots?.length, 1, "Number of root node should be 1");
+    suiteSetup(ensureExtensionActivated);
 
-		const projectNode = roots![0] as MavenProject;
-		assert.equal(
-			projectNode.name,
-			"my-app",
-			'Project name should be "my-app"'
-		);
-	});
+    test("Can list maven projects", async () => {
+        const roots = await MavenExplorerProvider.getInstance().getChildren();
+        assert.equal(roots?.length, 1, "Number of root node should be 1");
+
+        const projectNode = roots![0] as MavenProject;
+        assert.equal(projectNode.name, "my-app", "Project name should be \"my-app\"");
+    });
+
 });
