@@ -44,115 +44,115 @@ import java.util.Map;
 
 public class AddDependencyHandler {
 
-	public static class AddDependencyParams {
+    public static class AddDependencyParams {
 
-		final String fullClassName;
-		final String artifactInfo; // gid:aid:version
-		final String uri;
-		final int line;
-		final int character;
-		final int length;
+        final String fullClassName;
+        final String artifactInfo; // gid:aid:version
+        final String uri;
+        final int line;
+        final int character;
+        final int length;
 
-		public AddDependencyParams(String fullClassName, String artifactInfo,
-				String uri, int line, int character, int length) {
-			this.fullClassName = fullClassName;
-			this.artifactInfo = artifactInfo;
-			this.uri = uri;
-			this.line = line;
-			this.character = character;
-			this.length = length;
-		}
-	}
+        public AddDependencyParams(String fullClassName, String artifactInfo,
+                String uri, int line, int character, int length) {
+            this.fullClassName = fullClassName;
+            this.artifactInfo = artifactInfo;
+            this.uri = uri;
+            this.line = line;
+            this.character = character;
+            this.length = length;
+        }
+    }
 
-	private static WorkspaceEdit importEdit(AddDependencyParams params,
-			ICompilationUnit unit, CompilationUnit astRoot) throws CoreException {
-		// import the new class
-		final CompilationUnitChange cuChange = new CompilationUnitChange("", unit);
-		final ImportRewrite importRewrite = CodeStyleConfiguration.createImportRewrite(astRoot, true);
-		importRewrite.addImport(params.fullClassName);
-		cuChange.setEdit(importRewrite.rewriteImports(null));
-		return ChangeUtil.convertToWorkspaceEdit(cuChange);
-	}
+    private static WorkspaceEdit importEdit(AddDependencyParams params,
+            ICompilationUnit unit, CompilationUnit astRoot) throws CoreException {
+        // import the new class
+        final CompilationUnitChange cuChange = new CompilationUnitChange("", unit);
+        final ImportRewrite importRewrite = CodeStyleConfiguration.createImportRewrite(astRoot, true);
+        importRewrite.addImport(params.fullClassName);
+        cuChange.setEdit(importRewrite.rewriteImports(null));
+        return ChangeUtil.convertToWorkspaceEdit(cuChange);
+    }
 
-	private static WorkspaceEdit replaceEdit(AddDependencyParams params,
-			ICompilationUnit unit) throws JavaModelException {
-		// replace old class name with new one
-		final Map<String, List<TextEdit>> textEdits = new HashMap<>();
-		textEdits.put(unit.getCorrespondingResource().getLocationURI().toString(),
-				Arrays.asList(new TextEdit(new Range(new Position(params.line, params.character),
-						new Position(params.line, params.character + params.length)),
-						params.fullClassName.substring(params.fullClassName.lastIndexOf('.') + 1))));
-		return new WorkspaceEdit(textEdits);
-	}
+    private static WorkspaceEdit replaceEdit(AddDependencyParams params,
+            ICompilationUnit unit) throws JavaModelException {
+        // replace old class name with new one
+        final Map<String, List<TextEdit>> textEdits = new HashMap<>();
+        textEdits.put(unit.getCorrespondingResource().getLocationURI().toString(),
+                    Arrays.asList(new TextEdit(new Range(new Position(params.line, params.character),
+                    new Position(params.line, params.character + params.length)),
+                    params.fullClassName.substring(params.fullClassName.lastIndexOf('.') + 1))));
+        return new WorkspaceEdit(textEdits);
+    }
 
-	private static PosInfo getPosInfo(String pomPath, String targetDependency) {
-		PosInfo posInfo = null;
-		final SAXParserFactory factory = SAXParserFactory.newInstance();
-		try {
-			final SAXParser parser = factory.newSAXParser();
-			final XMLReader reader = parser.getXMLReader();
-			final GetPosHandler posHandler = new GetPosHandler();
-			posHandler.setTargetDependency(targetDependency);
-			reader.setContentHandler(posHandler);
-			reader.parse(pomPath);
-			posInfo = posHandler.getPosInfo();
-			return posInfo;
-		} catch (SAXException | IOException | ParserConfigurationException e) {
-			// there is no pom.xml, or fail to get parser
-			return null;
-		}
-	}
+    private static PosInfo getPosInfo(String pomPath, String targetDependency) {
+        PosInfo posInfo = null;
+        final SAXParserFactory factory = SAXParserFactory.newInstance();
+        try {
+            final SAXParser parser = factory.newSAXParser();
+            final XMLReader reader = parser.getXMLReader();
+            final GetPosHandler posHandler = new GetPosHandler();
+            posHandler.setTargetDependency(targetDependency);
+            reader.setContentHandler(posHandler);
+            reader.parse(pomPath);
+            posInfo = posHandler.getPosInfo();
+            return posInfo;
+        } catch (SAXException | IOException | ParserConfigurationException e) {
+            // there is no pom.xml, or fail to get parser
+            return null;
+        }
+    }
 
-	private static WorkspaceEdit pomEdit(AddDependencyParams params,
-			ICompilationUnit unit) throws JavaModelException {
-		final IPath path = unit.getJavaProject().getCorrespondingResource().getLocation().append("pom.xml");
-		final String info[] = params.artifactInfo.replaceAll(" ", "").split(":");
-		if (info.length < 3) {
-			return new WorkspaceEdit();
-		}
-		final PosInfo posInfo = getPosInfo(path.toString(), info[0] + ":" + info[1]);
-		final String linesep = System.lineSeparator();
-		String newtext = "";
-		final String pomUriString = unit.getJavaProject().getCorrespondingResource()
-				.getLocationURI().toString() + "/pom.xml";
-		final Map<String, List<TextEdit>> textEdits = new HashMap<>();
+    private static WorkspaceEdit pomEdit(AddDependencyParams params,
+            ICompilationUnit unit) throws JavaModelException {
+        final IPath path = unit.getJavaProject().getCorrespondingResource().getLocation().append("pom.xml");
+        final String info[] = params.artifactInfo.replaceAll(" ", "").split(":");
+        if (info.length < 3) {
+            return new WorkspaceEdit();
+        }
+        final PosInfo posInfo = getPosInfo(path.toString(), info[0] + ":" + info[1]);
+        final String linesep = System.lineSeparator();
+        String newtext = "";
+        final String pomUriString = unit.getJavaProject().getCorrespondingResource()
+                .getLocationURI().toString() + "/pom.xml";
+        final Map<String, List<TextEdit>> textEdits = new HashMap<>();
 
-		if (posInfo != null) {
-			if (posInfo.needAddDependency == false) {
-				textEdits.put(pomUriString, new ArrayList<TextEdit>());
-			} else if (posInfo.alreadyHasDependencies == false) {
-				final int space = 2;
-				newtext = linesep + StringUtils.repeat(" ", space) + "<dependencies>" + linesep +
-						StringUtils.repeat(" ", space + 2) + "<dependency>" + linesep +
-						StringUtils.repeat(" ", space + 4) + "<groupId>" + info[0] + "</groupId>" +
-						linesep + StringUtils.repeat(" ", space + 4) + "<artifactId>" + info[1] +
-						"</artifactId>" + linesep + StringUtils.repeat(" ", space + 4) + "<version>" +
-						info[2] + "</version>" + linesep + StringUtils.repeat(" ", space + 2) + "</dependency>" +
-						linesep + StringUtils.repeat(" ", space) + "</dependencies>" + linesep;
-				textEdits.put(pomUriString,
-						Arrays.asList(new TextEdit(new Range(posInfo.pos, posInfo.pos), newtext)));
-			} else {
-				final int space = posInfo.pos.getCharacter();
-				newtext = linesep + StringUtils.repeat(" ", space + 2) + "<dependency>" + linesep +
-						StringUtils.repeat(" ", space + 4) + "<groupId>" + info[0] + "</groupId>" + linesep +
-						StringUtils.repeat(" ", space + 4) + "<artifactId>" + info[1] + "</artifactId>" +
-						linesep + StringUtils.repeat(" ", space + 4) + "<version>" + info[2] + "</version>" +
-						linesep + StringUtils.repeat(" ", space + 2) + "</dependency>" + linesep +
-						StringUtils.repeat(" ", space);
-				textEdits.put(pomUriString,
-						Arrays.asList(new TextEdit(new Range(posInfo.pos, posInfo.pos), newtext)));
-			}
-			return new WorkspaceEdit(textEdits);
-		} else {
-			return new WorkspaceEdit();
-		}
-	}
+        if (posInfo != null) {
+            if (posInfo.needAddDependency == false) {
+                textEdits.put(pomUriString, new ArrayList<TextEdit>());
+            } else if (posInfo.alreadyHasDependencies == false) {
+                final int space = 2;
+                newtext = linesep + StringUtils.repeat(" ", space) + "<dependencies>" + linesep +
+                        StringUtils.repeat(" ", space + 2) + "<dependency>" + linesep +
+                        StringUtils.repeat(" ", space + 4) + "<groupId>" + info[0] + "</groupId>" +
+                        linesep + StringUtils.repeat(" ", space + 4) + "<artifactId>" + info[1] +
+                        "</artifactId>" + linesep + StringUtils.repeat(" ", space + 4) + "<version>" +
+                        info[2] + "</version>" + linesep + StringUtils.repeat(" ", space + 2) + "</dependency>" +
+                        linesep + StringUtils.repeat(" ", space) + "</dependencies>" + linesep;
+                textEdits.put(pomUriString,
+                    Arrays.asList(new TextEdit(new Range(posInfo.pos, posInfo.pos), newtext)));
+            } else {
+                final int space = posInfo.pos.getCharacter();
+                newtext = linesep + StringUtils.repeat(" ", space + 2) + "<dependency>" + linesep +
+                    StringUtils.repeat(" ", space + 4) + "<groupId>" + info[0] + "</groupId>" + linesep +
+                    StringUtils.repeat(" ", space + 4) + "<artifactId>" + info[1] + "</artifactId>" +
+                    linesep + StringUtils.repeat(" ", space + 4) + "<version>" + info[2] + "</version>" +
+                    linesep + StringUtils.repeat(" ", space + 2) + "</dependency>" + linesep +
+                    StringUtils.repeat(" ", space);
+                textEdits.put(pomUriString,
+                    Arrays.asList(new TextEdit(new Range(posInfo.pos, posInfo.pos), newtext)));
+            }
+            return new WorkspaceEdit(textEdits);
+        } else {
+            return new WorkspaceEdit();
+        }
+    }
 
-	public static List<WorkspaceEdit> addDependency(AddDependencyParams params,
-			IProgressMonitor monitor) throws CoreException, JavaModelException {
-		final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(params.uri);
-		final CompilationUnit astRoot = ASTResolving.createQuickFixAST(unit, null);
-		return Arrays.asList(replaceEdit(params, unit), importEdit(params, unit, astRoot),
-				pomEdit(params, unit));
-	}
+    public static List<WorkspaceEdit> addDependency(AddDependencyParams params,
+            IProgressMonitor monitor) throws CoreException, JavaModelException {
+        final ICompilationUnit unit = JDTUtils.resolveCompilationUnit(params.uri);
+        final CompilationUnit astRoot = ASTResolving.createQuickFixAST(unit, null);
+        return Arrays.asList(replaceEdit(params, unit), importEdit(params, unit, astRoot),
+                            pomEdit(params, unit));
+    }
 }

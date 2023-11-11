@@ -13,92 +13,93 @@ package com.microsoft.java.maven;
 
 public class ArtifactResult {
 
-	private String groupId;
+    private String groupId;
 
-	private String artifactId;
+    private String artifactId;
 
-	private String version;
+    private String version;
 
-	private String className;
+    private String className;
 
-	private String fullClassName;
+    private String fullClassName;
 
-	private int usage;
+    private int usage;
 
-	private int kind;
+    private int kind;
 
-	public static final int PREFIX = 1;
-	public static final int FUZZY = 2;
+    public static final int PREFIX = 1;
+    public static final int FUZZY = 2;
 
-	public ArtifactResult(String groupId, String artifactId, String version, String className,
-			String fullClassName, int usage, int kind) {
-		this.setGroupId(groupId);
-		this.setArtifactId(artifactId);
-		this.setVersion(version);
-		this.setClassName(className);
-		this.setFullClassName(fullClassName);
-		this.setUsage(usage);
-		this.setKind(kind);
-	}
+    public ArtifactResult(String groupId, String artifactId, String version, String className,
+        String fullClassName, int usage, int kind) {
+        this.setGroupId(groupId);
+        this.setArtifactId(artifactId);
+        this.setVersion(version);
+        this.setClassName(className);
+        this.setFullClassName(fullClassName);
+        this.setUsage(usage);
+        this.setKind(kind);
+    }
 
-	public String getFullClassName() {
-		return fullClassName;
-	}
+    public String getFullClassName() {
+        return fullClassName;
+    }
 
-	public void setFullClassName(String fullClassName) {
-		this.fullClassName = fullClassName;
-	}
+    public void setFullClassName(String fullClassName) {
+        this.fullClassName = fullClassName;
+    }
 
-	public String getClassName() {
-		return className;
-	}
+    public String getClassName() {
+        return className;
+    }
 
-	public void setClassName(String className) {
-		this.className = className;
-	}
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-	public String getVersion() {
-		return version;
-	}
+    public String getVersion() {
+        return version;
+    }
 
-	public void setVersion(String version) {
-		this.version = version;
-	}
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
-	public String getArtifactId() {
-		return artifactId;
-	}
+    public String getArtifactId() {
+        return artifactId;
+    }
 
-	public void setArtifactId(String artifactId) {
-		this.artifactId = artifactId;
-	}
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
 
-	public String getGroupId() {
-		return groupId;
-	}
+    public String getGroupId() {
+        return groupId;
+    }
 
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
-	public int getUsage() {
-		return usage;
-	}
+    public int getUsage() {
+        return usage;
+    }
 
-	public void setUsage(int usage) {
-		this.usage = usage;
-	}
+    public void setUsage(int usage) {
+        this.usage = usage;
+    }
 
-	public int getKind() {
-		return kind;
-	}
+    public int getKind() {
+        return kind;
+    }
 
-	public void setKind(int kind) {
-		this.kind = kind;
-	}
+    public void setKind(int kind) {
+        this.kind = kind;
+    }
 
-	@Override
-	public String toString() {
-		return groupId + ":" + artifactId + ":" + version + ":" + className + ":" + fullClassName;
-	}
+    @Override
+    public String toString() {
+        return groupId + ":" + artifactId + ":" + version + ":" + className + ":" + fullClassName;
+    }
 }
+

@@ -9,27 +9,24 @@ import { MavenProject } from "./MavenProject";
 import { ProjectMenu } from "./Menu";
 
 export class PluginsMenu extends ProjectMenu implements ITreeItem {
-	constructor(project: MavenProject) {
-		super(project);
-		this.name = "Plugins";
-	}
+    constructor(project: MavenProject) {
+        super(project);
+        this.name = "Plugins";
+    }
 
-	public async getChildren(): Promise<MavenPlugin[]> {
-		await this.project.getEffectivePom();
-		return this.project.plugins;
-	}
+    public async getChildren() : Promise<MavenPlugin[]> {
+        await this.project.getEffectivePom();
+        return this.project.plugins;
+    }
 
-	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
-		const treeItem: vscode.TreeItem = new vscode.TreeItem(
-			this.name,
-			vscode.TreeItemCollapsibleState.Collapsed
-		);
-		treeItem.iconPath = new vscode.ThemeIcon("extensions");
-		return treeItem;
-	}
+    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+        const treeItem: vscode.TreeItem = new vscode.TreeItem(this.name, vscode.TreeItemCollapsibleState.Collapsed);
+        treeItem.iconPath = new vscode.ThemeIcon("extensions");
+        return treeItem;
+    }
 
-	public async refresh(): Promise<void> {
-		this.project.refreshEffectivePom().catch(console.error);
-		MavenExplorerProvider.getInstance().refresh(this);
-	}
+    public async refresh(): Promise<void> {
+        this.project.refreshEffectivePom().catch(console.error);
+        MavenExplorerProvider.getInstance().refresh(this);
+    }
 }

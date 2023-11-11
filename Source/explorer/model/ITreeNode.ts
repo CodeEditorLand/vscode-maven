@@ -2,9 +2,10 @@
 // Licensed under the MIT license.
 
 export interface ITreeNode {
-	children: ITreeNode[];
-	parent?: ITreeNode | undefined;
-	root?: ITreeNode | undefined;
+    children: ITreeNode[];
+    parent?: ITreeNode | undefined;
+    root?: ITreeNode | undefined;
 
-	addChild(node: ITreeNode): void;
+    addChild(node: ITreeNode): void;
+
 }

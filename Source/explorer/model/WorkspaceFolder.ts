@@ -12,46 +12,42 @@ import { MavenProject } from "./MavenProject";
 const CONTEXT_VALUE = "maven:workspaceFolder";
 
 export class WorkspaceFolder implements ITreeItem {
-	constructor(public workspaceFolder: vscode.WorkspaceFolder) {}
+    constructor(
+        public workspaceFolder: vscode.WorkspaceFolder,
+    ) { }
 
-	public getContextValue(): string {
-		return CONTEXT_VALUE;
-	}
+    public getContextValue(): string {
+        return CONTEXT_VALUE;
+    }
 
-	public async getChildren(): Promise<ITreeItem[]> {
-		const ret: ITreeItem[] = [];
-		const allProjects: MavenProject[] =
-			await MavenProjectManager.loadProjects(this.workspaceFolder);
-		if (allProjects.length === 0) {
-			return [new HintNode("No Maven project found.")];
-		}
+    public async getChildren(): Promise<ITreeItem[]> {
+        const ret: ITreeItem[] = [];
+        const allProjects: MavenProject[] = await MavenProjectManager.loadProjects(this.workspaceFolder);
+        if (allProjects.length === 0) {
+            return [new HintNode("No Maven project found.")];
+        }
 
-		switch (Settings.viewType()) {
-			case "hierarchical": {
-				ret.push(
-					...this.sortByName(allProjects.filter((m) => !m.parent))
-				);
-				break;
-			}
-			case "flat": {
-				ret.push(...this.sortByName(allProjects));
-				break;
-			}
-			default:
-		}
-		return ret;
-	}
+        switch (Settings.viewType()) {
+            case "hierarchical":{
+                ret.push(...this.sortByName(allProjects.filter(m => !m.parent)));
+                break;
+            }
+            case "flat": {
+                ret.push(...this.sortByName(allProjects));
+                break;
+            }
+            default:
+        }
+        return ret;
+    }
 
-	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
-		return new vscode.TreeItem(
-			this.workspaceFolder.name,
-			TreeItemCollapsibleState.Expanded
-		);
-	}
+    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+        return new vscode.TreeItem(this.workspaceFolder.name, TreeItemCollapsibleState.Expanded);
+    }
 
-	private sortByName(arr: MavenProject[]): MavenProject[] {
-		return arr.sort((a, b) => {
-			return a.name > b.name ? 1 : a.name < b.name ? -1 : 0;
-		});
-	}
+    private sortByName(arr: MavenProject[]): MavenProject[] {
+        return arr.sort((a, b) => {
+            return a.name > b.name ? 1 : a.name < b.name ? -1 : 0;
+        });
+    }
 }

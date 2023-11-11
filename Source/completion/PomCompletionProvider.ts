@@ -12,52 +12,36 @@ import { SchemaProvider } from "./providers/SchemaProvider";
 import { SnippetProvider } from "./providers/SnippetProvider";
 
 export class PomCompletionProvider implements vscode.CompletionItemProvider {
-	private providers: IXmlCompletionProvider[];
 
-	constructor() {
-		const providers = [
-			new SnippetProvider(),
-			new ArtifactProvider(),
-			new PropertiesProvider(),
-		];
+    private providers: IXmlCompletionProvider[];
 
-		if (!isXmlExtensionEnabled()) {
-			providers.push(new SchemaProvider());
-		}
+    constructor() {
+        const providers = [
+            new SnippetProvider(),
+            new ArtifactProvider(),
+            new PropertiesProvider(),
+        ];
 
-		this.providers = providers;
-	}
+        if (!isXmlExtensionEnabled()) {
+            providers.push(new SchemaProvider());
+        }
 
-	async provideCompletionItems(
-		document: vscode.TextDocument,
-		position: vscode.Position,
-		_token: vscode.CancellationToken,
-		_context: vscode.CompletionContext
-	): Promise<
-		| vscode.CompletionItem[]
-		| vscode.CompletionList<vscode.CompletionItem>
-		| undefined
-	> {
-		const documentText: string = document.getText();
-		const cursorOffset: number = document.offsetAt(position);
-		const currentNode: Node | undefined = getCurrentNode(
-			documentText,
-			cursorOffset
-		);
-		if (
-			currentNode === undefined ||
-			currentNode.startIndex === null ||
-			currentNode.endIndex === null
-		) {
-			return undefined;
-		}
+        this.providers = providers;
 
-		const ret = [];
-		for (const provider of this.providers) {
-			ret.push(
-				...(await provider.provide(document, position, currentNode))
-			);
-		}
-		return ret;
-	}
+    }
+
+    async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem> | undefined> {
+        const documentText: string = document.getText();
+        const cursorOffset: number = document.offsetAt(position);
+        const currentNode: Node | undefined = getCurrentNode(documentText, cursorOffset);
+        if (currentNode === undefined || currentNode.startIndex === null || currentNode.endIndex === null) {
+            return undefined;
+        }
+
+        const ret = [];
+        for (const provider of this.providers) {
+            ret.push(...await provider.provide(document, position, currentNode));
+        }
+        return ret;
+    }
 }

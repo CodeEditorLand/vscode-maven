@@ -15,51 +15,45 @@ import { Utils } from "./utils/Utils";
  * vscode-maven:///<pom-path-in-local-maven-repository>
  */
 class MavenContentProvider implements vscode.TextDocumentContentProvider {
-	public readonly onDidChange: vscode.Event<vscode.Uri>;
-	private _onDidChangeEmitter: vscode.EventEmitter<vscode.Uri>;
 
-	constructor() {
-		this._onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
-		this.onDidChange = this._onDidChangeEmitter.event;
-	}
+    public readonly onDidChange: vscode.Event<vscode.Uri>;
+    private _onDidChangeEmitter: vscode.EventEmitter<vscode.Uri>;
 
-	public invalidate(uri: vscode.Uri): void {
-		this._onDidChangeEmitter.fire(uri);
-	}
+    constructor() {
+        this._onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
+        this.onDidChange = this._onDidChangeEmitter.event;
+    }
 
-	public async provideTextDocumentContent(
-		uri: vscode.Uri,
-		_token: vscode.CancellationToken
-	): Promise<string | undefined> {
-		if (uri.scheme !== "vscode-maven") {
-			throw new Error(
-				`Scheme ${uri.scheme} not supported by this content provider.`
-			);
-		}
+    public invalidate(uri: vscode.Uri): void {
+        this._onDidChangeEmitter.fire(uri);
+    }
 
-		const pomPath = uri.query;
-		switch (uri.authority) {
-			case "dependencies":
-				return getDependencyTree(pomPath);
-			case "effective-pom": {
-				const project: MavenProject | undefined =
-					MavenProjectManager.get(pomPath);
-				if (project) {
-					const effectivePom: IEffectivePom =
-						await project.getEffectivePom();
-					return effectivePom.ePomString;
-				} else {
-					return Utils.getEffectivePom(pomPath);
-				}
-			}
-			case "local-repository": {
-				const fsUri = uri.with({ scheme: "file", authority: "" });
-				return (await vscode.workspace.fs.readFile(fsUri)).toString();
-			}
-			default:
-		}
-		return undefined;
-	}
+    public async provideTextDocumentContent(uri: vscode.Uri, _token: vscode.CancellationToken): Promise<string | undefined> {
+        if (uri.scheme !== "vscode-maven") {
+            throw new Error(`Scheme ${uri.scheme} not supported by this content provider.`);
+        }
+
+        const pomPath = uri.query;
+        switch (uri.authority) {
+            case "dependencies":
+                return getDependencyTree(pomPath);
+            case "effective-pom": {
+                const project: MavenProject | undefined = MavenProjectManager.get(pomPath);
+                if (project) {
+                    const effectivePom: IEffectivePom = await project.getEffectivePom();
+                    return effectivePom.ePomString;
+                } else {
+                    return Utils.getEffectivePom(pomPath);
+                }
+            }
+            case "local-repository":{
+                const fsUri = uri.with({ scheme: "file", authority: "" });
+                return (await vscode.workspace.fs.readFile(fsUri)).toString();
+            }
+            default:
+        }
+        return undefined;
+    }
 }
 
 export const contentProvider: MavenContentProvider = new MavenContentProvider();

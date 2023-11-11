@@ -10,71 +10,62 @@ import { EOL } from "os";
 let schema: unknown;
 
 export async function init() {
-	const XSD_FILE_PATH = getPathToExtensionRoot(
-		"resources",
-		"maven-4.0.0.xsd.json"
-	);
-	try {
-		schema = await fse.readJson(XSD_FILE_PATH);
-	} catch (error) {
-		console.error(`failed to parse ${XSD_FILE_PATH}`, error);
-	}
+    const XSD_FILE_PATH = getPathToExtensionRoot("resources", "maven-4.0.0.xsd.json");
+    try {
+        schema = await fse.readJson(XSD_FILE_PATH);
+    } catch (error) {
+        console.error(`failed to parse ${XSD_FILE_PATH}`, error);
+    }
 }
 
 export function getXsdElement(nodePath: string) {
-	if (schema) {
-		const obj = _.get(schema, nodePath);
-		return new XSDElement(obj, nodePath);
-	}
-	return undefined;
+    if (schema) {
+        const obj = _.get(schema, nodePath);
+        return new XSDElement(obj, nodePath);
+    }
+    return undefined;
 }
 
 export class XSDElement {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	constructor(
-		private definitionObject: { [key: string]: any },
-		public nodePath: string
-	) {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(private definitionObject: { [key: string]: any }, public nodePath: string) { }
 
-	public get name(): string {
-		const start = this.nodePath.lastIndexOf(".") + 1;
-		return this.nodePath.slice(start);
-	}
+    public get name() : string {
+        const start = this.nodePath.lastIndexOf(".") + 1;
+        return this.nodePath.slice(start);
+    }
 
-	public get documentation(): { version?: string; description?: string } {
-		return this.definitionObject["$documentation"];
-	}
+    public get documentation(): { version?: string; description?: string } {
+        return this.definitionObject["$documentation"];
+    }
 
-	public get isLeaf(): boolean {
-		return this.definitionObject["$type"]?.startsWith("xs:");
-	}
+    public get isLeaf() : boolean {
+        return this.definitionObject["$type"]?.startsWith("xs:");
+    }
 
-	public get isDeprecated(): boolean {
-		return this.definitionObject["$deprecated"] === true;
-	}
+    public get isDeprecated() : boolean {
+        return this.definitionObject["$deprecated"] === true;
+    }
 
-	public get candidates(): XSDElement[] {
-		const children = Object.entries(this.definitionObject).filter(
-			(entry) => !entry[0].startsWith("$")
-		);
-		return children.map(
-			(c) => new XSDElement(c[1], `${this.nodePath}.${c[0]}`)
-		);
-	}
+    public get candidates(): XSDElement[] {
+        const children = Object.entries(this.definitionObject).filter(entry => !entry[0].startsWith("$"));
+        return children.map(c => new XSDElement(c[1], `${this.nodePath}.${c[0]}`));
+    }
 
-	public get markdownString(): MarkdownString {
-		const { version, description } = this.documentation;
-		let content = "";
-		if (description) {
-			content += description;
-		}
-		if (version) {
-			content += EOL + EOL;
-			content += `Version: ${version}`;
-		}
 
-		const mdString = new MarkdownString(content);
-		mdString.supportHtml = true;
-		return mdString;
-	}
+    public get markdownString() : MarkdownString {
+        const {version, description } = this.documentation;
+        let content = "";
+        if (description) {
+            content += description;
+        }
+        if (version) {
+            content += EOL + EOL;
+            content += `Version: ${version}`
+        }
+
+        const mdString = new MarkdownString(content);
+        mdString.supportHtml = true;
+        return mdString;
+    }
 }

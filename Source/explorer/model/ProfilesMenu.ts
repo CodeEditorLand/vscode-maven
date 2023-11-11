@@ -7,23 +7,23 @@ import { MavenProject } from "./MavenProject";
 import { ProjectMenu } from "./Menu";
 
 export class ProfilesMenu extends ProjectMenu implements ITreeItem {
-	constructor(project: MavenProject) {
-		super(project);
-		this.name = "Profiles";
-	}
+    constructor(project: MavenProject) {
+        super(project);
+        this.name = "Profiles";
+    }
 
-	public getContextValue(): string {
-		return "maven:profilesMenu";
-	}
+    public getContextValue(): string {
+        return "maven:profilesMenu";
+    }
 
-	public async getChildren(): Promise<MavenProfile[]> {
-		if (this.project.profiles === undefined) {
-			await this.project.refreshProfiles();
-		}
-		return this.project.profiles;
-	}
+    public async getChildren() : Promise<MavenProfile[]> {
+        if (this.project.profiles === undefined) {
+            await this.project.refreshProfiles();
+        }
+        return this.project.profiles;
+    }
 
-	public async refresh(): Promise<void> {
-		await this.project.refreshProfiles();
-	}
+    public async refresh(): Promise<void> {
+        await this.project.refreshProfiles();
+    }
 }

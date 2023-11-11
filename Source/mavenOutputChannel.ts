@@ -4,32 +4,28 @@
 import * as vscode from "vscode";
 
 class MavenOutputChannel implements vscode.Disposable {
-	private readonly channel: vscode.OutputChannel =
-		vscode.window.createOutputChannel("Maven for Java");
+    private readonly channel: vscode.OutputChannel = vscode.window.createOutputChannel("Maven for Java");
 
-	public appendLine(message: string, title?: string): void {
-		if (title) {
-			const simplifiedTime: string = new Date()
-				.toISOString()
-				.replace(/z|t/gi, " ")
-				.trim(); // YYYY-MM-DD HH:mm:ss.sss
-			const highlightingTitle = `[${title} ${simplifiedTime}]`;
-			this.channel.appendLine(highlightingTitle);
-		}
-		this.channel.appendLine(message);
-	}
+    public appendLine(message: string, title?: string): void {
+        if (title) {
+            const simplifiedTime: string = (new Date()).toISOString().replace(/z|t/gi, " ").trim(); // YYYY-MM-DD HH:mm:ss.sss
+            const highlightingTitle = `[${title} ${simplifiedTime}]`;
+            this.channel.appendLine(highlightingTitle);
+        }
+        this.channel.appendLine(message);
+    }
 
-	public append(message: string): void {
-		this.channel.append(message);
-	}
+    public append(message: string): void {
+        this.channel.append(message);
+    }
 
-	public show(): void {
-		this.channel.show();
-	}
+    public show(): void {
+        this.channel.show();
+    }
 
-	public dispose(): void {
-		this.channel.dispose();
-	}
+    public dispose(): void {
+        this.channel.dispose();
+    }
 }
 
 export const mavenOutputChannel: MavenOutputChannel = new MavenOutputChannel();

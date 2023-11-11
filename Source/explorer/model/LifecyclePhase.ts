@@ -6,21 +6,16 @@ import { ITreeItem } from "./ITreeItem";
 import { MavenProject } from "./MavenProject";
 
 export class LifecyclePhase implements ITreeItem {
-	constructor(
-		public project: MavenProject,
-		public phase: string
-	) {}
 
-	public getContextValue(): string {
-		return "maven:lifecycle";
-	}
+    constructor(public project: MavenProject, public phase: string) {}
 
-	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
-		const treeItem: vscode.TreeItem = new vscode.TreeItem(
-			this.phase,
-			vscode.TreeItemCollapsibleState.None
-		);
-		treeItem.iconPath = new vscode.ThemeIcon("gear");
-		return treeItem;
-	}
+    public getContextValue(): string {
+        return "maven:lifecycle";
+    }
+
+    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+        const treeItem: vscode.TreeItem = new vscode.TreeItem(this.phase, vscode.TreeItemCollapsibleState.None);
+        treeItem.iconPath = new vscode.ThemeIcon("gear");
+        return treeItem;
+    }
 }
