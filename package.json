@@ -1,36 +1,25 @@
 {
-	"name": "vscode-maven",
-	"displayName": "Maven for Java",
-	"version": "0.0.1",
-	"private": false,
-	"description": "%description%",
-	"keywords": [
-		"land"
+	"activationEvents": [
+		"workspaceContains:**/pom.xml"
 	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandMaven#readme",
+	"aiKey": "7c4292ac-8ca8-4e02-9f1c-0b73e1eeeca4",
+	"author": {
+		"email": "Land@PlayForm.Cloud",
+		"name": "🌆 — Land —",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
 	"bugs": {
 		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandMaven/issues"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandMaven.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🌆 — Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
-	"main": "./dist/extension",
-	"scripts": {
-		"Document": "Document 'Source/**/*.ts'",
-		"build-plugin": "node scripts/build-jdtls-ext.js",
-		"compile": "tsc -p ./",
-		"prepublishOnly": "Build 'Source/**/*.ts'",
-		"update-tpn": "node scripts/update-third-party-notice.js",
-		"update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js",
-		"webpack": "webpack --mode development"
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"restrictedConfigurations": [
+				"maven.executable.options",
+				"maven.terminal.customEnv"
+			],
+			"supported": "limited"
+		},
+		"virtualWorkspaces": false
 	},
 	"contributes": {
 		"commands": [
@@ -790,9 +779,6 @@
 			}
 		]
 	},
-	"activationEvents": [
-		"workspaceContains:**/pom.xml"
-	],
 	"dependencies": {
 		"domhandler": "5.0.3",
 		"expand-home-dir": "0.0.3",
@@ -809,6 +795,7 @@
 		"which": "4.0.0",
 		"xml2js": "0.6.2"
 	},
+	"description": "%description%",
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
@@ -825,21 +812,34 @@
 		"glob": "10.3.12",
 		"ts-loader": "9.5.1"
 	},
+	"displayName": "Maven for Java",
+	"enabledApiProposals": [],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandMaven#readme",
+	"icon": "resources/logo.png",
+	"keywords": [
+		"land"
+	],
+	"license": "SEE LICENSE IN LICENSE",
+	"main": "./dist/extension",
+	"name": "vscode-maven",
+	"preview": false,
+	"private": false,
 	"publishConfig": {
 		"access": "public"
 	},
-	"icon": "resources/logo.png",
-	"preview": false,
-	"aiKey": "7c4292ac-8ca8-4e02-9f1c-0b73e1eeeca4",
-	"capabilities": {
-		"untrustedWorkspaces": {
-			"restrictedConfigurations": [
-				"maven.executable.options",
-				"maven.terminal.customEnv"
-			],
-			"supported": "limited"
-		},
-		"virtualWorkspaces": false
+	"repository": {
+		"type": "git",
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandMaven.git"
 	},
-	"enabledApiProposals": []
+	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
+		"build-plugin": "node scripts/build-jdtls-ext.js",
+		"compile": "tsc -p ./",
+		"prepublishOnly": "Build 'Source/**/*.ts'",
+		"update-tpn": "node scripts/update-third-party-notice.js",
+		"update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js",
+		"webpack": "webpack --mode development"
+	},
+	"type": "module",
+	"version": "0.0.1"
 }
