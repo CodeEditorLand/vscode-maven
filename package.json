@@ -1,27 +1,7 @@
 {
 	"name": "vscode-maven",
 	"displayName": "Maven for Java",
-	"version": "0.0.1",
-	"private": false,
 	"description": "%description%",
-	"keywords": [
-		"land"
-	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandMaven#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandMaven/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandMaven.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🛬 Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
 	"main": "./dist/extension",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
@@ -811,7 +791,6 @@
 	},
 	"devDependencies": {
 		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
 		"@types/fs-extra": "11.0.4",
 		"@types/glob": "8.1.0",
 		"@types/lodash": "4.17.1",
@@ -824,9 +803,6 @@
 		"@types/xml2js": "0.4.14",
 		"glob": "10.3.12",
 		"ts-loader": "9.5.1"
-	},
-	"publishConfig": {
-		"access": "public"
 	},
 	"icon": "resources/logo.png",
 	"preview": false,
