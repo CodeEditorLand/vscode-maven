@@ -22,7 +22,7 @@ function generateMavenDef() {
     return schema;
 }
 exports.generateMavenDef = generateMavenDef;
-var Documentation =  (function () {
+var Documentation = /** @class */ (function () {
     function Documentation(version, description) {
         this.version = version;
         this.description = description;
