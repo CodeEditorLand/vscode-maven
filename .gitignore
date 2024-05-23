@@ -1,10 +1,8 @@
 out
 .vscode-test/
 *.vsix
-yarn.lock
 *.log
 .gradle/
-.DS_Store
 .test
 dist
 server
