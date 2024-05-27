@@ -1,8 +1,11 @@
 out
+node_modules
 .vscode-test/
 *.vsix
+yarn.lock
 *.log
 .gradle/
+.DS_Store
 .test
 dist
 server
