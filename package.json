@@ -782,7 +782,7 @@
 		"lodash": "4.17.21",
 		"lru-cache": "10.2.2",
 		"md5": "2.3.0",
-		"minimatch": "9.0.4",
+		"minimatch": "9.0.5",
 		"semver": "7.6.2",
 		"which": "4.0.0",
 		"xml2js": "0.6.2"
@@ -790,11 +790,11 @@
 	"devDependencies": {
 		"@types/fs-extra": "11.0.4",
 		"@types/glob": "8.1.0",
-		"@types/lodash": "4.17.5",
+		"@types/lodash": "4.17.6",
 		"@types/lru-cache": "7.10.9",
 		"@types/md5": "2.3.5",
 		"@types/minimatch": "5.1.2",
-		"@types/node": "20.14.8",
+		"@types/node": "20.14.9",
 		"@types/semver": "7.5.8",
 		"@types/which": "3.0.4",
 		"@types/xml2js": "0.4.14",
