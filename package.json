@@ -780,7 +780,7 @@
 		"htmlparser2": "9.1.0",
 		"jszip": "3.10.1",
 		"lodash": "4.17.21",
-		"lru-cache": "10.2.2",
+		"lru-cache": "10.3.0",
 		"md5": "2.3.0",
 		"minimatch": "9.0.5",
 		"semver": "7.6.2",
