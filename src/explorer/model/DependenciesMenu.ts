@@ -1,0 +1,63 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+import * as vscode from "vscode";
+import { diagnosticProvider } from "../../DiagnosticProvider";
+import { parseRawDependencyDataHandler } from "../../handlers/parseRawDependencyDataHandler";
+import { getPathToExtensionRoot } from "../../utils/contextUtils";
+import { MavenExplorerProvider } from "../MavenExplorerProvider";
+import { Dependency } from "./Dependency";
+import { HintNode } from "./HintNode";
+import { ITreeItem } from "./ITreeItem";
+import { MavenProject } from "./MavenProject";
+import { ProjectMenu } from "./Menu";
+
+export class DependenciesMenu extends ProjectMenu implements ITreeItem {
+    constructor(project: MavenProject) {
+        super(project);
+        this.name = "Dependencies";
+    }
+
+    public getContextValue(): string {
+        return "maven:dependenciesMenu";
+    }
+
+    public async getChildren() : Promise<Dependency[] | HintNode[]> {
+        const treeNodes = await parseRawDependencyDataHandler(this.project);
+        await diagnosticProvider.refreshDiagnostics(vscode.Uri.file(this.project.pomPath));
+        if (treeNodes.length === 0) {
+            const hintNodes: HintNode[] = [new HintNode("No dependencies")];
+            return Promise.resolve(hintNodes);
+        } else {
+            return Promise.resolve(treeNodes);
+        }
+    }
+
+    public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+        const treeItem: vscode.TreeItem = new vscode.TreeItem(this.name, vscode.TreeItemCollapsibleState.Collapsed);
+        const uri: vscode.Uri = vscode.Uri.file("");
+        treeItem.resourceUri = uri.with({authority: this.project.pomPath}); // distinguish dependenciesMenu in multi-module project
+        treeItem.tooltip = this.name;
+        // TODO: switch to codicon folder-library after vscode's next release in early Sept.
+        const iconFile = "library-folder.svg";
+        treeItem.iconPath = {
+            light: getPathToExtensionRoot("resources", "icons", "light", iconFile),
+            dark: getPathToExtensionRoot("resources", "icons", "dark", iconFile)
+        };
+        return treeItem;
+    }
+
+    public refresh(): void {
+        this._savePom();
+        MavenExplorerProvider.getInstance().refresh(this);
+    }
+
+    private _savePom(): void {
+        const pomUri: vscode.Uri = vscode.Uri.file(this.project.pomPath);
+        const textEditor: vscode.TextEditor | undefined = vscode.window.visibleTextEditors.find(editor =>
+            editor.document.uri.toString() === pomUri.toString());
+        if (textEditor !== undefined) {
+            textEditor.document.save();
+        }
+    }
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
+    <delegateCommandHandler class="com.microsoft.java.maven.handler.DelegateCommandHandler">
+      <command id="java.maven.initializeSearcher"/>
+      <command id="java.maven.searchArtifact"/>
+      <command id="java.maven.addDependency"/>
+      <command id="java.maven.controlContext"/>
+    </delegateCommandHandler>
+  </extension>
+</plugin>
