@@ -10,6 +10,7 @@ yarn.lock
 dist
 server
 
+# prevents updating maven indexer files
 resources/IndexData/index/*.cfe
 resources/IndexData/index/*.cfs
 resources/IndexData/index/*.si
