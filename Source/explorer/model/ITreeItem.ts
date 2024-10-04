@@ -4,16 +4,16 @@
 import * as vscode from "vscode";
 
 export interface ITreeItem {
-    getContextValue(): string;
-    getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem>;
+	getContextValue(): string;
+	getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem>;
 
-    /**
-     * If implemented, it will be triggered to get children items.
-     */
-    getChildren?(): ITreeItem[] | undefined | Promise<ITreeItem[] | undefined>;
+	/**
+	 * If implemented, it will be triggered to get children items.
+	 */
+	getChildren?(): ITreeItem[] | undefined | Promise<ITreeItem[] | undefined>;
 
-    /**
-     * If implemented, it will be triggered to refresh tree item.
-     */
-    refresh?(): void | Promise<void>;
+	/**
+	 * If implemented, it will be triggered to refresh tree item.
+	 */
+	refresh?(): void | Promise<void>;
 }

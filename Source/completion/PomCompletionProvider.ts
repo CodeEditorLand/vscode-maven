@@ -3,6 +3,7 @@
 
 import { Node } from "domhandler";
 import * as vscode from "vscode";
+
 import { isXmlExtensionEnabled } from "../utils/extensionUtils";
 import { getCurrentNode } from "../utils/lexerUtils";
 import { ArtifactProvider } from "./providers/ArtifactProvider";
@@ -12,36 +13,52 @@ import { SchemaProvider } from "./providers/SchemaProvider";
 import { SnippetProvider } from "./providers/SnippetProvider";
 
 export class PomCompletionProvider implements vscode.CompletionItemProvider {
+	private providers: IXmlCompletionProvider[];
 
-    private providers: IXmlCompletionProvider[];
+	constructor() {
+		const providers = [
+			new SnippetProvider(),
+			new ArtifactProvider(),
+			new PropertiesProvider(),
+		];
 
-    constructor() {
-        const providers = [
-            new SnippetProvider(),
-            new ArtifactProvider(),
-            new PropertiesProvider(),
-        ];
+		if (!isXmlExtensionEnabled()) {
+			providers.push(new SchemaProvider());
+		}
 
-        if (!isXmlExtensionEnabled()) {
-            providers.push(new SchemaProvider());
-        }
+		this.providers = providers;
+	}
 
-        this.providers = providers;
+	async provideCompletionItems(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		_token: vscode.CancellationToken,
+		_context: vscode.CompletionContext,
+	): Promise<
+		| vscode.CompletionItem[]
+		| vscode.CompletionList<vscode.CompletionItem>
+		| undefined
+	> {
+		const documentText: string = document.getText();
+		const cursorOffset: number = document.offsetAt(position);
+		const currentNode: Node | undefined = getCurrentNode(
+			documentText,
+			cursorOffset,
+		);
+		if (
+			currentNode === undefined ||
+			currentNode.startIndex === null ||
+			currentNode.endIndex === null
+		) {
+			return undefined;
+		}
 
-    }
-
-    async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem> | undefined> {
-        const documentText: string = document.getText();
-        const cursorOffset: number = document.offsetAt(position);
-        const currentNode: Node | undefined = getCurrentNode(documentText, cursorOffset);
-        if (currentNode === undefined || currentNode.startIndex === null || currentNode.endIndex === null) {
-            return undefined;
-        }
-
-        const ret = [];
-        for (const provider of this.providers) {
-            ret.push(...await provider.provide(document, position, currentNode));
-        }
-        return ret;
-    }
+		const ret = [];
+		for (const provider of this.providers) {
+			ret.push(
+				...(await provider.provide(document, position, currentNode)),
+			);
+		}
+		return ret;
+	}
 }

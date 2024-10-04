@@ -2,58 +2,67 @@
 // Licensed under the MIT license.
 
 import { Disposable, InputBox, QuickInputButtons, window } from "vscode";
-import { IProjectCreationMetadata, IProjectCreationStep, StepResult } from "./types";
+
+import {
+	IProjectCreationMetadata,
+	IProjectCreationStep,
+	StepResult,
+} from "./types";
 
 export class SpecifyArtifactIdStep implements IProjectCreationStep {
-    public previousStep?: IProjectCreationStep;
+	public previousStep?: IProjectCreationStep;
 
-    public async run(metadata: IProjectCreationMetadata): Promise<StepResult> {
-        const disposables: Disposable[] = [];
-        const quickInputPromise = new Promise<StepResult>((resolve) => {
-            const inputBox: InputBox = window.createInputBox();
-            inputBox.title = metadata.title;
-            inputBox.placeholder = "e.g. demo";
-            inputBox.prompt = metadata.parentProject ? "Input the module name." : "Input artifact Id (also as project name) of your project.";
-            inputBox.value = metadata.artifactId ?? "demo";
-            inputBox.ignoreFocusOut = true;
-            if (this.previousStep) {
-                inputBox.buttons = [(QuickInputButtons.Back)];
-                disposables.push(
-                    inputBox.onDidTriggerButton((item) => {
-                        if (item === QuickInputButtons.Back) {
-                            resolve(StepResult.PREVIOUS);
-                        }
-                    })
-                );
-            }
-            disposables.push(
-                inputBox.onDidChangeValue(() => {
-                    const validationMessage: string | undefined = this.artifactIdValidation(inputBox.value);
-                    inputBox.validationMessage = validationMessage;
-                }),
-                inputBox.onDidAccept(() => {
-                    if (!inputBox.validationMessage) {
-                        metadata.artifactId = inputBox.value;
-                        resolve(StepResult.NEXT);
-                    }
-                }),
-                inputBox.onDidHide(() => {
-                    resolve(StepResult.STOP);
-                })
-            );
-            disposables.push(inputBox);
-            inputBox.show();
-        });
+	public async run(metadata: IProjectCreationMetadata): Promise<StepResult> {
+		const disposables: Disposable[] = [];
+		const quickInputPromise = new Promise<StepResult>((resolve) => {
+			const inputBox: InputBox = window.createInputBox();
+			inputBox.title = metadata.title;
+			inputBox.placeholder = "e.g. demo";
+			inputBox.prompt = metadata.parentProject
+				? "Input the module name."
+				: "Input artifact Id (also as project name) of your project.";
+			inputBox.value = metadata.artifactId ?? "demo";
+			inputBox.ignoreFocusOut = true;
+			if (this.previousStep) {
+				inputBox.buttons = [QuickInputButtons.Back];
+				disposables.push(
+					inputBox.onDidTriggerButton((item) => {
+						if (item === QuickInputButtons.Back) {
+							resolve(StepResult.PREVIOUS);
+						}
+					}),
+				);
+			}
+			disposables.push(
+				inputBox.onDidChangeValue(() => {
+					const validationMessage: string | undefined =
+						this.artifactIdValidation(inputBox.value);
+					inputBox.validationMessage = validationMessage;
+				}),
+				inputBox.onDidAccept(() => {
+					if (!inputBox.validationMessage) {
+						metadata.artifactId = inputBox.value;
+						resolve(StepResult.NEXT);
+					}
+				}),
+				inputBox.onDidHide(() => {
+					resolve(StepResult.STOP);
+				}),
+			);
+			disposables.push(inputBox);
+			inputBox.show();
+		});
 
-        try {
-            return await quickInputPromise;
-        } finally {
-            disposables.forEach(d => d.dispose());
-        }
-    }
+		try {
+			return await quickInputPromise;
+		} finally {
+			disposables.forEach((d) => d.dispose());
+		}
+	}
 
-    private artifactIdValidation(value: string): string | undefined {
-        return (/^[a-z_][a-z0-9_]*(-[a-z_][a-z0-9_]*)*$/.test(value)) ? undefined : "Invalid Artifact Id";
-    }
-
+	private artifactIdValidation(value: string): string | undefined {
+		return /^[a-z_][a-z0-9_]*(-[a-z_][a-z0-9_]*)*$/.test(value)
+			? undefined
+			: "Invalid Artifact Id";
+	}
 }
