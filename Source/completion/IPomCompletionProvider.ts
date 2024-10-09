@@ -5,5 +5,9 @@ import { Node } from "domhandler";
 import * as vscode from "vscode";
 
 export interface IPomCompletionProvider {
-    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, currentNode: Node ): Promise<vscode.CompletionItem[] | vscode.CompletionList | undefined>;
+	provideCompletionItems(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		currentNode: Node,
+	): Promise<vscode.CompletionItem[] | vscode.CompletionList | undefined>;
 }

@@ -3,110 +3,130 @@
 
 import * as http from "http";
 import * as https from "https";
-import * as _ from "lodash";
 import * as path from "path";
 import * as url from "url";
+import * as _ from "lodash";
 
 const URL_MAVEN_SEARCH_API = "https://search.maven.org/solrsearch/select";
 const URL_MAVEN_CENTRAL_REPO = "https://repo1.maven.org/maven2/";
 const MAVEN_METADATA_FILENAME = "maven-metadata.xml";
 
 export interface IArtifactMetadata {
-    id: string;
-    g: string;
-    a: string;
-    latestVersion: string;
-    versionCount: number;
-    p: string;
+	id: string;
+	g: string;
+	a: string;
+	latestVersion: string;
+	versionCount: number;
+	p: string;
 }
 
 export interface IVersionMetadata {
-    id: string;
-    g: string;
-    a: string;
-    v: string;
-    timestamp: number;
+	id: string;
+	g: string;
+	a: string;
+	v: string;
+	timestamp: number;
 }
 
-export async function getArtifacts(keywords: string[]): Promise<IArtifactMetadata[]> {
-    // Remove short keywords
-    const validKeywords: string[] = keywords.filter(keyword => keyword.length >= 3);
-    if (validKeywords.length === 0) {
-        return [];
-    }
+export async function getArtifacts(
+	keywords: string[],
+): Promise<IArtifactMetadata[]> {
+	// Remove short keywords
+	const validKeywords: string[] = keywords.filter(
+		(keyword) => keyword.length >= 3,
+	);
+	if (validKeywords.length === 0) {
+		return [];
+	}
 
-    const params = {
-        q: validKeywords.join(" ").trim(),
-        rows: 50,
-        wt: "json"
-    };
-    const raw: string = await httpsGet(`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`);
-    try {
-        return _.get(JSON.parse(raw), "response.docs", []);
-    } catch (error) {
-        console.error(error);
-        return [];
-    }
+	const params = {
+		q: validKeywords.join(" ").trim(),
+		rows: 50,
+		wt: "json",
+	};
+	const raw: string = await httpsGet(
+		`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`,
+	);
+	try {
+		return _.get(JSON.parse(raw), "response.docs", []);
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
 }
 
-export async function getVersions(gid: string, aid: string): Promise<IVersionMetadata[]> {
-    const params = {
-        q: `g:"${gid}" AND a:"${aid}"`,
-        core: "gav",
-        rows: 50,
-        wt: "json"
-    };
-    const raw: string = await httpsGet(`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`);
-    try {
-        return _.get(JSON.parse(raw), "response.docs", []);
-    } catch (error) {
-        console.error(error);
-        return [];
-    }
+export async function getVersions(
+	gid: string,
+	aid: string,
+): Promise<IVersionMetadata[]> {
+	const params = {
+		q: `g:"${gid}" AND a:"${aid}"`,
+		core: "gav",
+		rows: 50,
+		wt: "json",
+	};
+	const raw: string = await httpsGet(
+		`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`,
+	);
+	try {
+		return _.get(JSON.parse(raw), "response.docs", []);
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
 }
 
-export async function getLatestVersion(gid: string, aid: string): Promise<string | undefined> {
-    try {
-        const params = {
-            q: `g:"${gid}" AND a:"${aid}"`,
-            rows: 1,
-            wt: "json"
-        };
-        const raw: string = await httpsGet(`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`);
-        return _.get(JSON.parse(raw), "response.docs[0].latestVersion");
-    } catch (error) {
-        console.error(error);
-        return undefined;
-    }
+export async function getLatestVersion(
+	gid: string,
+	aid: string,
+): Promise<string | undefined> {
+	try {
+		const params = {
+			q: `g:"${gid}" AND a:"${aid}"`,
+			rows: 1,
+			wt: "json",
+		};
+		const raw: string = await httpsGet(
+			`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`,
+		);
+		return _.get(JSON.parse(raw), "response.docs[0].latestVersion");
+	} catch (error) {
+		console.error(error);
+		return undefined;
+	}
 }
 
 async function httpsGet(urlString: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-        let result = "";
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const options: any = url.parse(urlString);
-        options.headers = {
-            'User-Agent': 'vscode-maven/0.1'
-        }
-        https.get(options, (res: http.IncomingMessage) => {
-            res.on("data", chunk => {
-                result = result.concat(chunk.toString());
-            });
-            res.on("end", () => {
-                resolve(result);
-            });
-            res.on("error", err => {
-                reject(err);
-            });
-        });
-    });
+	return new Promise<string>((resolve, reject) => {
+		let result = "";
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const options: any = url.parse(urlString);
+		options.headers = {
+			"User-Agent": "vscode-maven/0.1",
+		};
+		https.get(options, (res: http.IncomingMessage) => {
+			res.on("data", (chunk) => {
+				result = result.concat(chunk.toString());
+			});
+			res.on("end", () => {
+				resolve(result);
+			});
+			res.on("error", (err) => {
+				reject(err);
+			});
+		});
+	});
 }
 
 function toQueryString(params: { [key: string]: number | string }): string {
-    return Object.keys(params).map(k => `${k}=${encodeURIComponent(params[k].toString())}`).join("&");
+	return Object.keys(params)
+		.map((k) => `${k}=${encodeURIComponent(params[k].toString())}`)
+		.join("&");
 }
 
 export async function fetchPluginMetadataXml(gid: string): Promise<string> {
-    const metadataUrl = URL_MAVEN_CENTRAL_REPO + path.posix.join(...gid.split("."), MAVEN_METADATA_FILENAME);
-    return await httpsGet(metadataUrl);
+	const metadataUrl =
+		URL_MAVEN_CENTRAL_REPO +
+		path.posix.join(...gid.split("."), MAVEN_METADATA_FILENAME);
+	return await httpsGet(metadataUrl);
 }

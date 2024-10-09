@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 export interface IEffectivePom {
-  pomPath: string;
-  ePomString?: string;
-  ePom?: any;
+	pomPath: string;
+	ePomString?: string;
+	ePom?: any;
 }
