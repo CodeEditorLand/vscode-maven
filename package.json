@@ -1,14 +1,17 @@
 {
-	"name": "vscode-maven",
-	"displayName": "Maven for Java",
-	"description": "%description%",
-	"main": "./dist/extension",
-	"scripts": {
-		"build-plugin": "node scripts/build-jdtls-ext.js",
-		"compile": "tsc -p ./",
-		"update-tpn": "node scripts/update-third-party-notice.js",
-		"update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js",
-		"webpack": "webpack --mode development"
+	"activationEvents": [
+		"workspaceContains:**/pom.xml"
+	],
+	"aiKey": "7c4292ac-8ca8-4e02-9f1c-0b73e1eeeca4",
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"restrictedConfigurations": [
+				"maven.executable.options",
+				"maven.terminal.customEnv"
+			],
+			"supported": "limited"
+		},
+		"virtualWorkspaces": false
 	},
 	"contributes": {
 		"commands": [
@@ -768,9 +771,6 @@
 			}
 		]
 	},
-	"activationEvents": [
-		"workspaceContains:**/pom.xml"
-	],
 	"dependencies": {
 		"domhandler": "5.0.3",
 		"expand-home-dir": "0.0.3",
@@ -787,6 +787,7 @@
 		"which": "5.0.0",
 		"xml2js": "0.6.2"
 	},
+	"description": "%description%",
 	"devDependencies": {
 		"@types/fs-extra": "11.0.4",
 		"@types/glob": "8.1.0",
@@ -801,18 +802,17 @@
 		"glob": "11.0.0",
 		"ts-loader": "9.5.1"
 	},
+	"displayName": "Maven for Java",
+	"enabledApiProposals": [],
 	"icon": "resources/logo.png",
+	"main": "./dist/extension",
+	"name": "vscode-maven",
 	"preview": false,
-	"aiKey": "7c4292ac-8ca8-4e02-9f1c-0b73e1eeeca4",
-	"capabilities": {
-		"untrustedWorkspaces": {
-			"restrictedConfigurations": [
-				"maven.executable.options",
-				"maven.terminal.customEnv"
-			],
-			"supported": "limited"
-		},
-		"virtualWorkspaces": false
-	},
-	"enabledApiProposals": []
+	"scripts": {
+		"build-plugin": "node scripts/build-jdtls-ext.js",
+		"compile": "tsc -p ./",
+		"update-tpn": "node scripts/update-third-party-notice.js",
+		"update-xsd": "tsc scripts/generate-maven-xsd.ts && node scripts/generate-maven-xsd.js",
+		"webpack": "webpack --mode development"
+	}
 }
