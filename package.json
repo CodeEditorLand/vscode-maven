@@ -791,7 +791,7 @@
 	"devDependencies": {
 		"@types/fs-extra": "11.0.4",
 		"@types/glob": "8.1.0",
-		"@types/lodash": "4.17.10",
+		"@types/lodash": "4.17.11",
 		"@types/lru-cache": "7.10.10",
 		"@types/md5": "2.3.5",
 		"@types/minimatch": "5.1.2",
