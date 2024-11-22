@@ -36,11 +36,14 @@ export class ConflictResolver implements vscode.CodeActionProvider {
 	): vscode.CodeAction {
 		const node: Dependency | undefined =
 			diagnosticProvider.map.get(diagnostic);
+
 		if (node === undefined) {
 			throw new Error("Failed to find Dependency.");
 		}
 		const gid: string = node.groupId;
+
 		const aid: string = node.artifactId;
+
 		const effectiveVersion: string =
 			node.omittedStatus?.effectiveVersion ?? node.version;
 
@@ -65,6 +68,7 @@ export class ConflictResolver implements vscode.CodeActionProvider {
 		};
 		actionSetVersion.diagnostics = [diagnostic];
 		actionSetVersion.isPreferred = true;
+
 		return actionSetVersion;
 	}
 }

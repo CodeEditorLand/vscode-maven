@@ -17,10 +17,12 @@ export async function getDependencyNode(
 		vscode.Uri.file(pomPath),
 		{ preserveFocus: true },
 	);
+
 	const projectNodes: Element[] = getNodesByTag(
 		pomDocument.document.getText(),
 		XmlTagName.Project,
 	);
+
 	if (projectNodes === undefined || projectNodes.length !== 1) {
 		throw new UserError(
 			"Only support POM file with single <project> node.",
@@ -28,9 +30,11 @@ export async function getDependencyNode(
 	}
 
 	const projectNode: Element = projectNodes[0];
+
 	const dependenciesNode: Element | undefined = projectNode.children.find(
 		(elem) => isTag(elem) && elem.tagName === XmlTagName.Dependencies,
 	) as Element | undefined;
+
 	return getDependencyNodeFromDependenciesNode(
 		dependenciesNode,
 		gid,
@@ -70,5 +74,6 @@ export function getDependencyNodeFromDependenciesNode(
 						: id.firstChild.data) === aid,
 			),
 	) as Element | undefined;
+
 	return dependencyNode;
 }

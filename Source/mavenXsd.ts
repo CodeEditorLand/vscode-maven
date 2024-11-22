@@ -15,6 +15,7 @@ export async function init() {
 		"resources",
 		"maven-4.0.0.xsd.json",
 	);
+
 	try {
 		schema = await fse.readJson(XSD_FILE_PATH);
 	} catch (error) {
@@ -25,6 +26,7 @@ export async function init() {
 export function getXsdElement(nodePath: string) {
 	if (schema) {
 		const obj = _.get(schema, nodePath);
+
 		return new XSDElement(obj, nodePath);
 	}
 	return undefined;
@@ -39,6 +41,7 @@ export class XSDElement {
 
 	public get name(): string {
 		const start = this.nodePath.lastIndexOf(".") + 1;
+
 		return this.nodePath.slice(start);
 	}
 
@@ -58,6 +61,7 @@ export class XSDElement {
 		const children = Object.entries(this.definitionObject).filter(
 			(entry) => !entry[0].startsWith("$"),
 		);
+
 		return children.map(
 			(c) => new XSDElement(c[1], `${this.nodePath}.${c[0]}`),
 		);
@@ -65,7 +69,9 @@ export class XSDElement {
 
 	public get markdownString(): MarkdownString {
 		const { version, description } = this.documentation;
+
 		let content = "";
+
 		if (description) {
 			content += description;
 		}
@@ -76,6 +82,7 @@ export class XSDElement {
 
 		const mdString = new MarkdownString(content);
 		mdString.supportHtml = true;
+
 		return mdString;
 	}
 }

@@ -16,6 +16,7 @@ export class PropertiesProvider implements IXmlCompletionProvider {
 		currentNode: Node,
 	): Promise<vscode.CompletionItem[]> {
 		let tagNode: Element | undefined;
+
 		if (isTag(currentNode)) {
 			tagNode = currentNode;
 		} else if (currentNode.parent && isTag(currentNode.parent)) {
@@ -26,13 +27,17 @@ export class PropertiesProvider implements IXmlCompletionProvider {
 		}
 
 		const documentText = document.getText();
+
 		const cursorOffset = document.offsetAt(position);
+
 		const eol = document.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
 
 		const ret: vscode.CompletionItem[] = [];
+
 		switch (tagNode.tagName) {
 			case XmlTagName.Properties: {
 				const project = MavenProjectManager.get(document.uri.fsPath);
+
 				const props = await project?.getProperties();
 
 				if (props) {
@@ -41,7 +46,9 @@ export class PropertiesProvider implements IXmlCompletionProvider {
 							prop,
 							vscode.CompletionItemKind.Property,
 						);
+
 						const insertText = `<${prop}>$1</${prop}>${eol}$0`;
+
 						const snippetContent: string = trimBrackets(
 							insertText,
 							documentText,
@@ -50,6 +57,7 @@ export class PropertiesProvider implements IXmlCompletionProvider {
 						item.insertText = new vscode.SnippetString(
 							snippetContent,
 						);
+
 						return item;
 					};
 

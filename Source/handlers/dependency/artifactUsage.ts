@@ -25,7 +25,9 @@ function initialize() {
 		"IndexData",
 		"ArtifactUsage.json",
 	);
+
 	let raw;
+
 	try {
 		raw = JSON.parse(readFileSync(usageFilePath).toString());
 	} catch (error) {
@@ -34,6 +36,7 @@ function initialize() {
 
 	if (raw) {
 		dict = new Map();
+
 		for (const id of Object.keys(raw)) {
 			dict.set(id, raw[id]);
 		}

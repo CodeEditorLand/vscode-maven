@@ -26,6 +26,7 @@ export class FavoriteCommand implements ITreeItem {
 		);
 		treeItem.description = this.alias;
 		treeItem.iconPath = new vscode.ThemeIcon("gear");
+
 		return treeItem;
 	}
 }

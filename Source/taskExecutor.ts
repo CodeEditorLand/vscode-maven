@@ -37,9 +37,12 @@ class TaskExecutor implements Disposable {
 			return;
 		}
 		this._isExecuting = true;
+
 		const currentTask: CallableFunction | undefined = this._tasks.pop();
+
 		if (!currentTask) {
 			this._isExecuting = false;
+
 			return;
 		}
 		try {

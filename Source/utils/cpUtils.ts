@@ -14,8 +14,11 @@ export async function executeCommand(
 	return new Promise(
 		(resolve: (res: string) => void, reject: (e: Error) => void): void => {
 			mavenOutputChannel.appendLine(`${command}, [${args.join(",")}]`);
+
 			let result = "";
+
 			const childProc: cp.ChildProcess = cp.spawn(command, args, options);
+
 			if (childProc.stdout !== null) {
 				childProc.stdout.on("data", (data: string | Buffer) => {
 					data = data.toString();
@@ -51,6 +54,7 @@ export async function executeCommandWithProgress(
 			p: vscode.Progress<{ message?: string; increment?: number }>,
 		) => {
 			mavenOutputChannel.appendLine(`${command}, [${args.join(",")}]`);
+
 			return new Promise<void>((resolve, reject) => {
 				p.report({ message });
 				executeCommand(command, args, options)
@@ -62,5 +66,6 @@ export async function executeCommandWithProgress(
 			});
 		},
 	);
+
 	return result;
 }

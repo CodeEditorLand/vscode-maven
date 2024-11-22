@@ -36,6 +36,7 @@ export class MavenPlugin implements ITreeItem {
 
 	private get pluginId(): string {
 		let pluginId = `${this.groupId}:${this.artifactId}`;
+
 		if (this.version !== undefined) {
 			pluginId += `:${this.version}`;
 		}
@@ -48,11 +49,13 @@ export class MavenPlugin implements ITreeItem {
 
 	public async getTreeItem(): Promise<vscode.TreeItem> {
 		const label: string = this.prefix || this.pluginId;
+
 		const treeItem: vscode.TreeItem = new vscode.TreeItem(
 			label,
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
 		treeItem.iconPath = new vscode.ThemeIcon("symbol-property");
+
 		if (this.prefix) {
 			treeItem.description = this.pluginId;
 		}

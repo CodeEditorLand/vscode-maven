@@ -29,7 +29,9 @@ export async function setDependencyVersionHandler(
 	selectedItem?: any,
 ): Promise<void> {
 	let pomPath: string;
+
 	let effectiveVersion: string;
+
 	if (selectedItem && selectedItem.pomPath) {
 		// codeAction
 		pomPath = selectedItem.pomPath;
@@ -50,8 +52,11 @@ export async function setDependencyVersionHandler(
 	}
 
 	const gid: string = selectedItem.groupId;
+
 	const aid: string = selectedItem.artifactId;
+
 	const versions: string[] = getAllVersionsInTree(pomPath, gid, aid);
+
 	const OPTION_SEARCH_MAVEN_CENTRAL = "Search Maven Central Repository...";
 	versions.push(OPTION_SEARCH_MAVEN_CENTRAL);
 
@@ -72,6 +77,7 @@ export async function setDependencyVersionHandler(
 			},
 		)
 		.then((version) => (version ? version.value : undefined));
+
 	if (selectedVersion === undefined) {
 		return;
 	}
@@ -95,6 +101,7 @@ export async function setDependencyVersionHandler(
 					},
 				)
 				.then((artifact) => (artifact ? artifact.value : undefined));
+
 		if (selectedVersionFromMavenCentral === undefined) {
 			return;
 		}
@@ -112,6 +119,7 @@ async function setDependencyVersion(
 	version: string,
 ): Promise<void> {
 	const project: MavenProject | undefined = MavenProjectManager.get(pomPath);
+
 	if (project === undefined) {
 		throw new Error("Failed to get maven project.");
 	}
@@ -120,10 +128,12 @@ async function setDependencyVersion(
 		vscode.Uri.file(pomPath),
 		{ preserveFocus: true },
 	);
+
 	const projectNodes: Element[] = getNodesByTag(
 		pomDocument.document.getText(),
 		XmlTagName.Project,
 	);
+
 	if (projectNodes === undefined || projectNodes.length !== 1) {
 		throw new UserError(
 			"Only support POM file with single <project> node.",
@@ -131,9 +141,11 @@ async function setDependencyVersion(
 	}
 
 	const projectNode: Element = projectNodes[0];
+
 	const dependenciesNode: Element | undefined = projectNode.children.find(
 		(elem) => isTag(elem) && elem.tagName === XmlTagName.Dependencies,
 	) as Element | undefined;
+
 	const dependencyManagementNode: Element | undefined =
 		projectNode.children.find(
 			(elem) =>
@@ -146,6 +158,7 @@ async function setDependencyVersion(
 		aid,
 		project,
 	);
+
 	if (dependencyManagementNode !== undefined) {
 		await insertDependencyManagement(
 			pomPath,
@@ -182,22 +195,29 @@ async function insertDependencyManagement(
 	}
 	const currentDocument: vscode.TextDocument =
 		await vscode.workspace.openTextDocument(pomPath);
+
 	const textEditor: vscode.TextEditor =
 		await vscode.window.showTextDocument(currentDocument);
+
 	const baseIndent: string = getIndentation(
 		currentDocument,
 		getInnerEndIndex(targetNode),
 	);
+
 	const options: vscode.TextEditorOptions = textEditor.options;
+
 	const indent: string =
 		options.insertSpaces && typeof options.tabSize === "number"
 			? " ".repeat(options.tabSize)
 			: "\t";
+
 	const eol: string =
 		currentDocument.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
 
 	let insertPosition: vscode.Position | undefined;
+
 	let targetText: string;
+
 	let dependencyNodeInManagement: Element | undefined;
 
 	if (targetNode.tagName === XmlTagName.DependencyManagement) {
@@ -206,6 +226,7 @@ async function insertDependencyManagement(
 				(node) =>
 					isTag(node) && node.tagName === XmlTagName.Dependencies,
 			) as Element | undefined;
+
 		if (dependenciesNode) {
 			insertPosition = currentDocument.positionAt(
 				getInnerStartIndex(dependenciesNode),
@@ -232,6 +253,7 @@ async function insertDependencyManagement(
 							id.firstChild.data === aid,
 					),
 			) as Element | undefined;
+
 			const newIndent = `${baseIndent}${indent}`;
 			targetText = constructDependencyNode({
 				gid,
@@ -271,18 +293,22 @@ async function insertDependencyManagement(
 	}
 
 	const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
+
 	if (deleteNode) {
 		// the version of ${gid:aid} dependency node already imported should be deleted
 		const versionNode: Element | undefined = deleteNode.children?.find(
 			(node) => isTag(node) && node.tagName === XmlTagName.Version,
 		) as Element | undefined;
+
 		if (
 			versionNode &&
 			versionNode.startIndex !== null &&
 			versionNode.endIndex !== null
 		) {
 			const start: number = versionNode.startIndex;
+
 			const end: number = versionNode.endIndex + 1;
+
 			const range = new vscode.Range(
 				currentDocument.positionAt(start),
 				currentDocument.positionAt(end),
@@ -297,7 +323,9 @@ async function insertDependencyManagement(
 	) {
 		// ${gid:aid} dependency node that already exists in <dependencyManagement> shoule be deleted
 		const start: number = dependencyNodeInManagement.startIndex;
+
 		const end: number = dependencyNodeInManagement.endIndex + 1;
+
 		const range = new vscode.Range(
 			currentDocument.positionAt(start),
 			currentDocument.positionAt(end),
@@ -307,6 +335,7 @@ async function insertDependencyManagement(
 
 	edit.insert(currentDocument.uri, insertPosition, targetText);
 	await vscode.workspace.applyEdit(edit);
+
 	const endingPosition: vscode.Position = currentDocument.positionAt(
 		currentDocument.offsetAt(insertPosition) + targetText.length,
 	);
@@ -319,13 +348,18 @@ function getAllVersionsInTree(
 	aid: string,
 ): string[] {
 	const project: MavenProject | undefined = MavenProjectManager.get(pomPath);
+
 	if (project === undefined) {
 		throw new Error("Failed to get maven projects.");
 	}
 	const fullText: string = project.fullText;
+
 	const re = new RegExp(`${gid}:${aid}:[\\w.-]+`, "gm");
+
 	const artifacts: string[] | null = fullText.match(re);
+
 	let versions: string[] = [];
+
 	if (artifacts !== null) {
 		artifacts.forEach((a) => {
 			versions.push(a.slice(gid.length + aid.length + 2));
@@ -335,12 +369,17 @@ function getAllVersionsInTree(
 	function compare(v1: string, v2: string): number {
 		// correct versions that do not follow SemVer Policy
 		const s1: semver.SemVer | null = semver.coerce(v1);
+
 		const s2: semver.SemVer | null = semver.coerce(v2);
+
 		const version1: semver.SemVer | string = s1 === null ? v1 : s1;
+
 		const version2: semver.SemVer | string = s2 === null ? v2 : s2;
+
 		return semver.rcompare(version1, version2, true);
 	}
 
 	versions = Array.from(new Set(versions)).sort(compare);
+
 	return versions;
 }

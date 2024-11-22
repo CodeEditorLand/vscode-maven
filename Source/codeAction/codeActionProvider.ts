@@ -18,11 +18,14 @@ class CodeActionProvider implements vscode.CodeActionProvider {
 		_token: vscode.CancellationToken,
 	): vscode.Command[] | undefined {
 		const documentText: string = document.getText();
+
 		const cursorOffset: number = document.offsetAt(range.start);
+
 		const currentNode: Node | undefined = getCurrentNode(
 			documentText,
 			cursorOffset,
 		);
+
 		if (
 			currentNode === undefined ||
 			currentNode.startIndex === null ||
@@ -43,6 +46,7 @@ class CodeActionProvider implements vscode.CodeActionProvider {
 					},
 				],
 			};
+
 			return [addDependencyCommand];
 		}
 

@@ -40,11 +40,14 @@ export class PomCompletionProvider implements vscode.CompletionItemProvider {
 		| undefined
 	> {
 		const documentText: string = document.getText();
+
 		const cursorOffset: number = document.offsetAt(position);
+
 		const currentNode: Node | undefined = getCurrentNode(
 			documentText,
 			cursorOffset,
 		);
+
 		if (
 			currentNode === undefined ||
 			currentNode.startIndex === null ||
@@ -54,6 +57,7 @@ export class PomCompletionProvider implements vscode.CompletionItemProvider {
 		}
 
 		const ret = [];
+
 		for (const provider of this.providers) {
 			ret.push(
 				...(await provider.provide(document, position, currentNode)),

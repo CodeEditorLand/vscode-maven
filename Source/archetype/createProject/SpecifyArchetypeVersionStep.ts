@@ -21,6 +21,7 @@ export class SpecifyArchetypeVersionStep implements IProjectCreationStep {
 
 	public async run(metadata: IProjectCreationMetadata): Promise<StepResult> {
 		const disposables: Disposable[] = [];
+
 		const specifyAchetypeVersionPromise = new Promise<StepResult>(
 			(resolve, reject) => {
 				if (!metadata.archetype) {
@@ -30,6 +31,7 @@ export class SpecifyArchetypeVersionStep implements IProjectCreationStep {
 					}
 					// no archetype
 					resolve(StepResult.NEXT);
+
 					return;
 				}
 
@@ -39,6 +41,7 @@ export class SpecifyArchetypeVersionStep implements IProjectCreationStep {
 
 				if (metadata.archetype.versions === undefined) {
 					reject("Invalid archetype selected.");
+
 					return;
 				}
 
@@ -49,6 +52,7 @@ export class SpecifyArchetypeVersionStep implements IProjectCreationStep {
 				pickBox.items = metadata.archetype.versions.map((version) => ({
 					label: version,
 				}));
+
 				if (this.previousStep) {
 					pickBox.buttons = [QuickInputButtons.Back];
 					disposables.push(

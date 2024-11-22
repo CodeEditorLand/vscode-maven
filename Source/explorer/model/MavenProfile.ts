@@ -29,6 +29,7 @@ export class MavenProfile implements ITreeItem {
 			this.id,
 			vscode.TreeItemCollapsibleState.None,
 		);
+
 		if (this.checked()) {
 			treeItem.iconPath = new vscode.ThemeIcon("check");
 		}

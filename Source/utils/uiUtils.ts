@@ -24,9 +24,11 @@ export async function openDialogForFolder(
 		canSelectFolders: true,
 		canSelectMany: false,
 	};
+
 	const result: Uri[] | undefined = await window.showOpenDialog(
 		Object.assign(options, customOptions),
 	);
+
 	if (result && result.length > 0) {
 		return Promise.resolve(result[0]);
 	} else {
@@ -42,9 +44,11 @@ export async function openDialogForFile(
 		canSelectFolders: false,
 		canSelectMany: false,
 	};
+
 	const result: Uri[] | undefined = await window.showOpenDialog(
 		Object.assign(options, customOptions),
 	);
+
 	if (result && result.length > 0) {
 		return Promise.resolve(result[0]);
 	} else {
@@ -64,12 +68,15 @@ export async function showTroubleshootingDialog(
 	errorMessage: string,
 ): Promise<void> {
 	const OPTION_SHOW_OUTPUT = "Show Output";
+
 	const OPTION_LEARN_MORE = "Learn More";
+
 	const choiceForDetails: string | undefined = await window.showErrorMessage(
 		errorMessage,
 		OPTION_SHOW_OUTPUT,
 		OPTION_LEARN_MORE,
 	);
+
 	if (choiceForDetails === OPTION_LEARN_MORE) {
 		// open FAQs
 		vscode.commands.executeCommand(
@@ -156,11 +163,15 @@ export function registerCommandRequiringTrust(
 
 async function promptToManageWorkspaceTrust(): Promise<void> {
 	const COMMAND_MANAGE_TRUST = "workbench.trust.manage";
+
 	const OPTION_MANAGE_TRUST = "Manage Workspace Trust";
+
 	const information =
 		"For security concern, this command requires your trust on current workspace before it can be executed.";
+
 	const choiceForDetails: string | undefined =
 		await window.showInformationMessage(information, OPTION_MANAGE_TRUST);
+
 	if (choiceForDetails === OPTION_MANAGE_TRUST) {
 		vscode.commands.executeCommand(COMMAND_MANAGE_TRUST);
 	}
@@ -168,7 +179,9 @@ async function promptToManageWorkspaceTrust(): Promise<void> {
 
 export function effectivePomContentUri(pomPath: string): vscode.Uri {
 	const displayName = "EffectivePOM.xml";
+
 	const contentType = "effective-pom";
+
 	return vscode.Uri.file(path.join(pomPath, displayName)).with({
 		scheme: "vscode-maven",
 		authority: contentType,
@@ -178,7 +191,9 @@ export function effectivePomContentUri(pomPath: string): vscode.Uri {
 
 export function dependenciesContentUri(pomPath: string): vscode.Uri {
 	const displayName = "Dependencies";
+
 	const contentType = "dependencies";
+
 	return vscode.Uri.file(path.join(pomPath, displayName)).with({
 		scheme: "vscode-maven",
 		authority: contentType,

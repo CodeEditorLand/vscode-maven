@@ -6,6 +6,7 @@ import * as vscode from "vscode";
 import { JavaExtensionNotActivatedError } from "../utils/errorUtils";
 
 const JAVA_EXTENSION_ID = "redhat.java";
+
 const JAVA_EXECUTE_WORKSPACE_COMMAND = "java.execute.workspaceCommand";
 
 // tslint:disable-next-line:export-name
@@ -25,11 +26,13 @@ export function executeJavaLanguageServerCommand<R>(
 
 export function isJavaExtEnabled(): boolean {
 	const javaExt: vscode.Extension<unknown> | undefined = getJavaExtension();
+
 	return !!javaExt;
 }
 
 export function isJavaExtActivated(): boolean {
 	const javaExt: vscode.Extension<unknown> | undefined = getJavaExtension();
+
 	return !!javaExt && javaExt.isActive;
 }
 
@@ -40,5 +43,6 @@ export function getJavaExtension(): vscode.Extension<unknown> | undefined {
 export function isJavaLanguageServerStandard(): boolean {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const javaExt: vscode.Extension<any> | undefined = getJavaExtension();
+
 	return javaExt?.exports?.serverMode === "Standard";
 }

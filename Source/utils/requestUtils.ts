@@ -8,7 +8,9 @@ import * as url from "url";
 import * as _ from "lodash";
 
 const URL_MAVEN_SEARCH_API = "https://search.maven.org/solrsearch/select";
+
 const URL_MAVEN_CENTRAL_REPO = "https://repo1.maven.org/maven2/";
+
 const MAVEN_METADATA_FILENAME = "maven-metadata.xml";
 
 export interface IArtifactMetadata {
@@ -35,6 +37,7 @@ export async function getArtifacts(
 	const validKeywords: string[] = keywords.filter(
 		(keyword) => keyword.length >= 3,
 	);
+
 	if (validKeywords.length === 0) {
 		return [];
 	}
@@ -44,13 +47,16 @@ export async function getArtifacts(
 		rows: 50,
 		wt: "json",
 	};
+
 	const raw: string = await httpsGet(
 		`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`,
 	);
+
 	try {
 		return _.get(JSON.parse(raw), "response.docs", []);
 	} catch (error) {
 		console.error(error);
+
 		return [];
 	}
 }
@@ -65,13 +71,16 @@ export async function getVersions(
 		rows: 50,
 		wt: "json",
 	};
+
 	const raw: string = await httpsGet(
 		`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`,
 	);
+
 	try {
 		return _.get(JSON.parse(raw), "response.docs", []);
 	} catch (error) {
 		console.error(error);
+
 		return [];
 	}
 }
@@ -86,12 +95,15 @@ export async function getLatestVersion(
 			rows: 1,
 			wt: "json",
 		};
+
 		const raw: string = await httpsGet(
 			`${URL_MAVEN_SEARCH_API}?${toQueryString(params)}`,
 		);
+
 		return _.get(JSON.parse(raw), "response.docs[0].latestVersion");
 	} catch (error) {
 		console.error(error);
+
 		return undefined;
 	}
 }
@@ -128,5 +140,6 @@ export async function fetchPluginMetadataXml(gid: string): Promise<string> {
 	const metadataUrl =
 		URL_MAVEN_CENTRAL_REPO +
 		path.posix.join(...gid.split("."), MAVEN_METADATA_FILENAME);
+
 	return await httpsGet(metadataUrl);
 }

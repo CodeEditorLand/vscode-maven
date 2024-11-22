@@ -8,6 +8,7 @@ const DECORATION_CONFLICT: vscode.FileDecoration = new vscode.FileDecoration(
 	"conflict",
 	new vscode.ThemeColor("list.warningForeground"),
 );
+
 const DECORATION_DUPLICATE: vscode.FileDecoration = new vscode.FileDecoration(
 	"D",
 	"duplicate",
@@ -16,6 +17,7 @@ const DECORATION_DUPLICATE: vscode.FileDecoration = new vscode.FileDecoration(
 
 class DecorationProvider implements vscode.FileDecorationProvider {
 	private disposables: vscode.Disposable[] = [];
+
 	constructor() {
 		this.disposables.push(
 			vscode.window.registerFileDecorationProvider(this),

@@ -10,6 +10,7 @@ import { IOmittedStatus } from "../explorer/model/OmittedStatus";
 import { getDependencyTree } from "./dependency/showDependenciesHandler";
 
 const DUPLICATE_INDICATOR = "omitted for duplicate";
+
 const CONFLICT_INDICATOR = "omitted for conflict";
 
 export async function parseRawDependencyDataHandler(
@@ -18,6 +19,7 @@ export async function parseRawDependencyDataHandler(
 	const dependencyTree: string | undefined = await getDependencyTree(
 		project.pomPath,
 	);
+
 	if (dependencyTree === undefined) {
 		throw new Error("Failed to generate dependency tree.");
 	}
@@ -34,7 +36,9 @@ export async function parseRawDependencyDataHandler(
 
 	const indent = "   "; // three spaces
 	const eol = "\r\n";
+
 	const prefix = "+- ";
+
 	const [treeNodes, conflictNodes] = await parseTreeNodes(
 		treeContent,
 		eol,
@@ -44,6 +48,7 @@ export async function parseRawDependencyDataHandler(
 	);
 	project.conflictNodes = conflictNodes;
 	project.dependencyNodes = treeNodes;
+
 	return treeNodes;
 }
 
@@ -55,26 +60,40 @@ async function parseTreeNodes(
 	projectPomPath: string,
 ): Promise<Dependency[][]> {
 	const treeNodes: Dependency[] = [];
+
 	const conflictNodes: Dependency[] = [];
+
 	if (treecontent) {
 		let curNode: Dependency;
+
 		let preNode: Dependency;
+
 		let parentNode: Dependency;
+
 		let rootNode: Dependency;
+
 		let curIndentCnt: number;
+
 		let preIndentCnt: number;
+
 		const lines: string[] = treecontent.split(eol).splice(1); // delete project name
 		const toDependency = (line: string): Dependency => {
 			let name: string = line.slice(curIndentCnt + prefix.length);
+
 			const indexCut: number = name.indexOf("(");
+
 			let supplement = "";
+
 			if (indexCut !== -1) {
 				supplement = name.substr(indexCut);
 				name = name.substr(0, indexCut - 1);
 			}
 			const [gid, aid, version, scope] = name.split(":");
+
 			let effectiveVersion: string;
+
 			let omittedStatus: IOmittedStatus | undefined;
+
 			if (supplement.indexOf(CONFLICT_INDICATOR) !== -1) {
 				const re = /\(omitted for conflict with ([\w.-]+)\)/gm;
 				effectiveVersion = supplement.replace(re, "$1");
@@ -102,8 +121,11 @@ async function parseTreeNodes(
 		lines.forEach((line) => {
 			curIndentCnt = line.indexOf(prefix);
 			curNode = toDependency(line);
+
 			let uri: vscode.Uri;
+
 			let curFilePath: string;
+
 			if (curIndentCnt === 0) {
 				curNode.root = curNode;
 				rootNode = curNode;
@@ -111,6 +133,7 @@ async function parseTreeNodes(
 				curFilePath = path.join(curNode.groupId, curNode.artifactId);
 			} else {
 				curNode.root = rootNode;
+
 				if (curIndentCnt === preIndentCnt) {
 					parentNode.addChild(curNode);
 				} else if (curIndentCnt > preIndentCnt) {
@@ -119,6 +142,7 @@ async function parseTreeNodes(
 				} else {
 					const level: number =
 						(preIndentCnt - curIndentCnt) / indent.length;
+
 					for (let i = level; i > 0; i -= 1) {
 						parentNode = parentNode.parent;
 					}
@@ -139,8 +163,10 @@ async function parseTreeNodes(
 				curNode.uri = uri.with({ query: "hasConflict" });
 				// find all parent and set hasConflict upforward
 				let tmpNode = curNode;
+
 				while (tmpNode.parent !== undefined) {
 					const parent = tmpNode.parent;
+
 					if (parent.uri.query !== "hasConflict") {
 						parent.uri = uri.with({ query: "hasConflict" });
 						tmpNode = parent;

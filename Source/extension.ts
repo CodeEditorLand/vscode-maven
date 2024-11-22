@@ -97,8 +97,10 @@ async function doActivate(
 	);
 	// register tree view
 	await MavenProjectManager.loadProjects();
+
 	const mavenExplorerProvider: MavenExplorerProvider =
 		MavenExplorerProvider.getInstance();
+
 	const view = vscode.window.createTreeView("mavenProjects", {
 		treeDataProvider: mavenExplorerProvider,
 		showCollapseAll: true,
@@ -229,6 +231,7 @@ async function doActivate(
 	context.subscriptions.push(
 		vscode.window.onDidCloseTerminal((closedTerminal: vscode.Terminal) => {
 			const name: string | undefined = mavenTerminal.find(closedTerminal);
+
 			if (name !== undefined) {
 				mavenTerminal.dispose(name);
 			}
@@ -289,6 +292,7 @@ async function doActivate(
 	vscode.debug.onDidTerminateDebugSession((session) => {
 		if (session.type === "java") {
 			const terminalName: string = session.configuration.terminalName;
+
 			if (terminalName) {
 				// After terminating debug session, output is no longer visible.
 				// Solution: via future API waitOnExit
@@ -300,6 +304,7 @@ async function doActivate(
 
 	registerCommand(context, "maven.java.projectConfiguration.update", () => {
 		MavenExplorerProvider.getInstance().refresh();
+
 		if (isJavaExtEnabled()) {
 			// Reload All Maven Projects in JDTLS, impl in upstream
 			vscode.commands.executeCommand(
@@ -344,6 +349,7 @@ function registerPomFileWatcher(context: vscode.ExtensionContext): void {
 			const project: MavenProject | undefined = MavenProjectManager.get(
 				e.fsPath,
 			);
+
 			if (project) {
 				// notify dependencies/effectivePOM to update
 				contentProvider.invalidate(
@@ -354,6 +360,7 @@ function registerPomFileWatcher(context: vscode.ExtensionContext): void {
 				);
 
 				await project.refresh();
+
 				if (Settings.Pomfile.autoUpdateEffectivePOM()) {
 					taskExecutor.execute(async () => {
 						await project.refreshEffectivePom();

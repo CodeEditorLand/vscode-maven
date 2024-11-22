@@ -39,7 +39,9 @@ class DiagnosticProvider {
 		this.updateNodeForDocumentTimeout = setTimeout(async () => {
 			const startTime: number = performance.now();
 			await this.refreshDiagnostics(uri);
+
 			const executionTime: number = performance.now() - startTime;
+
 			const movingAverage: MovingAverage =
 				lruCache.get(uri) || new MovingAverage();
 			movingAverage.update(executionTime);
@@ -49,20 +51,25 @@ class DiagnosticProvider {
 
 	public async refreshDiagnostics(uri: vscode.Uri): Promise<void> {
 		const diagnostics: vscode.Diagnostic[] = [];
+
 		if (Settings.enableConflictDiagnostics() === false) {
 			this._collection.set(uri, diagnostics);
+
 			return;
 		}
 		const project: MavenProject | undefined = MavenProjectManager.get(
 			uri.fsPath,
 		);
+
 		if (project === undefined) {
 			throw new Error("Failed to get maven project.");
 		}
 
 		const conflictNodes: Dependency[] = project.conflictNodes;
+
 		for (const node of conflictNodes) {
 			const diagnostic = await this.createDiagnostics(node);
+
 			if (diagnostic) {
 				diagnostics.push(diagnostic);
 				this.map.set(diagnostic, node);
@@ -75,22 +82,26 @@ class DiagnosticProvider {
 		node: Dependency,
 	): Promise<vscode.Diagnostic | undefined> {
 		const root: Dependency = node.root;
+
 		const range: vscode.Range | undefined = await this.findConflictRange(
 			root.projectPomPath,
 			root.groupId,
 			root.artifactId,
 		);
+
 		if (!range) {
 			return undefined;
 		}
 
 		const message = `Dependency conflict in ${root.artifactId}: ${node.groupId}:${node.artifactId}:${node.version} conflict with ${node.omittedStatus?.effectiveVersion}`;
+
 		const diagnostic: vscode.Diagnostic = new vscode.Diagnostic(
 			range,
 			message,
 			vscode.DiagnosticSeverity.Warning,
 		);
 		diagnostic.code = MAVEN_DEPENDENCY_CONFLICT;
+
 		return diagnostic;
 	}
 
@@ -100,6 +111,7 @@ class DiagnosticProvider {
 		aid: string,
 	): Promise<vscode.Range | undefined> {
 		const dependencyNode = await getDependencyNode(pomPath, gid, aid);
+
 		if (
 			dependencyNode === undefined ||
 			!dependencyNode.startIndex ||
@@ -108,11 +120,13 @@ class DiagnosticProvider {
 			console.warn(
 				`Failed to find dependency node ${gid}:${aid} in ${pomPath}.`,
 			);
+
 			return undefined;
 		}
 
 		const currentDocument: vscode.TextDocument =
 			await vscode.workspace.openTextDocument(pomPath);
+
 		return new vscode.Range(
 			currentDocument.positionAt(dependencyNode.startIndex),
 			currentDocument.positionAt(dependencyNode.endIndex),

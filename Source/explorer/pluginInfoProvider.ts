@@ -48,17 +48,22 @@ class PluginInfoProvider {
 	): Promise<string | undefined> {
 		// read from cache if exists
 		const infos: PluginInfoDict = _.get(this.getPluginCache(), [gid]) ?? {};
+
 		const info: IPluginInfo = _.get(infos, [aid]) ?? {};
+
 		if (info.prefix !== undefined) {
 			return info.prefix;
 		}
 
 		// get prefix from central/groupId/maven-metadata.xml
 		const metadataXml = await fetchPluginMetadataXml(gid);
+
 		const xml: any = await Utils.parseXmlContent(metadataXml);
+
 		const plugins: any[] = _.get(xml, "metadata.plugins[0].plugin");
 		plugins.forEach((plugin) => {
 			const a: string = _.get(plugin, "artifactId[0]");
+
 			const p: string = _.get(plugin, "prefix[0]");
 			infos[a] = infos[a] ?? {};
 			infos[a].prefix = p;
@@ -66,6 +71,7 @@ class PluginInfoProvider {
 
 		// update cache
 		await this.udpatePluginInfoCache(gid, infos);
+
 		return infos[aid]?.prefix;
 	}
 
@@ -78,11 +84,14 @@ class PluginInfoProvider {
 		// read from cache if exists
 		const infos: PluginInfoDict =
 			_.get(this.getPluginCache(), [groupId]) ?? {};
+
 		const info: IPluginInfo = _.get(infos, [artifactId]) ?? {};
 		info.versions = info.versions ?? {};
+
 		const goalsFromCache: string[] | undefined = _.get(info.versions, [
 			version,
 		]);
+
 		if (goalsFromCache !== undefined) {
 			return goalsFromCache;
 		}
@@ -94,6 +103,7 @@ class PluginInfoProvider {
 			artifactId,
 			version,
 		);
+
 		if (desc) {
 			info.prefix = desc.goalPrefix;
 			info.versions[version] = desc.goals;
@@ -111,6 +121,7 @@ class PluginInfoProvider {
 
 		// update cache
 		await this.cachePluginInfo(groupId, artifactId, info);
+
 		return info.versions[version];
 	}
 
@@ -144,21 +155,27 @@ class PluginInfoProvider {
 		version?: string,
 	): Promise<{ prefix?: string; goals?: string[] }> {
 		let prefix: string | undefined;
+
 		const goals: string[] = [];
+
 		const textOutput: string = await Utils.getPluginDescription(
 			this.getPluginId(gid, aid, version),
 			projectBasePath,
 		);
 
 		const versionRegExp = /^Version: (.*)/m;
+
 		const versionMatch: string[] | null = textOutput.match(versionRegExp);
+
 		if (versionMatch !== null && versionMatch.length === 2) {
 			version = versionMatch[1];
 		}
 
 		// find prefix
 		const prefixRegExp = /^Goal Prefix: (.*)/m;
+
 		const prefixMatch: string[] | null = textOutput.match(prefixRegExp);
+
 		if (prefixMatch !== null && prefixMatch.length === 2) {
 			prefix = prefixMatch[1];
 		}
@@ -166,7 +183,9 @@ class PluginInfoProvider {
 		// find goals
 		if (version && prefix !== undefined) {
 			const goalRegExp = new RegExp(`^${prefix}:(.*)`, "gm");
+
 			const goalsMatch: string[] | null = textOutput.match(goalRegExp);
+
 			if (goalsMatch !== null) {
 				// prefix:goal matched, remove "prefix:" part
 				for (const fullGoal of goalsMatch) {
@@ -197,16 +216,24 @@ async function parseMetadataFromJar(
 		version,
 		`${artifactId}-${version}.jar`,
 	);
+
 	try {
 		await fs.promises.access(jarFilePath);
+
 		const jarUri = vscode.Uri.file(jarFilePath);
+
 		const segs = "META-INF/maven/plugin.xml".split("/");
 
 		const xml = await readContentFromJar(jarUri, ...segs);
+
 		const xmlObj = xml && (await Utils.parseXmlContent(xml));
+
 		const goalPrefix: any = _.get(xmlObj, "plugin.goalPrefix[0]");
+
 		const mojos = _.get(xmlObj, "plugin.mojos[0].mojo");
+
 		const goals = mojos ? (mojos as any[]).map((m) => m.goal[0]) : [];
+
 		return {
 			goalPrefix,
 			goals,

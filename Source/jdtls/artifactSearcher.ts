@@ -14,15 +14,18 @@ import {
 
 // Please refer to https://help.eclipse.org/2019-06/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Freference%2Fapi%2Fconstant-values.html
 const UNDEFINED_TYPE = "16777218"; // e.g. Unknown var;
+
 const UNDEFINED_NAME = "570425394"; // e.g. Unknown.foo();
 
 const COMMAND_SEARCH_ARTIFACT = "maven.artifactSearch";
+
 const TITLE_RESOLVE_UNKNOWN_TYPE = "Resolve unknown type";
 
 export function registerArtifactSearcher(
 	context: vscode.ExtensionContext,
 ): void {
 	const javaExt: vscode.Extension<any> | undefined = getJavaExtension();
+
 	if (javaExt) {
 		const resolver: TypeResolver = new TypeResolver(
 			path.join(context.extensionPath, "resources", "IndexData"),
@@ -99,6 +102,7 @@ class TypeResolver {
 
 		if (!this.initialized) {
 			this.initialize().catch();
+
 			return undefined;
 		}
 
@@ -111,14 +115,20 @@ class TypeResolver {
 					position.isBeforeOrEqual(diagnostic.range.end)
 				);
 			});
+
 		if (diagnostics.length > 0) {
 			const diagnostic: vscode.Diagnostic = diagnostics[0];
+
 			const line: number = diagnostic.range.start.line;
+
 			const character: number = diagnostic.range.start.character;
+
 			const className: string = document.getText(diagnostic.range);
+
 			const length: number =
 				document.offsetAt(diagnostic.range.end) -
 				document.offsetAt(diagnostic.range.start);
+
 			const param: any = {
 				className,
 				uri: encodeBase64(document.uri.toString()),
@@ -126,11 +136,15 @@ class TypeResolver {
 				character,
 				length,
 			};
+
 			const commandName: string = TITLE_RESOLVE_UNKNOWN_TYPE;
+
 			const message = `\uD83D\uDC49 [${commandName}](command:${COMMAND_SEARCH_ARTIFACT}?${encodeURIComponent(JSON.stringify(param))} "${commandName}")`;
+
 			const hoverMessage: vscode.MarkdownString =
 				new vscode.MarkdownString(message);
 			hoverMessage.isTrusted = true;
+
 			return new vscode.Hover(hoverMessage);
 		} else {
 			return undefined;
@@ -148,6 +162,7 @@ class TypeResolver {
 
 		if (!this.initialized) {
 			this.initialize().catch();
+
 			return undefined;
 		}
 
@@ -156,14 +171,21 @@ class TypeResolver {
 				return diagnosticIndicatesUnresolvedType(diagnostic, document);
 			},
 		);
+
 		if (diagnostics.length > 0) {
 			const range: vscode.Range = diagnostics[0].range;
+
 			const className: string = document.getText(range);
+
 			const uri: string = document.uri.toString();
+
 			const line: number = range.start.line;
+
 			const character: number = range.start.character;
+
 			const length: number =
 				document.offsetAt(range.end) - document.offsetAt(range.start);
+
 			const command: vscode.Command = {
 				title: TITLE_RESOLVE_UNKNOWN_TYPE,
 				command: COMMAND_SEARCH_ARTIFACT,
@@ -177,11 +199,13 @@ class TypeResolver {
 					},
 				],
 			};
+
 			const codeAction: vscode.CodeAction = {
 				title: `${TITLE_RESOLVE_UNKNOWN_TYPE} '${className}'`,
 				command,
 				kind: vscode.CodeActionKind.QuickFix,
 			};
+
 			return [codeAction];
 		} else {
 			return [];
@@ -195,6 +219,7 @@ class TypeResolver {
 
 		if (!this.initialized) {
 			this.initialize().catch();
+
 			return;
 		}
 
@@ -203,10 +228,12 @@ class TypeResolver {
 				getArtifactsPickItems(param.className),
 				{ placeHolder: "Select the artifact you want to add" },
 			);
+
 		if (pickItem === undefined) {
 			return;
 		}
 		param.uri = decodeBase64(param.uri);
+
 		const edits: vscode.WorkspaceEdit[] = await getWorkSpaceEdits(
 			pickItem,
 			param,
@@ -222,12 +249,15 @@ async function getArtifactsPickItems(
 		searchType: SearchType.className,
 		className,
 	};
+
 	const response: IArtifactSearchResult[] =
 		await executeJavaLanguageServerCommand(
 			"java.maven.searchArtifact",
 			searchParam,
 		);
+
 	const picks: vscode.QuickPickItem[] = [];
+
 	for (let i = 0; i < Math.min(Math.round(response.length / 5), 5); i += 1) {
 		const arr: string[] = [
 			response[i].groupId,
@@ -269,8 +299,10 @@ async function applyEdits(uri: vscode.Uri, edits: any): Promise<void> {
 		// 0: import 1: replace
 		await applyWorkspaceEdit(edits[0]);
 		await applyWorkspaceEdit(edits[1]);
+
 		let document: vscode.TextDocument =
 			await vscode.workspace.openTextDocument(uri);
+
 		document.save();
 
 		// 2: pom
@@ -279,10 +311,13 @@ async function applyEdits(uri: vscode.Uri, edits: any): Promise<void> {
 			return;
 		}
 		await applyWorkspaceEdit(edits[2]);
+
 		document = await vscode.workspace.openTextDocument(
 			vscode.Uri.parse(Object.keys(edits[2].changes)[0]),
 		);
+
 		document.save();
+
 		const LINE_OFFSET = 1;
 		// tslint:disable-next-line: restrict-plus-operands
 		const startLine: number =
@@ -294,6 +329,7 @@ async function applyEdits(uri: vscode.Uri, edits: any): Promise<void> {
 			][0].newText.indexOf("<dependencies>") === -1
 				? 5
 				: 7;
+
 		const editor: vscode.TextEditor = await vscode.window.showTextDocument(
 			document,
 			{
@@ -359,6 +395,7 @@ export interface IArtifactSearchResult {
 	groupId: string;
 	artifactId: string;
 	version: string;
+
 	className: string;
 	fullClassName: string;
 	usage: number;
@@ -372,6 +409,7 @@ export enum SearchType {
 
 export interface ISearchArtifactParam {
 	searchType: SearchType;
+
 	className?: string;
 	groupId?: string;
 	artifactId?: string;

@@ -16,18 +16,25 @@ export class SchemaProvider implements IXmlCompletionProvider {
 		currentNode: Node,
 	): Promise<vscode.CompletionItem[]> {
 		const documentText = document.getText();
+
 		const cursorOffset = document.offsetAt(position);
+
 		const eol = document.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
 
 		const nodePath = getNodePath(currentNode);
+
 		const elem = getXsdElement(nodePath);
+
 		const defToCompletionItem = (e: XSDElement) => {
 			const name = e.name;
+
 			const item = new vscode.CompletionItem(
 				name,
 				vscode.CompletionItemKind.Property,
 			);
+
 			let insertText;
+
 			if (e.isLeaf) {
 				// <textNode>|</textNode>
 				insertText = `<${name}>$1</${name}>$0`;
@@ -60,6 +67,7 @@ export class SchemaProvider implements IXmlCompletionProvider {
 		};
 
 		const items = elem?.candidates.map(defToCompletionItem) ?? [];
+
 		return items;
 	}
 }

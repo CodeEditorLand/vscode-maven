@@ -25,10 +25,13 @@ export class FromCentral implements IArtifactCompletionProvider {
 			...groupIdHint.split("."),
 			...artifactIdHint.split("-"),
 		];
+
 		const docs: IArtifactMetadata[] = await getArtifacts(keywords);
+
 		const groupIds: string[] = Array.from(
 			new Set(docs.map((doc) => doc.g)).values(),
 		);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -40,6 +43,7 @@ export class FromCentral implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return groupIds.map((gid) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				gid,
@@ -48,6 +52,7 @@ export class FromCentral implements IArtifactCompletionProvider {
 			item.insertText = gid;
 			item.detail = "From Central Repository";
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
@@ -60,7 +65,9 @@ export class FromCentral implements IArtifactCompletionProvider {
 			...groupIdHint.split("."),
 			...artifactIdHint.split("-"),
 		];
+
 		const docs: IArtifactMetadata[] = await getArtifacts(keywords);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -72,6 +79,7 @@ export class FromCentral implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return docs.map((doc) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				{
@@ -84,6 +92,7 @@ export class FromCentral implements IArtifactCompletionProvider {
 			item.detail = `GroupId: ${doc.g}`;
 			(item as any).data = { groupId: doc.g };
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
@@ -97,6 +106,7 @@ export class FromCentral implements IArtifactCompletionProvider {
 		}
 
 		const docs: IVersionMetadata[] = await getVersions(groupId, artifactId);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -108,8 +118,10 @@ export class FromCentral implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return docs.map((doc) => {
 			const updateDate = `Updated: ${new Date(doc.timestamp).toLocaleDateString()}`;
+
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				{
 					label: doc.v,
@@ -121,6 +133,7 @@ export class FromCentral implements IArtifactCompletionProvider {
 			item.detail = updateDate;
 			item.sortText = getSortText(doc.v);
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}

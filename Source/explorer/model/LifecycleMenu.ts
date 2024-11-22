@@ -27,6 +27,7 @@ export class LifecycleMenu extends ProjectMenu implements ITreeItem {
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
 		treeItem.iconPath = new vscode.ThemeIcon("sync");
+
 		return treeItem;
 	}
 }

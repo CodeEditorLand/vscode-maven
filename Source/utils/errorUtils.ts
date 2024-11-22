@@ -7,6 +7,7 @@ import { showTroubleshootingDialog } from "./uiUtils";
 export class UserError extends Error {
 	constructor(msg?: string) {
 		super(msg);
+
 		setUserError(this);
 	}
 }
@@ -23,6 +24,7 @@ export class OperationCanceledError extends UserError {}
 export class JavaExtensionNotActivatedError extends Error {
 	constructor(msg?: string) {
 		super(msg);
+
 		setUserError(this);
 	}
 }

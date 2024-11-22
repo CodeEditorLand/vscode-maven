@@ -22,6 +22,7 @@ export async function applyWorkspaceEdit(
 	edit: ls.WorkspaceEdit,
 ): Promise<void> {
 	const workspaceEdit: WorkspaceEdit = p2c.asWorkspaceEdit(edit);
+
 	if (workspaceEdit !== undefined) {
 		await workspace.applyEdit(workspaceEdit);
 		// By executing the range formatting command to correct the indention according to the VS Code editor settings.
@@ -45,8 +46,10 @@ export async function applyWorkspaceEdit(
 				changes[0].range.start.line,
 				changes[0].range.start.character,
 			);
+
 			let lineOffsets: number =
 				changes[0].newText.split(/\r?\n/).length - 1;
+
 			for (let i = 1; i < changes.length; i += 1) {
 				// When it comes to a discontinuous range, execute the range formatting and record the new start position
 				if (changes[i].range.start.line !== startPosition.line) {
@@ -94,6 +97,7 @@ export function getIndentation(
 	offset: number,
 ): string {
 	const closingTagPosition: vscode.Position = document.positionAt(offset);
+
 	return document.getText(
 		new vscode.Range(
 			new vscode.Position(closingTagPosition.line, 0),
@@ -107,6 +111,7 @@ export function constructDependencyNode(options: {
 	aid: string;
 	version?: string;
 	dtype?: string;
+
 	classifier?: string;
 	baseIndent: string;
 	indent: string;
@@ -122,6 +127,7 @@ export function constructDependencyNode(options: {
 		`${indent}<groupId>${gid}</groupId>`,
 		`${indent}<artifactId>${aid}</artifactId>`,
 	];
+
 	if (version) {
 		builder.push(`${indent}<version>${version}</version>`);
 	}
@@ -146,6 +152,7 @@ export function constructDependenciesNode(options: {
 	aid: string;
 	version?: string;
 	dtype?: string;
+
 	classifier?: string;
 	baseIndent: string;
 	indent: string;
@@ -180,6 +187,7 @@ export function constructDependencyManagementNode(options: {
 	aid: string;
 	version: string;
 	dtype?: string;
+
 	classifier?: string;
 	baseIndent: string;
 	indent: string;

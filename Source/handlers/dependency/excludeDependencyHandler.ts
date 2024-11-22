@@ -22,6 +22,7 @@ export async function excludeDependencyHandler(
 		throw new UserError("Only Dependency can be excluded.");
 	}
 	const root: Dependency = toExclude.root;
+
 	if (
 		root === undefined ||
 		toExclude.fullArtifactName === root.fullArtifactName
@@ -29,9 +30,11 @@ export async function excludeDependencyHandler(
 		vscode.window.showInformationMessage(
 			"The dependency written in pom can not be excluded.",
 		);
+
 		return;
 	}
 	const pomPath: string = toExclude.projectPomPath;
+
 	if (!(await fse.pathExists(pomPath))) {
 		throw new UserError(
 			"Specified POM file does not exist on file system.",
@@ -55,6 +58,7 @@ async function excludeDependency(
 ): Promise<void> {
 	// find out <dependencies> node with artifactId === rootAid and insert <exclusions> node
 	const dependencyNode = await getDependencyNode(pomPath, rootGid, rootAid);
+
 	if (dependencyNode === undefined) {
 		throw new Error(
 			`Failed to find the dependency where ${gid}:${aid} is introduced.`,
@@ -75,24 +79,33 @@ async function insertExcludeDependency(
 	}
 	const currentDocument: vscode.TextDocument =
 		await vscode.workspace.openTextDocument(pomPath);
+
 	const textEditor: vscode.TextEditor =
 		await vscode.window.showTextDocument(currentDocument);
+
 	const baseIndent: string = getIndentation(
 		currentDocument,
 		getInnerEndIndex(targetNode),
 	);
+
 	const options: vscode.TextEditorOptions = textEditor.options;
+
 	const indent: string =
 		options.insertSpaces && typeof options.tabSize === "number"
 			? " ".repeat(options.tabSize)
 			: "\t";
+
 	const eol: string =
 		currentDocument.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
+
 	let insertPosition: vscode.Position;
+
 	let targetText: string;
+
 	const exclusionNode: Element | undefined = targetNode.children?.find(
 		(node) => isTag(node) && node.tagName === XmlTagName.Exclusions,
 	) as Element | undefined;
+
 	if (exclusionNode === undefined) {
 		insertPosition = currentDocument.positionAt(
 			getInnerEndIndex(targetNode),
@@ -107,6 +120,7 @@ async function insertExcludeDependency(
 	const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
 	edit.insert(currentDocument.uri, insertPosition, targetText);
 	await vscode.workspace.applyEdit(edit);
+
 	const endingPosition: vscode.Position = currentDocument.positionAt(
 		currentDocument.offsetAt(insertPosition) + targetText.length,
 	);

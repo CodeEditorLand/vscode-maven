@@ -9,7 +9,10 @@ export async function readContentFromJar(
 	...pathSegs: string[]
 ): Promise<string | undefined> {
 	const data = await workspace.fs.readFile(jarUri);
+
 	const zipData = await jszip.loadAsync(data);
+
 	const zipObj = zipData.file(pathSegs.join("/"));
+
 	return zipObj?.async("text");
 }

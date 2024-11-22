@@ -20,6 +20,7 @@ export class Dependency implements ITreeItem, ITreeNode {
 	public children: Dependency[] = [];
 	public root: Dependency;
 	public parent: Dependency;
+
 	constructor(
 		gid: string,
 		aid: string,
@@ -44,7 +45,9 @@ export class Dependency implements ITreeItem, ITreeNode {
 
 	public getContextValue(): string {
 		const root = this.root;
+
 		let contextValue = "maven:dependency";
+
 		if (root.fullArtifactName === this.fullArtifactName) {
 			contextValue = `${contextValue}+root`;
 		}
@@ -60,9 +63,11 @@ export class Dependency implements ITreeItem, ITreeNode {
 
 	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		const label = [this.groupId, this.artifactId, this.version].join(":");
+
 		const treeItem: vscode.TreeItem = new vscode.TreeItem(label);
 		treeItem.resourceUri = this.uri;
 		treeItem.tooltip = this.fullArtifactName;
+
 		if (this.children.length !== 0) {
 			treeItem.collapsibleState =
 				vscode.TreeItemCollapsibleState.Collapsed;
@@ -109,6 +114,7 @@ export class Dependency implements ITreeItem, ITreeNode {
 
 		// description
 		const descriptions: string[] = [];
+
 		if (!this.scope.includes("compile")) {
 			descriptions.push(`(${this.scope})`);
 		}
@@ -116,6 +122,7 @@ export class Dependency implements ITreeItem, ITreeNode {
 			descriptions.push(this.omittedStatus.description);
 		}
 		treeItem.description = descriptions.join(" ");
+
 		return treeItem;
 	}
 }

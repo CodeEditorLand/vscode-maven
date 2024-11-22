@@ -33,12 +33,15 @@ export class EffectivePomProvider {
 		}
 
 		const pomPath: string = this.pomPath;
+
 		try {
 			this.isCalculating = true;
+
 			const ePomString: string | undefined = await rawEffectivePom(
 				pomPath,
 				options,
 			);
+
 			if (ePomString === undefined) {
 				this.emitter.emit("complete", undefined);
 			} else {
@@ -73,6 +76,7 @@ export class EffectivePomProvider {
 		}
 
 		this.calculateEffectivePom(options).catch(console.error);
+
 		return promise;
 	}
 }

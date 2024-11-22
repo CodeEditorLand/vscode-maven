@@ -17,6 +17,7 @@ export class MovingAverage {
 	public update(value: number): this {
 		this._val = this._val + (value - this._val) / this._n;
 		this._n += 1;
+
 		return this;
 	}
 
@@ -27,6 +28,7 @@ export class MovingAverage {
 
 export function getRequestDelay(uri: vscode.Uri): number {
 	const avg: MovingAverage | undefined = lruCache.get(uri);
+
 	if (!avg) {
 		return 350;
 	}

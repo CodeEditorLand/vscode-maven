@@ -35,15 +35,21 @@ export const runSteps = async (
 		steps[i].previousStep = steps[i - 1];
 	}
 	let step: IProjectCreationStep | undefined = steps[0];
+
 	while (step !== undefined) {
 		const result = await step.run(metadata);
+
 		switch (result) {
 			case StepResult.NEXT:
 				step = step.nextStep;
+
 				break;
+
 			case StepResult.PREVIOUS:
 				step = step.previousStep;
+
 				break;
+
 			case StepResult.STOP:
 				return false; // user cancellation
 			default:

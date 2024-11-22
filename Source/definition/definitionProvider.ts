@@ -24,11 +24,14 @@ class DefinitionProvider implements vscode.DefinitionProvider {
 		vscode.Location | vscode.Location[] | vscode.LocationLink[]
 	> {
 		const documentText: string = document.getText();
+
 		const cursorOffset: number = document.offsetAt(position);
+
 		const currentNode: Node | undefined = getCurrentNode(
 			documentText,
 			cursorOffset,
 		);
+
 		if (
 			currentNode === undefined ||
 			currentNode.startIndex === null ||
@@ -44,6 +47,7 @@ class DefinitionProvider implements vscode.DefinitionProvider {
 			case XmlTagName.ArtifactId:
 			case XmlTagName.Version: {
 				const parentNode = tagNode.parent;
+
 				if (!parentNode || !isTag(parentNode)) {
 					return undefined;
 				}
@@ -94,6 +98,7 @@ function getParentDefinitionLinkFromRelativePath(
 	const mavenProject: MavenProject | undefined = MavenProjectManager.get(
 		document.uri.fsPath,
 	);
+
 	if (mavenProject) {
 		const parentPomPath = mavenProject.parentPomPath;
 		/**
@@ -113,11 +118,13 @@ function getParentDefinitionLinkFromRelativePath(
 				? document.positionAt(parentNode.endIndex)
 				: position,
 		);
+
 		const definitionLink: vscode.LocationLink = {
 			targetRange: new vscode.Range(0, 0, 0, 0),
 			targetUri: vscode.Uri.file(parentPomPath),
 			originSelectionRange: originSelectionRange,
 		};
+
 		return [definitionLink];
 	}
 	return undefined;
@@ -138,32 +145,41 @@ function getDependencyDefinitionLink(
 	);
 
 	const siblingNodes: Node[] = dependencyOrPluginNode.children ?? [];
+
 	const artifactIdNode: Element | undefined = siblingNodes.find(
 		(elem) => isTag(elem) && elem.tagName === XmlTagName.ArtifactId,
 	) as Element | undefined;
+
 	const groupIdNode: Element | undefined = siblingNodes.find(
 		(elem) => isTag(elem) && elem.tagName === XmlTagName.GroupId,
 	) as Element | undefined;
+
 	const versionNode: Element | undefined = siblingNodes.find(
 		(elem) => isTag(elem) && elem.tagName === XmlTagName.Version,
 	) as Element | undefined;
 
 	const groupIdHint = getTextFromNode(groupIdNode?.firstChild);
+
 	const artifactIdHint = getTextFromNode(artifactIdNode?.firstChild);
+
 	const versionHint = getTextFromNode(versionNode?.firstChild);
+
 	if (groupIdHint && artifactIdHint) {
 		const mavenProject: MavenProject | undefined = MavenProjectManager.get(
 			document.uri.fsPath,
 		);
+
 		const version: string | undefined =
 			mavenProject?.getDependencyVersion(groupIdHint, artifactIdHint) ||
 			versionHint;
+
 		if (version !== undefined) {
 			const pomPath: string = localPomPath(
 				groupIdHint,
 				artifactIdHint,
 				version,
 			);
+
 			if (existsSync(pomPath)) {
 				const definitionLink: vscode.LocationLink = {
 					targetRange: new vscode.Range(0, 0, 0, 0),
@@ -173,14 +189,17 @@ function getDependencyDefinitionLink(
 					}),
 					originSelectionRange: selectionRange,
 				};
+
 				return [definitionLink];
 			} else {
 				// provide all local version under gid:aid
 				const links: vscode.DefinitionLink[] = [];
+
 				const pomPaths = possibleLocalPomPath(
 					groupIdHint,
 					artifactIdHint,
 				);
+
 				for (const p of pomPaths) {
 					if (existsSync(p)) {
 						links.push({
@@ -206,12 +225,14 @@ function getModuleDefinitionLink(
 	position: vscode.Position,
 ) {
 	const moduleName = getTextFromNode(moduleNode.firstChild);
+
 	const targetUri = vscode.Uri.joinPath(
 		document.uri,
 		"..",
 		moduleName,
 		"pom.xml",
 	);
+
 	const selectionRange: vscode.Range = new vscode.Range(
 		moduleNode && moduleNode.startIndex !== null
 			? document.positionAt(moduleNode.startIndex)
@@ -220,11 +241,13 @@ function getModuleDefinitionLink(
 			? document.positionAt(moduleNode.endIndex)
 			: position,
 	);
+
 	const definitionLink: vscode.LocationLink = {
 		targetRange: new vscode.Range(0, 0, 0, 0),
 		targetUri,
 		originSelectionRange: selectionRange,
 	};
+
 	return [definitionLink];
 }
 
@@ -241,6 +264,7 @@ function getParentDefinitionLink(
 	const relativePathNode: Element | undefined = parentNode.childNodes.find(
 		(ch) => isTag(ch) && ch.name === XmlTagName.RelativePath,
 	) as Element | undefined;
+
 	if (relativePathNode && !relativePathNode.firstChild) {
 		// <relativePath/> to explicitly lookup parent from repository
 		return getDependencyDefinitionLink(parentNode, document, position);

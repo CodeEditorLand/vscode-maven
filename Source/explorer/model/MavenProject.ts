@@ -47,6 +47,7 @@ export class MavenProject implements ITreeItem {
 		// use <name> if provided, fallback to <artifactId>
 		if (this._pom?.project?.name?.[0] !== undefined) {
 			const rawName: string = this._pom.project.name[0];
+
 			return this.fillProperties(rawName);
 		} else {
 			return this._pom?.project?.artifactId?.[0];
@@ -94,16 +95,19 @@ export class MavenProject implements ITreeItem {
 			this._pom,
 			"project.modules[0].module",
 		);
+
 		return moduleNames ? moduleNames : [];
 	}
 
 	public get plugins(): MavenPlugin[] {
 		let plugins: any[] | undefined;
+
 		if (_.has(this._ePom, "projects.project")) {
 			// multi-module project
 			const project: any = this._ePom.projects.project.find(
 				(elem: any) => this.name === _.get(elem, "artifactId[0]"),
 			);
+
 			if (project) {
 				plugins = _.get(project, "build[0].plugins[0].plugin");
 			}
@@ -116,11 +120,13 @@ export class MavenProject implements ITreeItem {
 
 	public get dependencies(): any[] {
 		let deps: any[] = [];
+
 		if (_.has(this._ePom, "projects.project")) {
 			// multi-module project
 			const project: any = this._ePom.projects.project.find(
 				(elem: any) => this.name === _.get(elem, "artifactId[0]"),
 			);
+
 			if (project) {
 				deps = _.get(project, "build[0].plugins[0].plugin");
 			}
@@ -140,6 +146,7 @@ export class MavenProject implements ITreeItem {
 				path.dirname(this.pomPath),
 				moduleName,
 			);
+
 			if (fs.existsSync(relative) && fs.statSync(relative).isFile()) {
 				return relative;
 			} else {
@@ -153,8 +160,10 @@ export class MavenProject implements ITreeItem {
 	 */
 	public get parentPomPath(): string | undefined {
 		const parentNode = this._pom?.project?.parent?.[0];
+
 		if (parentNode) {
 			const relativePath: string = parentNode.relativePath?.[0];
+
 			if (relativePath === undefined) {
 				// default
 				return path.join(path.dirname(this.pomPath), "..", "pom.xml");
@@ -178,11 +187,14 @@ export class MavenProject implements ITreeItem {
 
 	public async getTreeItem(): Promise<vscode.TreeItem> {
 		await this.parsePom();
+
 		const label = this.artifactId
 			? Settings.getExploreProjectName(this)
 			: "Unknown";
+
 		const iconFile: string =
 			this.packaging === "pom" ? "root.svg" : "project.svg";
+
 		const treeItem: vscode.TreeItem = new vscode.TreeItem(label);
 		treeItem.iconPath = {
 			light: getPathToExtensionRoot(
@@ -201,6 +213,7 @@ export class MavenProject implements ITreeItem {
 		treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
 		treeItem.description = this.id;
 		treeItem.tooltip = this.pomPath;
+
 		return treeItem;
 	}
 
@@ -215,6 +228,7 @@ export class MavenProject implements ITreeItem {
 		ret.push(new DependenciesMenu(this));
 		ret.push(new FavoritesMenu(this));
 		ret.push(new ProfilesMenu(this));
+
 		if (
 			this.moduleNames.length > 0 &&
 			Settings.viewType() === "hierarchical"
@@ -235,11 +249,13 @@ export class MavenProject implements ITreeItem {
 		cacheOnly?: boolean;
 	}): Promise<IEffectivePom> {
 		let res: IEffectivePom = { pomPath: this.pomPath };
+
 		try {
 			res = await this.ePomProvider.getEffectivePom(options);
 			this._ePom = res?.ePom;
 		} catch (error) {
 			console.error(error);
+
 			throw new Error(
 				"Failed to calculate Effective POM. Please check output window 'Maven for Java' for more details.",
 			);
@@ -263,11 +279,13 @@ export class MavenProject implements ITreeItem {
 	public getDependencyVersion(gid: string, aid: string): string | undefined {
 		// from effective POM
 		const deps: any[] | undefined = this.dependencies;
+
 		const targetDep: any = deps?.find(
 			(elem) =>
 				_.get(elem, "groupId[0]") === gid &&
 				_.get(elem, "artifactId[0]") === aid,
 		);
+
 		if (targetDep?.version?.[0] !== undefined) {
 			return targetDep.version[0];
 		}
@@ -275,6 +293,7 @@ export class MavenProject implements ITreeItem {
 		const targetNode = this.dependencyNodes?.find(
 			(n) => n.groupId === gid && n.artifactId === aid,
 		);
+
 		if (targetNode?.version) {
 			return targetNode.version;
 		}
@@ -315,17 +334,22 @@ export class MavenProject implements ITreeItem {
 
 	public fillProperties(rawName: string): string {
 		const stringTemplatePattern = /\$\{.*?\}/g;
+
 		const matches: RegExpMatchArray | null = rawName.match(
 			stringTemplatePattern,
 		);
+
 		if (matches === null) {
 			return rawName;
 		}
 
 		let name: string = rawName;
+
 		for (const placeholder of matches) {
 			const key: string = placeholder.slice(2, placeholder.length - 1);
+
 			const value: string | undefined = this.getProperty(key);
+
 			if (value !== undefined) {
 				name = name.replace(placeholder, value);
 			}
@@ -347,6 +371,7 @@ export class MavenProject implements ITreeItem {
 			(this.parentPomPath
 				? MavenProjectManager.get(this.parentPomPath)
 				: undefined) ?? this.parent;
+
 		while (cur !== undefined) {
 			if (cur.properties.has(key)) {
 				return cur.properties.get(key);
@@ -364,6 +389,7 @@ export class MavenProject implements ITreeItem {
 	 */
 	public getProperties() {
 		const propertiesNode = _.get(this._ePom, "project.properties[0]");
+
 		if (typeof propertiesNode === "object") {
 			return Object.keys(propertiesNode);
 		} else {
@@ -373,6 +399,7 @@ export class MavenProject implements ITreeItem {
 
 	public async refreshProfiles() {
 		const output = await rawProfileList(this.pomPath);
+
 		if (output) {
 			const profiles = Utils.parseProfilesOutput(this, output);
 			this.profiles = profiles;

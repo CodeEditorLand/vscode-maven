@@ -8,10 +8,12 @@ export interface IArtifactCompletionProvider {
 		groupIdHint?: string,
 		artifactIdHint?: string,
 	): Promise<CompletionItem[]>;
+
 	getArtifactIdCandidates(
 		groupIdHint?: string,
 		artifactIdHint?: string,
 	): Promise<CompletionItem[]>;
+
 	getVersionCandidates(
 		groupIdHint?: string,
 		artifactIdHint?: string,

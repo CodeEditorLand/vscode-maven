@@ -29,6 +29,7 @@ interface IArchetypePickItem extends QuickPickItem {
 }
 
 const LABEL_NO_ARCHETYPE = "No Archetype...";
+
 const LABEL_MORE = "More...";
 
 export class SelectArchetypeStep implements IProjectCreationStep {
@@ -39,6 +40,7 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 
 	public async run(metadata: IProjectCreationMetadata): Promise<StepResult> {
 		const disposables: Disposable[] = [];
+
 		const specifyAchetypePromise = (items: IArchetypePickItem[]) =>
 			new Promise<StepResult>((resolve) => {
 				const pickBox: QuickPick<IArchetypePickItem> =
@@ -98,6 +100,7 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 
 		try {
 			const items = await this.getArchetypePickItems(false);
+
 			return await specifyAchetypePromise(items);
 		} finally {
 			disposables.forEach((d) => d.dispose());
@@ -113,13 +116,16 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 			detail: "Create a basic Maven project directly.",
 			alwaysShow: true,
 		};
+
 		const moreButton: IArchetypePickItem = {
 			label: LABEL_MORE,
 			description: "",
 			detail: "Find more archetypes available in remote catalog.",
 			alwaysShow: true,
 		};
+
 		const archetypes = await this.loadArchetypePickItems(all);
+
 		const pickItems = archetypes.map((archetype) => ({
 			archetype,
 			label: archetype.artifactId
@@ -128,10 +134,12 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 			description: archetype.groupId ? `${archetype.groupId}` : "",
 			detail: archetype.description,
 		}));
+
 		const SEP_ARCHETYPE: IArchetypePickItem = {
 			label: "Popular Archetypes",
 			kind: QuickPickItemKind.Separator,
 		};
+
 		return all
 			? pickItems
 			: [noArchetypeButton, moreButton, SEP_ARCHETYPE, ...pickItems];
@@ -143,6 +151,7 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 		// from cached remote-catalog
 		const remoteItems: Archetype[] =
 			await this.getCachedRemoteArchetypeItems();
+
 		const localOnlyItems: Archetype[] = localItems.filter(
 			(localItem) =>
 				!remoteItems.find(
@@ -150,11 +159,13 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 						remoteItem.identifier === localItem.identifier,
 				),
 		);
+
 		if (all) {
 			return [...localOnlyItems, ...remoteItems];
 		} else {
 			const recommendedItems: Archetype[] =
 				await this.getRecommendedItems(remoteItems);
+
 			return [...localOnlyItems, ...recommendedItems];
 		}
 	}
@@ -164,6 +175,7 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 	): Promise<Archetype[]> {
 		// Top popular archetypes according to usage data
 		let fixedList: string[] | undefined;
+
 		try {
 			fixedList = await fse.readJSON(
 				path.join(
@@ -194,8 +206,10 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 			getMavenLocalRepository(),
 			"archetype-catalog.xml",
 		);
+
 		if (await fse.pathExists(localCatalogPath)) {
 			const buf: Buffer = await fse.readFile(localCatalogPath);
+
 			return ArchetypeModule.listArchetypeFromXml(buf.toString());
 		} else {
 			return [];
@@ -207,6 +221,7 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 			"resources",
 			"archetypes.json",
 		);
+
 		if (await fse.pathExists(contentPath)) {
 			return (await fse.readJSON(contentPath)).map(
 				(rawItem: Archetype) =>

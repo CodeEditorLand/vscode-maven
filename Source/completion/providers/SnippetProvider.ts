@@ -13,6 +13,7 @@ const artifactSegments: string[] = [
 	"\t<groupId>$1</groupId>",
 	"\t<artifactId>$2</artifactId>",
 ];
+
 const dependencySnippetString = (eol: string) =>
 	["<dependency>", ...artifactSegments, "</dependency>"].join(eol);
 
@@ -26,6 +27,7 @@ export class SnippetProvider implements IXmlCompletionProvider {
 		currentNode: Node,
 	): Promise<vscode.CompletionItem[]> {
 		let tagNode: Element | undefined;
+
 		if (isTag(currentNode)) {
 			tagNode = currentNode;
 		} else if (currentNode.parent && isTag(currentNode.parent)) {
@@ -36,10 +38,13 @@ export class SnippetProvider implements IXmlCompletionProvider {
 		}
 
 		const documentText = document.getText();
+
 		const cursorOffset = document.offsetAt(position);
+
 		const eol = document.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
 
 		const ret: vscode.CompletionItem[] = [];
+
 		switch (tagNode.tagName) {
 			case XmlTagName.Dependencies: {
 				const snippetItem: vscode.CompletionItem =
@@ -47,11 +52,13 @@ export class SnippetProvider implements IXmlCompletionProvider {
 						"dependency",
 						vscode.CompletionItemKind.Snippet,
 					);
+
 				const snippetContent: string = trimBrackets(
 					dependencySnippetString(eol),
 					documentText,
 					cursorOffset,
 				);
+
 				const dependencySnippet: vscode.SnippetString =
 					new vscode.SnippetString(snippetContent);
 				snippetItem.insertText = dependencySnippet;
@@ -64,6 +71,7 @@ export class SnippetProvider implements IXmlCompletionProvider {
 					],
 				};
 				ret.push(snippetItem);
+
 				break;
 			}
 			case XmlTagName.Plugins: {
@@ -72,11 +80,13 @@ export class SnippetProvider implements IXmlCompletionProvider {
 						"plugin",
 						vscode.CompletionItemKind.Snippet,
 					);
+
 				const snippetContent: string = trimBrackets(
 					pluginSnippetString(eol),
 					documentText,
 					cursorOffset,
 				);
+
 				const pluginSnippet: vscode.SnippetString =
 					new vscode.SnippetString(snippetContent);
 				snippetItem.insertText = pluginSnippet;
@@ -87,6 +97,7 @@ export class SnippetProvider implements IXmlCompletionProvider {
 					arguments: [{ completeFor: "plugin", source: "snippet" }],
 				};
 				ret.push(snippetItem);
+
 				break;
 			}
 			default:

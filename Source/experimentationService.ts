@@ -22,6 +22,7 @@ class ExperimentationTelemetry implements IExperimentationTelemetry {
 
 	public postEvent(eventName: string, props: Map<string, string>): void {
 		const payload: any = { __event_name__: eventName };
+
 		for (const [key, value] of props) {
 			payload[key] = value;
 		}

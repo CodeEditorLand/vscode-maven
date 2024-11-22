@@ -44,6 +44,7 @@ export function getChildrenByTags(
 	tags: string[],
 ): Element[] {
 	const ret: Element[] = [];
+
 	for (const child of parentElement.children) {
 		if (isTag(child) && tags.includes(child.tagName)) {
 			ret.push(child);
@@ -64,6 +65,7 @@ export function detectDocumentIndent(
 	rawText: string,
 ): any {
 	const projectNodes = getChildrenByTags(xmlDocument, [XmlTagName.Project]);
+
 	if (!projectNodes.length) {
 		return;
 	}
@@ -71,13 +73,17 @@ export function detectDocumentIndent(
 	const firstChildElement = projectNodes[0].children.find((node) =>
 		isTag(node),
 	);
+
 	if (!firstChildElement || firstChildElement.startIndex === null) {
 		return;
 	}
 
 	let indent = 0;
+
 	let indentChar = " ";
+
 	let startOffset = firstChildElement.startIndex;
+
 	while (--startOffset > 0 && rawText.charAt(startOffset) != "\n") {
 		if (rawText.charAt(startOffset) == "\t") {
 			indentChar = "\t";
@@ -100,8 +106,10 @@ export function getNodesByTag(text: string, tag: string): Element[] {
 		lowerCaseTags: false,
 		xmlMode: true,
 	});
+
 	const ret: Element[] = [];
 	dfs(document, (node) => isTag(node) && node.tagName === tag, ret);
+
 	return ret;
 }
 
@@ -112,6 +120,7 @@ export function getCurrentNode(text: string, offset: number): Node | undefined {
 		lowerCaseTags: false,
 		xmlMode: true,
 	});
+
 	const ret: Node[] = [];
 	dfs(
 		document,
@@ -123,12 +132,15 @@ export function getCurrentNode(text: string, offset: number): Node | undefined {
 		ret,
 		true,
 	);
+
 	return ret?.[ret.length - 1];
 }
 
 export function getNodePath(node: Node) {
 	const parents = [];
+
 	let cur: Node | null = node;
+
 	while (cur) {
 		if (isTag(cur)) {
 			parents.unshift(cur.tagName);
@@ -163,6 +175,7 @@ export function getInnerEndIndex(node: Element) {
 
 export function getEnclosingTag(node: Node): Element | null {
 	let currentNode: Node | null = node;
+
 	while (currentNode) {
 		if (isTag(currentNode)) {
 			return currentNode;
@@ -180,6 +193,7 @@ function dfs(
 ) {
 	if (pred(node)) {
 		result.push(node);
+
 		if (!includeAll) {
 			return;
 		}

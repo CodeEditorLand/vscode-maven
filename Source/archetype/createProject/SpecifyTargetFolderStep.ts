@@ -24,12 +24,17 @@ export class SpecifyTargetFolderStep implements IProjectCreationStep {
 				metadata.parentProject.pomPath,
 				"../",
 			);
+
 			return StepResult.NEXT;
 		}
 		const LABEL_CHOOSE_FOLDER = "Select Destination Folder";
+
 		const OPTION_CONTINUE = "Continue";
+
 		const OPTION_CHOOSE_ANOTHER_FOLDER = "Choose another folder";
+
 		const OPTION_CHANGE_PROJECT_NAME = "Change project name";
+
 		const MESSAGE_EXISTING_FOLDER = `A folder [${metadata.artifactId}] already exists in the selected folder.`;
 
 		// choose target folder.
@@ -40,6 +45,7 @@ export class SpecifyTargetFolderStep implements IProjectCreationStep {
 					: undefined,
 			openLabel: LABEL_CHOOSE_FOLDER,
 		});
+
 		while (
 			result &&
 			pathExistsSync(path.join(result.fsPath, metadata.artifactId))
@@ -50,6 +56,7 @@ export class SpecifyTargetFolderStep implements IProjectCreationStep {
 				OPTION_CHOOSE_ANOTHER_FOLDER,
 				OPTION_CHANGE_PROJECT_NAME,
 			);
+
 			if (overrideChoice === OPTION_CHOOSE_ANOTHER_FOLDER) {
 				result = await openDialogForFolder({
 					defaultUri: result,
@@ -63,10 +70,12 @@ export class SpecifyTargetFolderStep implements IProjectCreationStep {
 		}
 
 		const targetFolder: string | undefined = result?.fsPath;
+
 		if (targetFolder === undefined) {
 			return StepResult.STOP;
 		}
 		metadata.targetFolder = targetFolder;
+
 		return StepResult.NEXT;
 	}
 }

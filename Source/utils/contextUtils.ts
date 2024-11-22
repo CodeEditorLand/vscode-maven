@@ -13,11 +13,17 @@ import { Settings } from "../Settings";
 import { Utils } from "./Utils";
 
 let EXTENSION_CONTEXT: ExtensionContext;
+
 let EXTENSION_PUBLISHER: string;
+
 let EXTENSION_NAME: string;
+
 let EXTENSION_VERSION: string;
+
 let EXTENSION_AI_KEY: string;
+
 let MAVEN_LOCAL_REPOSITORY: string;
+
 let TEMP_FOLDER_PER_USER: string;
 
 export async function loadPackageInfo(
@@ -50,15 +56,18 @@ export async function loadMavenSettingsFilePath(): Promise<void> {
 	try {
 		let userSettingsPath: string | undefined =
 			Settings.getSettingsFilePath();
+
 		if (!userSettingsPath) {
 			userSettingsPath = path.join(os.homedir(), ".m2", "settings.xml");
 		}
 		const userSettings: unknown =
 			await Utils.parseXmlFile(userSettingsPath);
+
 		const localRepository = _.get(
 			userSettings,
 			"settings.localRepository[0]",
 		);
+
 		if (localRepository) {
 			MAVEN_LOCAL_REPOSITORY = path.resolve(localRepository);
 			mavenOutputChannel.appendLine(
@@ -112,6 +121,7 @@ export function getPathToWorkspaceStorage(
 		return undefined;
 	}
 	fse.ensureDirSync(EXTENSION_CONTEXT.storagePath);
+
 	return path.join(EXTENSION_CONTEXT.storagePath, ...args);
 }
 
@@ -135,6 +145,8 @@ export function possibleLocalPomPath(gid: string, aid: string): string[] {
 		...gid.split("."),
 		aid,
 	);
+
 	const versions = readdirSync(artifactFolder);
+
 	return versions.map((v) => path.join(artifactFolder, v, `${aid}-${v}.pom`));
 }

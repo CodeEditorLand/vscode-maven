@@ -29,6 +29,7 @@ export class FavoritesMenu extends ProjectMenu implements ITreeItem {
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
 		treeItem.iconPath = new vscode.ThemeIcon("star-empty");
+
 		return treeItem;
 	}
 }

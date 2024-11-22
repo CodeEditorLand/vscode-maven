@@ -21,8 +21,10 @@ export class WorkspaceFolder implements ITreeItem {
 
 	public async getChildren(): Promise<ITreeItem[]> {
 		const ret: ITreeItem[] = [];
+
 		const allProjects: MavenProject[] =
 			await MavenProjectManager.loadProjects(this.workspaceFolder);
+
 		if (allProjects.length === 0) {
 			return [new HintNode("No Maven project found.")];
 		}
@@ -32,10 +34,12 @@ export class WorkspaceFolder implements ITreeItem {
 				ret.push(
 					...this.sortByName(allProjects.filter((m) => !m.parent)),
 				);
+
 				break;
 			}
 			case "flat": {
 				ret.push(...this.sortByName(allProjects));
+
 				break;
 			}
 			default:

@@ -17,6 +17,7 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 	private centralProvider;
 	private indexProvider;
 	private localProvider;
+
 	constructor() {
 		this.centralProvider = new FromCentral();
 		this.indexProvider = new FromIndex();
@@ -29,6 +30,7 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 		currentNode: Node,
 	): Promise<vscode.CompletionItem[]> {
 		let tagNode: Element | undefined;
+
 		if (isTag(currentNode)) {
 			tagNode = currentNode;
 		} else if (currentNode.parent && isTag(currentNode.parent)) {
@@ -41,23 +43,28 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 		switch (tagNode.tagName) {
 			case XmlTagName.GroupId: {
 				const groupIdTextNode = tagNode.firstChild;
+
 				const targetRange: vscode.Range | undefined = getRange(
 					groupIdTextNode,
 					document,
 					position,
 				);
+
 				if (!targetRange) {
 					return [];
 				}
 
 				const siblingNodes: Node[] = tagNode.parent?.children ?? [];
+
 				const artifactIdNode: Element | undefined = siblingNodes.find(
 					(elem) =>
 						isTag(elem) && elem.tagName === XmlTagName.ArtifactId,
 				) as Element | undefined;
+
 				const artifactIdTextNode = artifactIdNode?.firstChild;
 
 				const groupIdHint: string = getTextFromNode(groupIdTextNode);
+
 				const artifactIdHint: string =
 					getTextFromNode(artifactIdTextNode);
 
@@ -66,13 +73,16 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 						groupIdHint,
 						artifactIdHint,
 					);
+
 				const indexItems: vscode.CompletionItem[] =
 					await this.indexProvider.getGroupIdCandidates(
 						groupIdHint,
 						artifactIdHint,
 					);
+
 				const localItems: vscode.CompletionItem[] =
 					await this.localProvider.getGroupIdCandidates(groupIdHint);
+
 				const mergedItems: vscode.CompletionItem[] = _.unionBy(
 					centralItems,
 					indexItems,
@@ -80,27 +90,33 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 					(item) => item.insertText,
 				);
 				mergedItems.forEach((item) => (item.range = targetRange));
+
 				return mergedItems;
 			}
 			case XmlTagName.ArtifactId: {
 				const artifactIdTextNode = tagNode.firstChild;
+
 				const targetRange: vscode.Range | undefined = getRange(
 					artifactIdTextNode,
 					document,
 					position,
 				);
+
 				if (!targetRange) {
 					return [];
 				}
 
 				const siblingNodes: Node[] = tagNode.parent?.children ?? [];
+
 				const groupIdNode: Element | undefined = siblingNodes.find(
 					(elem) =>
 						isTag(elem) && elem.tagName === XmlTagName.GroupId,
 				) as Element | undefined;
+
 				const groupIdTextNode = groupIdNode?.firstChild;
 
 				const groupIdHint: string = getTextFromNode(groupIdTextNode);
+
 				const artifactIdHint: string =
 					getTextFromNode(artifactIdTextNode);
 
@@ -109,15 +125,18 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 						groupIdHint,
 						artifactIdHint,
 					);
+
 				const indexItems: vscode.CompletionItem[] =
 					await this.indexProvider.getArtifactIdCandidates(
 						groupIdHint,
 						artifactIdHint,
 					);
+
 				const localItems: vscode.CompletionItem[] =
 					await this.localProvider.getArtifactIdCandidates(
 						groupIdHint,
 					);
+
 				let mergedItems: vscode.CompletionItem[] = [];
 
 				const ID_SEPARATOR = ":";
@@ -143,9 +162,11 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 							item,
 							"data.groupId",
 						);
+
 						if (matchedGroupId) {
 							const groupIdRange: vscode.Range | undefined =
 								getRange(groupIdTextNode, document);
+
 							if (groupIdRange) {
 								item.additionalTextEdits = [
 									new vscode.TextEdit(
@@ -158,24 +179,29 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 					}
 				}
 				mergedItems.forEach((item) => (item.range = targetRange));
+
 				return mergedItems;
 			}
 			case XmlTagName.Version: {
 				const versionTextNode = tagNode.firstChild;
+
 				const targetRange: vscode.Range | undefined = getRange(
 					versionTextNode,
 					document,
 					position,
 				);
+
 				if (!targetRange) {
 					return [];
 				}
 
 				const siblingNodes: Node[] = tagNode.parent?.children ?? [];
+
 				const groupIdNode: Element | undefined = siblingNodes.find(
 					(elem) =>
 						isTag(elem) && elem.tagName === XmlTagName.GroupId,
 				) as Element | undefined;
+
 				const artifactIdNode: Element | undefined = siblingNodes.find(
 					(elem) =>
 						isTag(elem) && elem.tagName === XmlTagName.ArtifactId,
@@ -185,9 +211,11 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 					groupIdNode?.firstChild,
 					DEFAULT_GROUP_ID,
 				);
+
 				const artifactIdHint: string = getTextFromNode(
 					artifactIdNode?.firstChild,
 				);
+
 				if (!groupIdHint || !artifactIdHint) {
 					return [];
 				}
@@ -197,16 +225,19 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 						groupIdHint,
 						artifactIdHint,
 					);
+
 				const indexItems: vscode.CompletionItem[] =
 					await this.indexProvider.getVersionCandidates(
 						groupIdHint,
 						artifactIdHint,
 					);
+
 				const localItems: vscode.CompletionItem[] =
 					await this.localProvider.getVersionCandidates(
 						groupIdHint,
 						artifactIdHint,
 					);
+
 				const mergedItems: vscode.CompletionItem[] = _.unionBy(
 					centralItems,
 					indexItems,
@@ -214,6 +245,7 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 					(item) => item.insertText,
 				);
 				mergedItems.forEach((item) => (item.range = targetRange));
+
 				return mergedItems;
 			}
 		}
@@ -256,10 +288,13 @@ function dedupItemsWithGroupId(
 	const itemsWithGivenGroupId: vscode.CompletionItem[] = items.filter(
 		(item) => _.get(item, "data.groupId") === groupId,
 	);
+
 	const reservedArtifactIds: (string | vscode.SnippetString | undefined)[] =
 		itemsWithGivenGroupId.map((item) => item.insertText);
+
 	const dedupedItems = items.filter(
 		(item) => !reservedArtifactIds.includes(item.insertText),
 	);
+
 	return itemsWithGivenGroupId.concat(dedupedItems);
 }

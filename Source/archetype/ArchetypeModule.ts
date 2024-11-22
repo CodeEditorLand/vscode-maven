@@ -47,6 +47,7 @@ export class ArchetypeModule {
 			title: "New Maven Module",
 			targetFolderHint: workspace.workspaceFolders?.[0]?.uri.fsPath,
 		};
+
 		if (entry instanceof Uri) {
 			metadata.targetFolderHint = entry.fsPath;
 		} else if (typeof entry === "object") {
@@ -54,6 +55,7 @@ export class ArchetypeModule {
 		}
 
 		const steps: IProjectCreationStep[] = [];
+
 		if (!metadata.parentProject) {
 			steps.push(selectParentPomStep);
 		}
@@ -78,6 +80,7 @@ export class ArchetypeModule {
 			title: "New Maven Project",
 			targetFolderHint: workspace.workspaceFolders?.[0]?.uri.fsPath,
 		};
+
 		if (entry instanceof Uri) {
 			metadata.targetFolderHint = entry.fsPath;
 		} else if (typeof entry === "object") {
@@ -85,6 +88,7 @@ export class ArchetypeModule {
 		}
 
 		const steps: IProjectCreationStep[] = [];
+
 		if (
 			!metadata.archetypeArtifactId ||
 			!metadata.archetypeGroupId ||
@@ -110,6 +114,7 @@ export class ArchetypeModule {
 		metadata: IProjectCreationMetadata,
 	): Promise<void> {
 		const success: boolean = await runSteps(steps, metadata);
+
 		if (success) {
 			if (
 				metadata.archetypeArtifactId &&
@@ -138,8 +143,10 @@ export class ArchetypeModule {
 			REMOTE_ARCHETYPE_CATALOG_URL,
 			true,
 		);
+
 		const archetypes: Archetype[] =
 			await ArchetypeModule.listArchetypeFromXml(xml);
+
 		const targetFilePath: string = path.join(
 			getPathToExtensionRoot(),
 			"resources",
@@ -154,20 +161,28 @@ export class ArchetypeModule {
 	): Promise<Archetype[]> {
 		try {
 			const xmlObject: any = await Utils.parseXmlContent(xmlString);
+
 			const catalog: any = xmlObject && xmlObject["archetype-catalog"];
+
 			const dict: { [key: string]: Archetype } = {};
+
 			const archetypeList: any[] = catalog.archetypes[0].archetype;
 			archetypeList.forEach((archetype) => {
 				const groupId: string =
 					archetype.groupId && archetype.groupId[0];
+
 				const artifactId: string =
 					archetype.artifactId && archetype.artifactId[0];
+
 				const description: string =
 					archetype.description && archetype.description[0];
+
 				const version: string =
 					archetype.version && archetype.version[0];
+
 				const repository: string =
 					archetype.repository && archetype.repository[0];
+
 				const identifier = `${groupId}:${artifactId}`;
 
 				if (dict[identifier] === undefined) {
@@ -182,6 +197,7 @@ export class ArchetypeModule {
 					dict[identifier].versions.push(version);
 				}
 			});
+
 			return Object.keys(dict).map((k: string) => dict[k]);
 		} catch (err) {
 			console.error(err);
@@ -201,6 +217,7 @@ async function executeInTerminalHandler(
 		artifactId,
 		targetFolder,
 	} = metadata;
+
 	if (
 		archetypeArtifactId === undefined ||
 		archetypeGroupId === undefined ||
@@ -218,8 +235,11 @@ async function executeInTerminalHandler(
 		`-DgroupId="${groupId}"`,
 		`-DartifactId="${artifactId}"`,
 	];
+
 	let cwd: string | undefined = targetFolder;
+
 	let mvnPath: string | undefined = await getMaven();
+
 	if (mvnPath === undefined) {
 		cmdArgs.push(`-DoutputDirectory="${targetFolder}"`);
 		mvnPath = getEmbeddedMavenWrapper();
@@ -236,10 +256,13 @@ async function executeInTerminalHandler(
 	const defaultArgs: string | undefined = Settings.Executable.options(
 		metadata.targetFolder,
 	);
+
 	const mvnSettingsFile: string | undefined = Settings.getSettingsFilePath();
+
 	const mvnSettingsArg: string | undefined = mvnSettingsFile
 		? `-s "${await mavenTerminal.formattedPathForTerminal(mvnSettingsFile)}"`
 		: undefined;
+
 	let commandLine: string = [
 		mvnString,
 		...cmdArgs,
@@ -248,7 +271,9 @@ async function executeInTerminalHandler(
 	]
 		.filter(Boolean)
 		.join(" ");
+
 	const options: vscode.ShellExecutionOptions = { cwd };
+
 	if (vscode.env.remoteName === undefined && process.platform === "win32") {
 		// VS Code launched in Windows Desktop.
 		options.shellQuoting = shellQuotes.cmd;
@@ -259,6 +284,7 @@ async function executeInTerminalHandler(
 		options.shellQuoting = shellQuotes.bash;
 	}
 	const execution = new vscode.ShellExecution(commandLine, options);
+
 	const createProjectTask = new vscode.Task(
 		{ type: "maven", targetFolder, artifactId },
 		vscode.TaskScope.Global,
@@ -273,6 +299,7 @@ async function createBasicMavenProject(
 	metadata: IProjectCreationMetadata,
 ): Promise<void> {
 	const { groupId, artifactId, targetFolder } = metadata;
+
 	if (!groupId || !artifactId || !targetFolder) {
 		return;
 	}
@@ -285,9 +312,11 @@ async function createBasicMavenProject(
 			message: "Generating project from template...",
 			increment: 10,
 		});
+
 		const templateUri = vscode.Uri.file(
 			getPathToExtensionRoot("resources", "projectTemplate"),
 		);
+
 		const targetUri = vscode.Uri.joinPath(
 			vscode.Uri.file(targetFolder),
 			artifactId,
@@ -296,15 +325,21 @@ async function createBasicMavenProject(
 
 		// update groupId/artifactId in pom.xml
 		p.report({ message: "Updating pom.xml file...", increment: 10 });
+
 		const pomUri = vscode.Uri.joinPath(targetUri, "pom.xml");
+
 		let pomContent = (await workspace.fs.readFile(pomUri)).toString();
+
 		let parentPom = "";
+
 		const compilerSource =
 			metadata.parentProject?.getProperty("maven.compiler.source") ||
 			"17";
+
 		const compilerTarget =
 			metadata.parentProject?.getProperty("maven.compiler.target") ||
 			"17";
+
 		if (metadata.parentProject) {
 			parentPom =
 				`    <parent>\n` +
@@ -331,6 +366,7 @@ async function createBasicMavenProject(
 		await vscode.workspace.fs.createDirectory(
 			vscode.Uri.joinPath(targetUri, "src", "test", "java"),
 		);
+
 		const packageUri = vscode.Uri.joinPath(
 			targetUri,
 			"src",
@@ -339,7 +375,9 @@ async function createBasicMavenProject(
 			...groupId.split("."),
 		);
 		await vscode.workspace.fs.createDirectory(packageUri);
+
 		const mainUri = vscode.Uri.joinPath(packageUri, "Main.java");
+
 		const content: string = [
 			`package ${groupId};`,
 			"",
@@ -362,6 +400,7 @@ async function createBasicMavenProject(
 			message: "Import the new module as Java project...",
 			increment: 20,
 		});
+
 		importProjectOnDemand(targetFolder);
 	};
 
@@ -384,13 +423,17 @@ async function updateParentPom(
 	}
 
 	const pomDocument = await workspace.openTextDocument(parentPomPath);
+
 	const documentText = pomDocument.getText();
+
 	const xmlDocument = await parseDocument(documentText);
+
 	if (!xmlDocument) {
 		return;
 	}
 
 	const projectNodes = getChildrenByTags(xmlDocument, [XmlTagName.Project]);
+
 	if (!projectNodes.length) {
 		return;
 	}
@@ -399,11 +442,13 @@ async function updateParentPom(
 		indent: 2,
 		indentChar: " ",
 	};
+
 	const basicNodes = getChildrenByTags(projectNodes[0], [
 		XmlTagName.GroupId,
 		XmlTagName.ArtifactId,
 		XmlTagName.Version,
 	]);
+
 	let nextInsertOffset = -1;
 	basicNodes.forEach((node) => {
 		if (node.endIndex) {
@@ -417,13 +462,16 @@ async function updateParentPom(
 	nextInsertOffset++;
 
 	const parentPomUri = Uri.file(parentPomPath);
+
 	const packagingNodes = getChildrenByTags(projectNodes[0], [
 		XmlTagName.Packaging,
 	]);
+
 	const workspaceEdit = new vscode.WorkspaceEdit();
 	// Update the packaging mode to pom.
 	if (packagingNodes.length) {
 		const node = packagingNodes[0].firstChild;
+
 		if (node && getTextFromNode(node) === "pom") {
 			// it's already packaging as pom, do nothing
 		} else {
@@ -455,8 +503,10 @@ async function updateParentPom(
 	const moduleNodes = getChildrenByTags(projectNodes[0], [
 		XmlTagName.Modules,
 	]);
+
 	if (moduleNodes.length) {
 		const modules = getChildrenByTags(moduleNodes[0], [XmlTagName.Module]);
+
 		if (modules.length) {
 			const lastModule = modules[modules.length - 1];
 			nextInsertOffset = lastModule.endIndex
@@ -499,6 +549,7 @@ async function updateParentPom(
 
 function genIndent(indentChar: string, indentSize: number): string {
 	let ret = "";
+
 	for (let i = 0; i < indentSize; i++) {
 		ret += indentChar;
 	}

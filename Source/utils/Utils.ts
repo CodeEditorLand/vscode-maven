@@ -40,6 +40,7 @@ export class Utils {
 	): Promise<unknown> {
 		if (await fse.pathExists(xmlFilePath)) {
 			const xmlString: string = await fse.readFile(xmlFilePath, "utf8");
+
 			return Utils.parseXmlContent(xmlString, options);
 		} else {
 			return undefined;
@@ -51,6 +52,7 @@ export class Utils {
 		options?: xml2js.OptionsV2,
 	): Promise<unknown> {
 		const opts: object = Object.assign({ explicitArray: true }, options);
+
 		return new Promise<unknown>(
 			(
 				resolve: (value: unknown) => void,
@@ -74,6 +76,7 @@ export class Utils {
 	static getTempOutputPath(key: string): string {
 		const pathInWorkspaceFolder: string | undefined =
 			getPathToWorkspaceStorage(md5(key), createUuid());
+
 		if (pathInWorkspaceFolder !== undefined) {
 			return pathInWorkspaceFolder;
 		} else {
@@ -95,6 +98,7 @@ export class Utils {
 				reject: (e: Error) => void,
 			): void => {
 				const urlObj: url.Url = url.parse(targetUrl);
+
 				const options: object = Object.assign(
 					{
 						headers: Object.assign({}, customHeaders, {
@@ -106,6 +110,7 @@ export class Utils {
 
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				let client: any;
+
 				if (urlObj.protocol === "https:") {
 					client = https;
 					// tslint:disable-next-line:no-http-string
@@ -113,13 +118,16 @@ export class Utils {
 					client = http;
 				} else {
 					reject(new Error("Unsupported protocol."));
+
 					return;
 				}
 				// tslint:disable-next-line: no-unsafe-any
 				client
 					.get(options, (res: http.IncomingMessage) => {
 						let rawData: string;
+
 						let ws: fse.WriteStream;
+
 						if (readContent) {
 							rawData = "";
 						} else {
@@ -152,6 +160,7 @@ export class Utils {
 		param: Uri | MavenProject | string,
 	): Promise<void> {
 		let pomPath: string | undefined;
+
 		if (typeof param === "string") {
 			pomPath = param;
 		} else if (typeof param === "object" && param instanceof MavenProject) {
@@ -164,6 +173,7 @@ export class Utils {
 		}
 
 		const mvn: string | undefined = await getMaven(pomPath);
+
 		if (mvn === undefined) {
 			throw new MavenNotFoundError();
 		}
@@ -176,7 +186,9 @@ export class Utils {
 		pomPathOrMavenProject: string | MavenProject,
 	): Promise<string | undefined> {
 		let pomPath: string;
+
 		let name: string;
+
 		if (
 			typeof pomPathOrMavenProject === "object" &&
 			pomPathOrMavenProject instanceof MavenProject
@@ -192,14 +204,18 @@ export class Utils {
 		}
 		const task = async (p: Progress<{ message?: string }>) => {
 			p.report({ message: `Generating Effective POM: ${name}` });
+
 			try {
 				const ret: string | undefined = await rawEffectivePom(pomPath);
+
 				return ret ? ret : "";
 			} catch (error) {
 				setUserError(error);
+
 				throw error;
 			}
 		};
+
 		return await window.withProgress(
 			{ location: ProgressLocation.Notification },
 			task,
@@ -212,17 +228,21 @@ export class Utils {
 	): Promise<string> {
 		const task = async (p: Progress<{ message?: string }>) => {
 			p.report({ message: `Retrieving Plugin Info: ${pluginId}` });
+
 			try {
 				const ret: string | undefined = await pluginDescription(
 					pluginId,
 					pomPath,
 				);
+
 				return ret ? ret : "";
 			} catch (error) {
 				setUserError(error);
+
 				throw error;
 			}
 		};
+
 		return await window.withProgress(
 			{ location: ProgressLocation.Window },
 			task,
@@ -233,6 +253,7 @@ export class Utils {
 		pomOrProject: string | MavenProject,
 	): Promise<void> {
 		let pomPath: string | undefined;
+
 		if (typeof pomOrProject === "string") {
 			pomPath = pomOrProject;
 		} else if (
@@ -249,9 +270,11 @@ export class Utils {
 			placeHolder: "e.g. clean package -DskipTests",
 			ignoreFocusOut: true,
 		});
+
 		const trimmedGoals: string | undefined = inputGoals
 			? inputGoals.trim()
 			: undefined;
+
 		if (trimmedGoals) {
 			await executeInTerminal({
 				command: trimmedGoals,
@@ -268,6 +291,7 @@ export class Utils {
 			await Promise.all(projectPomPaths.map(getLRUCommands)),
 		) as ICommandHistoryEntry[];
 		candidates.sort((a, b) => b.timestamp - a.timestamp);
+
 		const selected:
 			| { command: string; pomPath: string; timestamp: number }
 			| undefined = await window
@@ -284,6 +308,7 @@ export class Utils {
 				},
 			)
 			.then((item) => (item ? item.value : undefined));
+
 		if (selected) {
 			await executeInTerminal({
 				command: selected.command,
@@ -296,7 +321,9 @@ export class Utils {
 		node?: LifecyclePhase | FavoriteCommand | { uri: string },
 	): Promise<void> {
 		let selectedProject: MavenProject | undefined;
+
 		let selectedCommand: string | undefined;
+
 		if (node instanceof LifecyclePhase) {
 			selectedProject = node.project;
 			selectedCommand = node.phase;
@@ -327,6 +354,7 @@ export class Utils {
 		// select a command if not provided
 		if (!selectedCommand) {
 			const LABEL_CUSTOM = "Custom ...";
+
 			const LABEL_FAVORITES = "Favorites ...";
 			selectedCommand = await window.showQuickPick(
 				[LABEL_FAVORITES, LABEL_CUSTOM, ...DEFAULT_MAVEN_LIFECYCLES],
@@ -335,6 +363,7 @@ export class Utils {
 					ignoreFocusOut: true,
 				},
 			);
+
 			if (!selectedCommand) {
 				return;
 			}
@@ -345,13 +374,17 @@ export class Utils {
 						"maven.goal.custom",
 						selectedProject,
 					);
+
 					return;
+
 				case LABEL_FAVORITES:
 					await commands.executeCommand(
 						"maven.favorites",
 						selectedProject,
 					);
+
 					return;
+
 				default:
 					break;
 			}
@@ -359,6 +392,7 @@ export class Utils {
 
 		if (node instanceof FavoriteCommand) {
 			await runFavoriteCommandsHandler(selectedProject, node);
+
 			return;
 		}
 
@@ -373,15 +407,22 @@ export class Utils {
 		output: string,
 	): MavenProfile[] {
 		const profiles: MavenProfile[] = [];
+
 		const regexp =
 			/Profile Id: (.*) \(Active: (true|false)\s?, Source: (.*)\)/g;
+
 		let match: RegExpExecArray | null;
+
 		do {
 			match = regexp.exec(output);
+
 			if (match != null && match.length === 4) {
 				const id = match[1];
+
 				const active = match[2] === "true";
+
 				const source = match[3];
+
 				if (!profiles.find((p) => p.id === id)) {
 					const profile = new MavenProfile(
 						project,
@@ -393,6 +434,7 @@ export class Utils {
 				}
 			}
 		} while (match !== null);
+
 		return profiles;
 	}
 }

@@ -21,12 +21,15 @@ export class MavenProjectManager {
 		workspaceFolder?: vscode.WorkspaceFolder,
 	): Promise<MavenProject[]> {
 		const newProjects: MavenProject[] = [];
+
 		const allProjects: MavenProject[] = [];
+
 		const pomPaths: string[] = await getAllPomPaths(workspaceFolder);
 
 		for (const pomPath of pomPaths) {
 			let currentProject: MavenProject | undefined =
 				MavenProjectManager.get(pomPath);
+
 			if (!currentProject) {
 				currentProject = new MavenProject(pomPath);
 				newProjects.push(currentProject);
@@ -40,11 +43,13 @@ export class MavenProjectManager {
 			p.modules.forEach((m) => {
 				const moduleNode: MavenProject | undefined =
 					MavenProjectManager.get(m);
+
 				if (moduleNode && moduleNode.parent === undefined) {
 					moduleNode.parent = p;
 				}
 			});
 		});
+
 		return allProjects;
 	}
 
@@ -75,6 +80,7 @@ export class MavenProjectManager {
 
 	public static remove(pomPath: string): void {
 		const projectMap = MavenProjectManager.getInstance()._projectMap;
+
 		if (projectMap.has(pomPath)) {
 			projectMap.delete(pomPath);
 		}
@@ -84,6 +90,7 @@ export class MavenProjectManager {
 		folder: vscode.WorkspaceFolder,
 	): Promise<void> {
 		const pomPaths: string[] = await getAllPomPaths(folder);
+
 		for (const pomPath of pomPaths) {
 			MavenProjectManager.remove(pomPath);
 		}
@@ -98,7 +105,9 @@ async function getAllPomPaths(
 			const arrayOfPoms: string[][] = await Promise.all(
 				vscode.workspace.workspaceFolders.map(getAllPomPaths),
 			);
+
 			const ret = [];
+
 			for (const poms of arrayOfPoms) {
 				ret.push(...poms);
 			}
@@ -108,10 +117,13 @@ async function getAllPomPaths(
 		}
 	}
 	const exclusions: string[] = Settings.excludedFolders(workspaceFolder.uri);
+
 	const pattern: string = Settings.Pomfile.globPattern();
+
 	const pomFileUris: vscode.Uri[] = await vscode.workspace.findFiles(
 		new vscode.RelativePattern(workspaceFolder, pattern),
 		`{${exclusions.join(",")}}`,
 	);
+
 	return pomFileUris.map((_uri) => _uri.fsPath);
 }

@@ -26,6 +26,7 @@ export abstract class Menu implements ITreeItem {
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
 		treeItem.iconPath = new vscode.ThemeIcon("folder");
+
 		return treeItem;
 	}
 }

@@ -27,6 +27,7 @@ export interface IDebugOptions {
 export async function debugCommand(options: IDebugOptions): Promise<void> {
 	if (!isJavaDebuggerEnabled()) {
 		await guideToInstallJavaDebugger();
+
 		return;
 	}
 	await debug(options);
@@ -38,19 +39,23 @@ async function debug({
 	projectName,
 }: IDebugOptions): Promise<void> {
 	const freePort: number = await getPort();
+
 	const mavenOpts: string = [
 		Settings.getEnvironment(pomfile).MAVEN_OPTS, // user-setting MAVEN_OPTS
 		`-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${freePort}`, // MAVEN_DEBUG_OPTS
 	]
 		.filter(Boolean)
 		.join(" ");
+
 	const sessionId: string = createUuid().substring(0, 6);
+
 	const debugTerminal: vscode.Terminal | undefined = await executeInTerminal({
 		command,
 		pomfile,
 		terminalName: `mvnDebug ${sessionId}: ${command}`,
 		env: { MAVEN_OPTS: mavenOpts },
 	});
+
 	if (!debugTerminal) {
 		return;
 	}
@@ -66,10 +71,12 @@ async function debug({
 	};
 
 	let elapsed = 0;
+
 	const interval = 100; // polling port status per 100ms
 	const timeout = 10000; // 10s timeout
 	const id = setInterval(async () => {
 		const taken = await isPortTaken(freePort);
+
 		if (taken || elapsed > timeout) {
 			// mvnDebug process launched, listening to the port
 			clearInterval(id);
@@ -83,16 +90,19 @@ async function debug({
 function isJavaDebuggerEnabled(): boolean {
 	const javaDebuggerExtension: vscode.Extension<any> | undefined =
 		vscode.extensions.getExtension("vscjava.vscode-java-debug");
+
 	return javaDebuggerExtension !== undefined;
 }
 
 async function guideToInstallJavaDebugger(): Promise<void> {
 	const BUTTON_CONFIRM = "View Details";
+
 	const choice: string | undefined =
 		await vscode.window.showInformationMessage(
 			"Debugger for Java is required for debugging, please install and enable it.",
 			BUTTON_CONFIRM,
 		);
+
 	if (choice === BUTTON_CONFIRM) {
 		vscode.commands.executeCommand(
 			"vscode.open",

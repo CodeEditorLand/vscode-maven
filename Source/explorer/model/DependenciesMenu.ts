@@ -28,8 +28,10 @@ export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 		await diagnosticProvider.refreshDiagnostics(
 			vscode.Uri.file(this.project.pomPath),
 		);
+
 		if (treeNodes.length === 0) {
 			const hintNodes: HintNode[] = [new HintNode("No dependencies")];
+
 			return Promise.resolve(hintNodes);
 		} else {
 			return Promise.resolve(treeNodes);
@@ -41,6 +43,7 @@ export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 			this.name,
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
+
 		const uri: vscode.Uri = vscode.Uri.file("");
 		treeItem.resourceUri = uri.with({ authority: this.project.pomPath }); // distinguish dependenciesMenu in multi-module project
 		treeItem.tooltip = this.name;
@@ -60,6 +63,7 @@ export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 				iconFile,
 			),
 		};
+
 		return treeItem;
 	}
 
@@ -70,11 +74,13 @@ export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 
 	private _savePom(): void {
 		const pomUri: vscode.Uri = vscode.Uri.file(this.project.pomPath);
+
 		const textEditor: vscode.TextEditor | undefined =
 			vscode.window.visibleTextEditors.find(
 				(editor) =>
 					editor.document.uri.toString() === pomUri.toString(),
 			);
+
 		if (textEditor !== undefined) {
 			textEditor.document.save();
 		}

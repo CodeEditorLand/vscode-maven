@@ -14,6 +14,7 @@ export class SpecifyArtifactIdStep implements IProjectCreationStep {
 
 	public async run(metadata: IProjectCreationMetadata): Promise<StepResult> {
 		const disposables: Disposable[] = [];
+
 		const quickInputPromise = new Promise<StepResult>((resolve) => {
 			const inputBox: InputBox = window.createInputBox();
 			inputBox.title = metadata.title;
@@ -23,6 +24,7 @@ export class SpecifyArtifactIdStep implements IProjectCreationStep {
 				: "Input artifact Id (also as project name) of your project.";
 			inputBox.value = metadata.artifactId ?? "demo";
 			inputBox.ignoreFocusOut = true;
+
 			if (this.previousStep) {
 				inputBox.buttons = [QuickInputButtons.Back];
 				disposables.push(

@@ -52,6 +52,7 @@ export class SelectParentPom implements IProjectCreationStep {
 			});
 
 		const disposables: Disposable[] = [];
+
 		try {
 			return await new Promise<StepResult>((resolve) => {
 				const pickBox: QuickPick<ParentPomPickItem> =
@@ -61,6 +62,7 @@ export class SelectParentPom implements IProjectCreationStep {
 				pickBox.matchOnDescription = true;
 				pickBox.ignoreFocusOut = true;
 				pickBox.items = items;
+
 				if (this.previousStep) {
 					pickBox.buttons = [QuickInputButtons.Back];
 					disposables.push(

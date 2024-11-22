@@ -28,6 +28,7 @@ export class SpecifyGroupIdStep implements IProjectCreationStep {
 		}
 
 		const disposables: Disposable[] = [];
+
 		const specifyGroupIdPromise = new Promise<StepResult>((resolve) => {
 			const inputBox: InputBox = window.createInputBox();
 			inputBox.title = metadata.title;
@@ -39,6 +40,7 @@ export class SpecifyGroupIdStep implements IProjectCreationStep {
 					? metadata.parentProject.groupId
 					: "com.example");
 			inputBox.ignoreFocusOut = true;
+
 			if (this.previousStep) {
 				inputBox.buttons = [QuickInputButtons.Back];
 				disposables.push(

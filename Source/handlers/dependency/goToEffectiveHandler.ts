@@ -22,17 +22,22 @@ export async function goToEffectiveHandler(
 		node.omittedStatus.effectiveVersion,
 		node.scope,
 	].join(":");
+
 	const pomPath: string = node.projectPomPath;
+
 	const project: MavenProject | undefined = MavenProjectManager.get(pomPath);
+
 	if (project === undefined) {
 		throw new Error("Failed to find maven projects.");
 	}
 
 	const dependencyNodes = project.dependencyNodes;
+
 	const treeItem: Dependency | undefined = await searchFirstEffective(
 		dependencyNodes,
 		fullArtifactName,
 	);
+
 	if (treeItem === undefined) {
 		throw new Error("Failed to find dependency.");
 	}
@@ -44,20 +49,25 @@ async function searchFirstEffective(
 	fullArtifactName: string,
 ): Promise<Dependency | undefined> {
 	let targetItem: Dependency | undefined;
+
 	const queue: Queue<Dependency> = new Queue();
+
 	for (const child of dependencyNodes) {
 		queue.push(child);
 	}
 	while (queue.empty() === false) {
 		const node: Dependency | undefined = queue.pop();
+
 		if (node === undefined) {
 			throw new Error("Failed to find dependency.");
 		}
 		if (node.fullArtifactName === fullArtifactName) {
 			targetItem = node;
+
 			break;
 		}
 		const children = node.children;
+
 		for (const child of children) {
 			queue.push(child);
 		}

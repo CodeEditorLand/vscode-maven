@@ -62,6 +62,7 @@ export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 	): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		return Promise.resolve(element.getTreeItem()).then((item) => {
 			item.contextValue = element.getContextValue();
+
 			return item;
 		});
 	}

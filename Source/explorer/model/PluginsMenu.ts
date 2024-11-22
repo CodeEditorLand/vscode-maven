@@ -17,6 +17,7 @@ export class PluginsMenu extends ProjectMenu implements ITreeItem {
 
 	public async getChildren(): Promise<MavenPlugin[]> {
 		await this.project.getEffectivePom();
+
 		return this.project.plugins;
 	}
 
@@ -26,6 +27,7 @@ export class PluginsMenu extends ProjectMenu implements ITreeItem {
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
 		treeItem.iconPath = new vscode.ThemeIcon("extensions");
+
 		return treeItem;
 	}
 

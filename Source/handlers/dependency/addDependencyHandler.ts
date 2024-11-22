@@ -25,6 +25,7 @@ import { getUsage } from "./artifactUsage";
 
 export async function addDependencyHandler(options?: any): Promise<void> {
 	let pomPath: string;
+
 	if (options && options.pomPath) {
 		// for nodes from Maven explorer
 		pomPath = options.pomPath;
@@ -38,6 +39,7 @@ export async function addDependencyHandler(options?: any): Promise<void> {
 		// select a project(pomfile)
 		const selectedProject: MavenProject | undefined =
 			await selectProjectIfNecessary();
+
 		if (!selectedProject) {
 			return;
 		}
@@ -73,6 +75,7 @@ export async function addDependencyHandler(options?: any): Promise<void> {
 					return undefined;
 				},
 			});
+
 		if (!keywordString) {
 			return;
 		}
@@ -96,6 +99,7 @@ export async function addDependencyHandler(options?: any): Promise<void> {
 				},
 			)
 			.then((selected) => selected?.value);
+
 		if (!selectedDoc) {
 			return;
 		}
@@ -123,10 +127,12 @@ async function addDependency(
 		vscode.Uri.file(pomPath),
 		{ preserveFocus: true },
 	);
+
 	const projectNodes: Element[] = getNodesByTag(
 		pomDocument.document.getText(),
 		XmlTagName.Project,
 	);
+
 	if (projectNodes === undefined || projectNodes.length !== 1) {
 		throw new UserError(
 			"Only support POM file with single <project> node.",
@@ -134,9 +140,11 @@ async function addDependency(
 	}
 
 	const projectNode: Element = projectNodes[0];
+
 	const dependenciesNode: Element | undefined = projectNode.children.find(
 		(elem) => isTag(elem) && elem.tagName === XmlTagName.Dependencies,
 	) as Element | undefined;
+
 	if (dependenciesNode !== undefined) {
 		await insertDependency(
 			pomPath,
@@ -171,21 +179,29 @@ async function insertDependency(
 ): Promise<void> {
 	const currentDocument: vscode.TextDocument =
 		await vscode.workspace.openTextDocument(pomPath);
+
 	const textEditor: vscode.TextEditor =
 		await vscode.window.showTextDocument(currentDocument);
+
 	const baseIndent: string = getIndentation(
 		currentDocument,
 		getInnerEndIndex(targetNode),
 	);
+
 	const options: vscode.TextEditorOptions = textEditor.options;
+
 	const indent: string =
 		options.insertSpaces && typeof options.tabSize === "number"
 			? " ".repeat(options.tabSize)
 			: "\t";
+
 	const eol: string =
 		currentDocument.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
+
 	let insertPosition: vscode.Position;
+
 	let targetText: string;
+
 	if (targetNode.tagName === XmlTagName.Dependencies) {
 		insertPosition = currentDocument.positionAt(
 			getInnerStartIndex(targetNode),
@@ -221,6 +237,7 @@ async function insertDependency(
 	const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
 	edit.insert(currentDocument.uri, insertPosition, targetText);
 	await vscode.workspace.applyEdit(edit);
+
 	const endingPosition: vscode.Position = currentDocument.positionAt(
 		currentDocument.offsetAt(insertPosition) + targetText.length,
 	);

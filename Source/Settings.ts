@@ -10,6 +10,7 @@ type FavoriteFormat = { alias?: string; command: string; debug?: boolean }
 export class Settings {
     public static excludedFolders(resource: Uri): string[] {
         const ret: string[] | undefined = _getMavenSection<string[]>("excludedFolders", resource);
+
         return ret !== undefined ? ret : [];
     }
 
@@ -71,6 +72,7 @@ export class Settings {
 
         public static favorites(project: MavenProject): FavoriteCommand[] | undefined {
             type Favorite = { alias: string, command: string, debug?: boolean };
+
             return _getMavenSection<Favorite[]>("terminal.favorites", vscode.Uri.file(project.pomPath))?.map(favorite => new FavoriteCommand(project, favorite.command, favorite.alias, favorite.debug));
         }
     }
@@ -80,6 +82,7 @@ export class Settings {
         }
         public static options(resourceOrFilepath?: Uri | string): string | undefined {
             const options: string | string[] | undefined = _getMavenSection("executable.options", resourceOrFilepath);
+
             if (Array.isArray(options)) {
                 return options.join(' ');
             }
@@ -97,6 +100,7 @@ export class Settings {
 
         public static globPattern(): string {
             const ret: string | undefined = _getMavenSection<string>("pomfile.globPattern");
+
             return ret !== undefined ? ret : "**/pom.xml";
         }
 
@@ -111,7 +115,9 @@ export class Settings {
             environmentVariable: string;
             value: string;
         };
+
         const environmentSettings: EnvironmentSetting[] | undefined = Settings.Terminal.customEnv(resourceOrFilepath);
+
         if (environmentSettings) {
             environmentSettings.forEach((s: EnvironmentSetting) => {
                 customEnv[s.environmentVariable] = s.value;
@@ -132,6 +138,7 @@ export class Settings {
         name: string;
     }) {
         const template = _getMavenSection<string>("explorer.projectName", project.pomPath);
+
         if (!template) {
             return "Unknown";
         }
@@ -146,6 +153,7 @@ export class Settings {
 
 function _getMavenSection<T>(section: string, resourceOrFilepath?: Uri | string): T | undefined {
     let resource: Uri | undefined;
+
     if (typeof resourceOrFilepath === "string") {
         resource = Uri.file(resourceOrFilepath);
     } else if (resourceOrFilepath instanceof Uri) {
@@ -158,7 +166,9 @@ function _getJavaHomeEnvIfAvailable(): { [key: string]: string } {
     // Look for the java.home setting from the redhat.java extension.  We can reuse it
     // if it exists to avoid making the user configure it in two places.
     const useJavaHome: boolean = Settings.Terminal.useJavaHome();
+
     const javaHome: string | undefined = Settings.External.javaHome();
+
     if (useJavaHome && javaHome) {
         return { JAVA_HOME: javaHome };
     } else {

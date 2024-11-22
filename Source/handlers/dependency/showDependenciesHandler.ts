@@ -19,7 +19,9 @@ export async function getDependencyTree(
 	pomPathOrMavenProject: string | MavenProject,
 ): Promise<string | undefined> {
 	let pomPath: string;
+
 	let name: string;
+
 	if (
 		typeof pomPathOrMavenProject === "object" &&
 		pomPathOrMavenProject instanceof MavenProject
@@ -36,14 +38,18 @@ export async function getDependencyTree(
 
 	const task = async (p: vscode.Progress<{ message?: string }>) => {
 		p.report({ message: `Generating Dependency Tree: ${name}` });
+
 		try {
 			const rawData = await rawDependencyTree(pomPath);
+
 			return rawData;
 		} catch (error) {
 			setUserError(error);
+
 			throw error;
 		}
 	};
+
 	return await vscode.window.withProgress(
 		{
 			location: vscode.ProgressLocation.Window,

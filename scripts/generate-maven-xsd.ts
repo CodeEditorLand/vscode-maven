@@ -4,12 +4,14 @@ import * as _ from "lodash";
 
 export function generateMavenDef() {
 	const schema = getSchema();
+
 	const dir = path.join(__dirname, "..", "resources");
 	writeFileSync(
 		path.join(dir, "maven-4.0.0.xsd.json"),
 		JSON.stringify(schema, null, 2),
 	);
 	// writeFileSync(path.join(dir, "maven-4.0.0.xsd-min.json"), JSON.stringify(schema, null));
+
 	return schema;
 }
 
@@ -21,7 +23,9 @@ class Documentation {
 }
 
 const M000 = "0.0.0+";
+
 const M300 = "3.0.0+";
+
 const M400 = "4.0.0+";
 
 const DESC = {

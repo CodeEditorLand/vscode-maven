@@ -20,8 +20,10 @@ export class FromLocal implements IArtifactCompletionProvider {
 	): Promise<vscode.CompletionItem[]> {
 		const packageSegments: string[] = groupIdHint.split(".");
 		packageSegments.pop();
+
 		const validGroupIds: string[] =
 			await this.searchForGroupIds(packageSegments);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -33,6 +35,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return validGroupIds.map((gid) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				gid,
@@ -41,6 +44,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 			item.insertText = gid;
 			item.detail = "From Local Repository";
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
@@ -54,6 +58,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 
 		const validArtifactIds: string[] =
 			await this.searchForArtifactIds(groupId);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -65,6 +70,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return validArtifactIds.map((aid) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				{
@@ -77,6 +83,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 			item.detail = `GroupId: ${groupId}`;
 			(item as any).data = { groupId };
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
@@ -93,6 +100,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 			groupId,
 			artifactId,
 		);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -104,6 +112,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return validVersions.map((v) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				v,
@@ -113,29 +122,35 @@ export class FromLocal implements IArtifactCompletionProvider {
 			item.detail = "From Local Repository";
 			item.sortText = getSortText(v);
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
 
 	private async searchForGroupIds(segments: string[]): Promise<string[]> {
 		const cwd: string = path.join(getMavenLocalRepository(), ...segments);
+
 		try {
 			const entries = await fg(["**/*/*", "!**/*.*"], {
 				onlyFiles: false,
 				deep: 3,
 				cwd,
 			});
+
 			const validSegments: string[] = entries.map((e: string) =>
 				e.substring(0, e.indexOf("/")),
 			);
+
 			const prefix: string = _.isEmpty(segments)
 				? ""
 				: [...segments, ""].join(".");
+
 			return Array.from(new Set(validSegments)).map(
 				(seg) => `${prefix}${seg}`,
 			);
 		} catch (error) {
 			console.error(error);
+
 			return [];
 		}
 	}
@@ -145,14 +160,18 @@ export class FromLocal implements IArtifactCompletionProvider {
 			getMavenLocalRepository(),
 			...groupId.split("."),
 		);
+
 		try {
 			const entries = await fg(["**/*.pom"], { deep: 3, cwd });
+
 			const validArtifactIds: string[] = entries.map((e: string) =>
 				e.substring(0, e.indexOf("/")),
 			);
+
 			return Array.from(new Set(validArtifactIds));
 		} catch (error) {
 			console.error(error);
+
 			return [];
 		}
 	}
@@ -166,11 +185,14 @@ export class FromLocal implements IArtifactCompletionProvider {
 			...groupId.split("."),
 			artifactId,
 		);
+
 		try {
 			const entries = await fg(["*/*.pom"], { deep: 2, cwd });
+
 			return entries.map((e: string) => e.substring(0, e.indexOf("/")));
 		} catch (error) {
 			console.error(error);
+
 			return [];
 		}
 	}

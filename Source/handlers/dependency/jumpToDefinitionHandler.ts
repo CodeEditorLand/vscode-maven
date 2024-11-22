@@ -17,6 +17,7 @@ export async function jumpToDefinitionHandler(
 	}
 
 	let selectedPath: string;
+
 	if (node.parent === undefined) {
 		selectedPath = node.projectPomPath;
 	} else {
@@ -36,6 +37,7 @@ async function goToDefinition(
 	aid: string,
 ): Promise<void> {
 	const dependencyNode = await getDependencyNode(pomPath, gid, aid);
+
 	if (dependencyNode !== undefined) {
 		await locateInFile(pomPath, dependencyNode);
 	} else {
@@ -52,12 +54,15 @@ async function locateInFile(
 	}
 	const currentDocument: vscode.TextDocument =
 		await vscode.workspace.openTextDocument(pomPath);
+
 	const textEditor: vscode.TextEditor = await vscode.window.showTextDocument(
 		currentDocument,
 		{ preview: false },
 	);
 	vscode.languages.setTextDocumentLanguage(currentDocument, "xml");
+
 	const start = currentDocument.positionAt(targetNode.startIndex);
+
 	const end = currentDocument.positionAt(targetNode.endIndex);
 	textEditor.selection = new vscode.Selection(start, end);
 	textEditor.revealRange(

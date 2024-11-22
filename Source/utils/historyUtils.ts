@@ -23,8 +23,11 @@ export async function updateLRUCommands(
 ): Promise<void> {
 	const historyFilePath: string = getCommandHistoryCachePath(pomPath);
 	await fse.ensureFile(historyFilePath);
+
 	const content: string = (await fse.readFile(historyFilePath)).toString();
+
 	let historyObject: ICommandHistory;
+
 	try {
 		historyObject = JSON.parse(content) as ICommandHistory;
 		historyObject.pomPath = pomPath;
@@ -40,9 +43,12 @@ export async function getLRUCommands(
 	pomPath: string,
 ): Promise<ICommandHistoryEntry[]> {
 	const filepath: string = getCommandHistoryCachePath(pomPath);
+
 	if (await fse.pathExists(filepath)) {
 		const content: string = (await fse.readFile(filepath)).toString();
+
 		let historyObject: ICommandHistory;
+
 		try {
 			historyObject = JSON.parse(content) as ICommandHistory;
 		} catch (error) {
@@ -50,9 +56,11 @@ export async function getLRUCommands(
 		}
 		const timestamps: { [command: string]: number } =
 			historyObject.timestamps;
+
 		const commandList: string[] = Object.keys(timestamps).sort(
 			(a, b) => timestamps[b] - timestamps[a],
 		);
+
 		return commandList.map(
 			(command) =>
 				Object.assign({

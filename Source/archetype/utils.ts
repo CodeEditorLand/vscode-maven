@@ -8,7 +8,9 @@ import path = require("path");
 
 // corresponding to setting values
 const OPEN_IN_NEW_WORKSPACE = "Open";
+
 const OPEN_IN_CURRENT_WORKSPACE = "Add as Workspace Folder";
+
 const OPEN_INTERACTIVE = "Interactive";
 
 export function registerProjectCreationEndListener(
@@ -24,11 +26,14 @@ export function registerProjectCreationEndListener(
 					vscode.window.showErrorMessage(
 						"Failed to create the project, check terminal output for more details.",
 					);
+
 					return;
 				}
 				const { targetFolder, artifactId } =
 					e.execution.task.definition;
+
 				const projectFolder = path.join(targetFolder, artifactId);
+
 				importProjectOnDemand(projectFolder);
 				await promptOnDidProjectCreated(artifactId, projectFolder);
 			}
@@ -42,11 +47,13 @@ export async function promptOnDidProjectCreated(
 ) {
 	// Open project either is the same workspace or new workspace
 	const hasOpenFolder = vscode.workspace.workspaceFolders !== undefined;
+
 	const choice = await specifyOpenMethod(
 		hasOpenFolder,
 		projectName,
 		projectFolderPath,
 	);
+
 	if (choice === OPEN_IN_NEW_WORKSPACE) {
 		vscode.commands.executeCommand(
 			"vscode.openFolder",
@@ -55,6 +62,7 @@ export async function promptOnDidProjectCreated(
 		);
 	} else if (choice === OPEN_IN_CURRENT_WORKSPACE) {
 		assert(vscode.workspace.workspaceFolders !== undefined);
+
 		if (
 			!vscode.workspace.workspaceFolders?.find((workspaceFolder) =>
 				projectFolderPath.startsWith(workspaceFolder.uri?.fsPath),
@@ -85,8 +93,10 @@ async function specifyOpenMethod(
 		},
 		{},
 	);
+
 	if (openMethod === OPEN_INTERACTIVE) {
 		let alreadyInCurrentWorkspace = false;
+
 		if (
 			vscode.workspace.workspaceFolders?.find((wf) =>
 				projectLocation.startsWith(wf.uri.fsPath),
@@ -122,6 +132,7 @@ export async function importProjectOnDemand(projectFolder: string) {
 	}
 
 	let projectInCurrentWorkspace = false;
+
 	if (
 		vscode.workspace.workspaceFolders?.find((wf) =>
 			projectFolder.startsWith(wf.uri.fsPath),
@@ -137,6 +148,7 @@ export async function importProjectOnDemand(projectFolder: string) {
 	const projectImportStrategy = vscode.workspace
 		.getConfiguration("java")
 		.get("import.projectSelection");
+
 	if (projectImportStrategy === "automatic") {
 		vscode.commands.executeCommand("java.project.import");
 	} else if (projectImportStrategy === "manual") {

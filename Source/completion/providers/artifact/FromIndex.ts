@@ -32,12 +32,15 @@ export class FromIndex implements IArtifactCompletionProvider {
 			groupId: groupIdHint,
 			artifactId: artifactIdHint,
 		};
+
 		const docs = await executeJavaLanguageServerCommand<
 			IArtifactSearchResult[]
 		>("java.maven.searchArtifact", searchParam);
+
 		const groupIds: string[] = Array.from(
 			new Set(docs.map((doc) => doc.groupId)).values(),
 		);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -49,6 +52,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return groupIds.map((gid) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				gid,
@@ -57,6 +61,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 			item.insertText = gid;
 			item.detail = "index";
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
@@ -73,11 +78,13 @@ export class FromIndex implements IArtifactCompletionProvider {
 			groupId: groupIdHint,
 			artifactId: artifactIdHint,
 		};
+
 		const docs: IArtifactSearchResult[] =
 			await executeJavaLanguageServerCommand(
 				"java.maven.searchArtifact",
 				searchParam,
 			);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -89,6 +96,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return docs.map((doc) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				{
@@ -102,6 +110,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 			item.detail = `GroupId: ${doc.groupId}`;
 			(item as any).data = { groupId: doc.groupId };
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
@@ -121,11 +130,13 @@ export class FromIndex implements IArtifactCompletionProvider {
 			groupId,
 			artifactId,
 		};
+
 		const docs: IArtifactSearchResult[] =
 			await executeJavaLanguageServerCommand(
 				"java.maven.searchArtifact",
 				searchParam,
 			);
+
 		const commandOnSelection: vscode.Command = {
 			title: "selected",
 			command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -137,6 +148,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 				},
 			],
 		};
+
 		return docs.map((doc) => {
 			const item: vscode.CompletionItem = new vscode.CompletionItem(
 				doc.version,
@@ -145,6 +157,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 			item.insertText = doc.version;
 			item.sortText = getSortText(doc.version);
 			item.command = commandOnSelection;
+
 			return item;
 		});
 	}
