@@ -14,10 +14,15 @@ import {
 } from "./types";
 
 export const selectArchetypeStep = new SelectArchetypeStep();
+
 export const specifyArchetypeVersionStep = new SpecifyArchetypeVersionStep();
+
 export const selectParentPomStep = new SelectParentPom();
+
 export const specifyGroupIdStep = new SpecifyGroupIdStep();
+
 export const specifyArtifactIdStep = new SpecifyArtifactIdStep();
+
 export const specifyTargetFolderStep = new SpecifyTargetFolderStep();
 
 /**

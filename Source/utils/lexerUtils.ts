@@ -11,6 +11,7 @@ import {
 import * as hp from "htmlparser2";
 
 export type ElementNode = Node;
+
 export enum XmlTagName {
 	GroupId = "groupId",
 	ArtifactId = "artifactId",

@@ -8,6 +8,7 @@ import { FavoriteCommand } from "./explorer/model/FavoriteCommand";
 import { MavenProject } from "./explorer/model/MavenProject";
 
 type FavoriteFormat = { alias?: string; command: string; debug?: boolean };
+
 export class Settings {
 	public static excludedFolders(resource: Uri): string[] {
 		const ret: string[] | undefined = _getMavenSection<string[]>(
