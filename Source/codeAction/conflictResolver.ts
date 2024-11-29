@@ -40,6 +40,7 @@ export class ConflictResolver implements vscode.CodeActionProvider {
 		if (node === undefined) {
 			throw new Error("Failed to find Dependency.");
 		}
+
 		const gid: string = node.groupId;
 
 		const aid: string = node.artifactId;
@@ -51,6 +52,7 @@ export class ConflictResolver implements vscode.CodeActionProvider {
 			`Resolve conflict for ${gid}:${aid}`,
 			vscode.CodeActionKind.QuickFix,
 		);
+
 		actionSetVersion.command = {
 			command: "maven.project.setDependencyVersion",
 			title: "set version to",
@@ -66,7 +68,9 @@ export class ConflictResolver implements vscode.CodeActionProvider {
 				},
 			],
 		};
+
 		actionSetVersion.diagnostics = [diagnostic];
+
 		actionSetVersion.isPreferred = true;
 
 		return actionSetVersion;

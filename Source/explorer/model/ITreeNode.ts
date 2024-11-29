@@ -3,7 +3,9 @@
 
 export interface ITreeNode {
 	children: ITreeNode[];
+
 	parent?: ITreeNode | undefined;
+
 	root?: ITreeNode | undefined;
 
 	addChild(node: ITreeNode): void;

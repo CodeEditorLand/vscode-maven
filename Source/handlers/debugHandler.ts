@@ -20,7 +20,9 @@ export async function debugHandler(goal: PluginGoal): Promise<void> {
 
 export interface IDebugOptions {
 	readonly command: string;
+
 	readonly pomfile: string;
+
 	readonly projectName: string;
 }
 
@@ -30,6 +32,7 @@ export async function debugCommand(options: IDebugOptions): Promise<void> {
 
 		return;
 	}
+
 	await debug(options);
 }
 
@@ -80,9 +83,12 @@ async function debug({
 		if (taken || elapsed > timeout) {
 			// mvnDebug process launched, listening to the port
 			clearInterval(id);
+
 			await vscode.debug.startDebugging(undefined, debugConfig);
+
 			debugTerminal.show(true);
 		}
+
 		elapsed += interval;
 	}, interval);
 }
@@ -115,16 +121,20 @@ async function isPortTaken(port: number): Promise<boolean> {
 	return new Promise<boolean>((resolve, _reject) => {
 		const server = net.createServer((socket) => {
 			socket.write("Echo server\r\n");
+
 			socket.pipe(socket);
 		});
 
 		server.on("error", () => {
 			resolve(true);
 		});
+
 		server.on("listening", () => {
 			server.close();
+
 			resolve(false);
 		});
+
 		server.listen(port, "localhost");
 	});
 }

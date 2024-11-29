@@ -72,6 +72,7 @@ export function registerArtifactSearcher(
 
 class TypeResolver {
 	private dataPath: string;
+
 	private initialized = false;
 
 	constructor(dataPath: string) {
@@ -85,6 +86,7 @@ class TypeResolver {
 					"java.maven.initializeSearcher",
 					this.dataPath,
 				);
+
 				this.initialized = true;
 			} catch (error) {
 				// ignore
@@ -143,6 +145,7 @@ class TypeResolver {
 
 			const hoverMessage: vscode.MarkdownString =
 				new vscode.MarkdownString(message);
+
 			hoverMessage.isTrusted = true;
 
 			return new vscode.Hover(hoverMessage);
@@ -232,12 +235,14 @@ class TypeResolver {
 		if (pickItem === undefined) {
 			return;
 		}
+
 		param.uri = decodeBase64(param.uri);
 
 		const edits: vscode.WorkspaceEdit[] = await getWorkSpaceEdits(
 			pickItem,
 			param,
 		);
+
 		await applyEdits(vscode.Uri.parse(param.uri), edits);
 	}
 }
@@ -266,15 +271,19 @@ async function getArtifactsPickItems(
 			" : ",
 			response[i].version,
 		];
+
 		picks.push({
 			label: `$(thumbsup)  ${response[i].className}`,
 			description: response[i].fullClassName,
 			detail: arr.join(""),
 		});
 	}
+
 	for (
 		let i: number = Math.min(Math.round(response.length / 5), 5);
+
 		i < response.length;
+
 		i += 1
 	) {
 		const arr: string[] = [
@@ -284,12 +293,14 @@ async function getArtifactsPickItems(
 			" : ",
 			response[i].version,
 		];
+
 		picks.push({
 			label: response[i].className,
 			description: response[i].fullClassName,
 			detail: arr.join(""),
 		});
 	}
+
 	return picks;
 }
 
@@ -298,6 +309,7 @@ async function applyEdits(uri: vscode.Uri, edits: any): Promise<void> {
 	if (Object.keys(edits[2].changes).length > 0) {
 		// 0: import 1: replace
 		await applyWorkspaceEdit(edits[0]);
+
 		await applyWorkspaceEdit(edits[1]);
 
 		let document: vscode.TextDocument =
@@ -310,6 +322,7 @@ async function applyEdits(uri: vscode.Uri, edits: any): Promise<void> {
 			// already has this dependency
 			return;
 		}
+
 		await applyWorkspaceEdit(edits[2]);
 
 		document = await vscode.workspace.openTextDocument(
@@ -342,6 +355,7 @@ async function applyEdits(uri: vscode.Uri, edits: any): Promise<void> {
 				preview: false,
 			},
 		);
+
 		editor.revealRange(
 			new vscode.Range(startLine, 0, startLine + lineNumber, 0),
 			vscode.TextEditorRevealType.InCenter,
@@ -393,12 +407,17 @@ function decodeBase64(content: string): string {
 
 export interface IArtifactSearchResult {
 	groupId: string;
+
 	artifactId: string;
+
 	version: string;
 
 	className: string;
+
 	fullClassName: string;
+
 	usage: number;
+
 	kind: number;
 }
 
@@ -411,6 +430,8 @@ export interface ISearchArtifactParam {
 	searchType: SearchType;
 
 	className?: string;
+
 	groupId?: string;
+
 	artifactId?: string;
 }

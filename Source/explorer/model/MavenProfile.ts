@@ -33,6 +33,7 @@ export class MavenProfile implements ITreeItem {
 		if (this.checked()) {
 			treeItem.iconPath = new vscode.ThemeIcon("check");
 		}
+
 		return treeItem;
 	}
 

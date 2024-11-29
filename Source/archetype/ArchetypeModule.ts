@@ -63,9 +63,11 @@ export class ArchetypeModule {
 		if (!metadata.groupId) {
 			steps.push(specifyGroupIdStep);
 		}
+
 		if (!metadata.artifactId) {
 			steps.push(specifyArtifactIdStep);
 		}
+
 		if (!metadata.targetFolder) {
 			steps.push(specifyTargetFolderStep);
 		}
@@ -96,12 +98,15 @@ export class ArchetypeModule {
 		) {
 			steps.push(selectArchetypeStep, specifyArchetypeVersionStep);
 		}
+
 		if (!metadata.groupId) {
 			steps.push(specifyGroupIdStep);
 		}
+
 		if (!metadata.artifactId) {
 			steps.push(specifyArtifactIdStep);
 		}
+
 		if (!metadata.targetFolder) {
 			steps.push(specifyTargetFolderStep);
 		}
@@ -127,12 +132,14 @@ export class ArchetypeModule {
 					archetypeVersion: metadata.archetypeVersion,
 					triggerfrom: metadata.title,
 				});
+
 				await executeInTerminalHandler(metadata);
 			} else {
 				sendInfo("", {
 					archetypeArtifactId: "No Archetype",
 					triggerfrom: metadata.title,
 				});
+
 				await createBasicMavenProject(metadata);
 			}
 		}
@@ -152,7 +159,9 @@ export class ArchetypeModule {
 			"resources",
 			"archetypes.json",
 		);
+
 		await fse.ensureFile(targetFilePath);
+
 		await fse.writeJSON(targetFilePath, archetypes);
 	}
 
@@ -167,6 +176,7 @@ export class ArchetypeModule {
 			const dict: { [key: string]: Archetype } = {};
 
 			const archetypeList: any[] = catalog.archetypes[0].archetype;
+
 			archetypeList.forEach((archetype) => {
 				const groupId: string =
 					archetype.groupId && archetype.groupId[0];
@@ -193,6 +203,7 @@ export class ArchetypeModule {
 						description,
 					);
 				}
+
 				if (dict[identifier].versions.indexOf(version) < 0) {
 					dict[identifier].versions.push(version);
 				}
@@ -202,6 +213,7 @@ export class ArchetypeModule {
 		} catch (err) {
 			console.error(err);
 		}
+
 		return [];
 	}
 }
@@ -225,6 +237,7 @@ async function executeInTerminalHandler(
 	) {
 		throw new Error("Archetype information is incomplete.");
 	}
+
 	const cmdArgs: string[] = [
 		// explicitly using 3.1.2 as maven-archetype-plugin:3.0.1 ignores -DoutputDirectory
 		// see https://github.com/microsoft/vscode-maven/issues/478
@@ -242,13 +255,16 @@ async function executeInTerminalHandler(
 
 	if (mvnPath === undefined) {
 		cmdArgs.push(`-DoutputDirectory="${targetFolder}"`);
+
 		mvnPath = getEmbeddedMavenWrapper();
+
 		cwd = path.dirname(mvnPath);
 	}
 
 	if (mvnPath === undefined) {
 		return;
 	}
+
 	const mvnString: string = wrappedWithQuotes(
 		await mavenTerminal.formattedPathForTerminal(mvnPath),
 	);
@@ -277,12 +293,16 @@ async function executeInTerminalHandler(
 	if (vscode.env.remoteName === undefined && process.platform === "win32") {
 		// VS Code launched in Windows Desktop.
 		options.shellQuoting = shellQuotes.cmd;
+
 		options.executable = "cmd.exe";
+
 		options.shellArgs = ["/c"];
+
 		commandLine = `"${commandLine}"`; // wrap full command with quotation marks, cmd /c "<fullcommand>", see https://stackoverflow.com/a/6378038
 	} else {
 		options.shellQuoting = shellQuotes.bash;
 	}
+
 	const execution = new vscode.ShellExecution(commandLine, options);
 
 	const createProjectTask = new vscode.Task(
@@ -292,6 +312,7 @@ async function executeInTerminalHandler(
 		"maven",
 		execution,
 	);
+
 	vscode.tasks.executeTask(createProjectTask);
 }
 
@@ -321,6 +342,7 @@ async function createBasicMavenProject(
 			vscode.Uri.file(targetFolder),
 			artifactId,
 		);
+
 		await workspace.fs.copy(templateUri, targetUri, { overwrite: true });
 
 		// update groupId/artifactId in pom.xml
@@ -348,21 +370,30 @@ async function createBasicMavenProject(
 				`          <version>${metadata.parentProject.version}</version>\n` +
 				`    </parent>\n`;
 		}
+
 		pomContent = pomContent.replace("${parentPom}", parentPom);
+
 		pomContent = pomContent.replace("${groupId}", groupId);
+
 		pomContent = pomContent.replace("${artifactId}", artifactId);
+
 		pomContent = pomContent.replace("${javaSourceVersion}", compilerSource);
+
 		pomContent = pomContent.replace("${javaTargetVersion}", compilerTarget);
+
 		await workspace.fs.writeFile(pomUri, Buffer.from(pomContent));
 
 		// create source files
 		p.report({ message: "Creating source files...", increment: 20 });
+
 		await vscode.workspace.fs.createDirectory(
 			vscode.Uri.joinPath(targetUri, "src", "main", "java"),
 		);
+
 		await vscode.workspace.fs.createDirectory(
 			vscode.Uri.joinPath(targetUri, "src", "main", "resources"),
 		);
+
 		await vscode.workspace.fs.createDirectory(
 			vscode.Uri.joinPath(targetUri, "src", "test", "java"),
 		);
@@ -374,6 +405,7 @@ async function createBasicMavenProject(
 			"java",
 			...groupId.split("."),
 		);
+
 		await vscode.workspace.fs.createDirectory(packageUri);
 
 		const mainUri = vscode.Uri.joinPath(packageUri, "Main.java");
@@ -387,11 +419,13 @@ async function createBasicMavenProject(
 			"    }",
 			"}",
 		].join("\n");
+
 		await vscode.workspace.fs.writeFile(mainUri, Buffer.from(content));
 
 		// Update parent pom on demand
 		if (metadata.parentProject) {
 			p.report({ message: "Update parent pom.xml...", increment: 20 });
+
 			await updateParentPom(metadata.parentProject.pomPath, artifactId);
 		}
 
@@ -450,6 +484,7 @@ async function updateParentPom(
 	]);
 
 	let nextInsertOffset = -1;
+
 	basicNodes.forEach((node) => {
 		if (node.endIndex) {
 			if (nextInsertOffset == -1) {
@@ -459,6 +494,7 @@ async function updateParentPom(
 			}
 		}
 	});
+
 	nextInsertOffset++;
 
 	const parentPomUri = Uri.file(parentPomPath);
@@ -488,6 +524,7 @@ async function updateParentPom(
 				"<packaging>pom</packaging>",
 			);
 		}
+
 		nextInsertOffset = packagingNodes[0].endIndex
 			? packagingNodes[0].endIndex + 1
 			: nextInsertOffset;
@@ -509,9 +546,11 @@ async function updateParentPom(
 
 		if (modules.length) {
 			const lastModule = modules[modules.length - 1];
+
 			nextInsertOffset = lastModule.endIndex
 				? (lastModule.endIndex || 0) + 1
 				: nextInsertOffset;
+
 			workspaceEdit.insert(
 				parentPomUri,
 				pomDocument.positionAt(nextInsertOffset),
@@ -544,6 +583,7 @@ async function updateParentPom(
 	}
 
 	await vscode.workspace.applyEdit(workspaceEdit);
+
 	await pomDocument?.save();
 }
 
@@ -553,14 +593,19 @@ function genIndent(indentChar: string, indentSize: number): string {
 	for (let i = 0; i < indentSize; i++) {
 		ret += indentChar;
 	}
+
 	return ret;
 }
 
 export class ArchetypeMetadata {
 	public groupId: string;
+
 	public artifactId: string;
+
 	public versions: string[];
+
 	public version: string;
+
 	public isLoadMore: boolean;
 }
 

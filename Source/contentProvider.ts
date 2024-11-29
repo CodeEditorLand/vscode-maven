@@ -17,10 +17,12 @@ import { Utils } from "./utils/Utils";
  */
 class MavenContentProvider implements vscode.TextDocumentContentProvider {
 	public readonly onDidChange: vscode.Event<vscode.Uri>;
+
 	private _onDidChangeEmitter: vscode.EventEmitter<vscode.Uri>;
 
 	constructor() {
 		this._onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
+
 		this.onDidChange = this._onDidChangeEmitter.event;
 	}
 
@@ -57,13 +59,16 @@ class MavenContentProvider implements vscode.TextDocumentContentProvider {
 					return Utils.getEffectivePom(pomPath);
 				}
 			}
+
 			case "local-repository": {
 				const fsUri = uri.with({ scheme: "file", authority: "" });
 
 				return (await vscode.workspace.fs.readFile(fsUri)).toString();
 			}
+
 			default:
 		}
+
 		return undefined;
 	}
 }

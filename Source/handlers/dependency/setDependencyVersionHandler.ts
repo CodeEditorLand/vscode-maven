@@ -35,9 +35,11 @@ export async function setDependencyVersionHandler(
 	if (selectedItem && selectedItem.pomPath) {
 		// codeAction
 		pomPath = selectedItem.pomPath;
+
 		effectiveVersion = selectedItem.effectiveVersion;
 	} else if (selectedItem && selectedItem instanceof Dependency) {
 		pomPath = selectedItem.projectPomPath;
+
 		effectiveVersion =
 			selectedItem.omittedStatus?.effectiveVersion ??
 			selectedItem.version;
@@ -58,6 +60,7 @@ export async function setDependencyVersionHandler(
 	const versions: string[] = getAllVersionsInTree(pomPath, gid, aid);
 
 	const OPTION_SEARCH_MAVEN_CENTRAL = "Search Maven Central Repository...";
+
 	versions.push(OPTION_SEARCH_MAVEN_CENTRAL);
 
 	let selectedVersion: string | undefined = await vscode.window
@@ -81,6 +84,7 @@ export async function setDependencyVersionHandler(
 	if (selectedVersion === undefined) {
 		return;
 	}
+
 	if (selectedVersion === OPTION_SEARCH_MAVEN_CENTRAL) {
 		const selectedVersionFromMavenCentral: string | undefined =
 			await vscode.window
@@ -105,8 +109,10 @@ export async function setDependencyVersionHandler(
 		if (selectedVersionFromMavenCentral === undefined) {
 			return;
 		}
+
 		selectedVersion = selectedVersionFromMavenCentral;
 	}
+
 	if (selectedVersion !== effectiveVersion) {
 		await setDependencyVersion(pomPath, gid, aid, selectedVersion);
 	}
@@ -193,6 +199,7 @@ async function insertDependencyManagement(
 			"Invalid target XML node to insert dependency management.",
 		);
 	}
+
 	const currentDocument: vscode.TextDocument =
 		await vscode.workspace.openTextDocument(pomPath);
 
@@ -255,6 +262,7 @@ async function insertDependencyManagement(
 			) as Element | undefined;
 
 			const newIndent = `${baseIndent}${indent}`;
+
 			targetText = constructDependencyNode({
 				gid,
 				aid,
@@ -267,6 +275,7 @@ async function insertDependencyManagement(
 			insertPosition = currentDocument.positionAt(
 				getInnerStartIndex(targetNode),
 			);
+
 			targetText = constructDependenciesNode({
 				gid,
 				aid,
@@ -280,6 +289,7 @@ async function insertDependencyManagement(
 		insertPosition = currentDocument.positionAt(
 			getInnerEndIndex(targetNode),
 		);
+
 		targetText = constructDependencyManagementNode({
 			gid,
 			aid,
@@ -313,9 +323,11 @@ async function insertDependencyManagement(
 				currentDocument.positionAt(start),
 				currentDocument.positionAt(end),
 			);
+
 			edit.delete(currentDocument.uri, range);
 		}
 	}
+
 	if (
 		dependencyNodeInManagement &&
 		dependencyNodeInManagement.startIndex !== null &&
@@ -330,15 +342,18 @@ async function insertDependencyManagement(
 			currentDocument.positionAt(start),
 			currentDocument.positionAt(end),
 		);
+
 		edit.delete(currentDocument.uri, range);
 	}
 
 	edit.insert(currentDocument.uri, insertPosition, targetText);
+
 	await vscode.workspace.applyEdit(edit);
 
 	const endingPosition: vscode.Position = currentDocument.positionAt(
 		currentDocument.offsetAt(insertPosition) + targetText.length,
 	);
+
 	textEditor.revealRange(new vscode.Range(insertPosition, endingPosition));
 }
 
@@ -352,6 +367,7 @@ function getAllVersionsInTree(
 	if (project === undefined) {
 		throw new Error("Failed to get maven projects.");
 	}
+
 	const fullText: string = project.fullText;
 
 	const re = new RegExp(`${gid}:${aid}:[\\w.-]+`, "gm");

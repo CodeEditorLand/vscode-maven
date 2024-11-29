@@ -12,6 +12,7 @@ import { ProjectMenu } from "./Menu";
 export class FavoritesMenu extends ProjectMenu implements ITreeItem {
 	constructor(project: MavenProject) {
 		super(project);
+
 		this.name = "Favorites";
 	}
 
@@ -28,6 +29,7 @@ export class FavoritesMenu extends ProjectMenu implements ITreeItem {
 			this.name,
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
+
 		treeItem.iconPath = new vscode.ThemeIcon("star-empty");
 
 		return treeItem;

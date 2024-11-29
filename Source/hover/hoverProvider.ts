@@ -91,6 +91,7 @@ export class HoverProvider implements vscode.HoverProvider {
 					if (!mavenProject) {
 						return undefined;
 					}
+
 					const effectiveVersion: string | undefined =
 						mavenProject.getDependencyVersion(
 							groupIdHint,
@@ -108,14 +109,17 @@ export class HoverProvider implements vscode.HoverProvider {
 						);
 					}
 				}
+
 				return undefined;
 			}
+
 			default:
 				// schema-based
 				if (this.isXmlExtensionEnabled) {
 					// See: https://github.com/microsoft/vscode-maven/issues/918
 					return undefined;
 				}
+
 				return xsdElement
 					? new vscode.Hover(
 							[

@@ -90,6 +90,7 @@ export class Utils {
 		customHeaders?: object,
 	): Promise<string> {
 		const tempFilePath: string = Utils.getTempOutputPath(targetUrl);
+
 		await fse.ensureFile(tempFilePath);
 
 		return await new Promise(
@@ -133,6 +134,7 @@ export class Utils {
 						} else {
 							ws = fse.createWriteStream(tempFilePath);
 						}
+
 						res.on("data", (chunk: string | Buffer) => {
 							if (readContent) {
 								rawData += chunk;
@@ -140,11 +142,13 @@ export class Utils {
 								ws.write(chunk);
 							}
 						});
+
 						res.on("end", () => {
 							if (readContent) {
 								resolve(rawData);
 							} else {
 								ws.end();
+
 								resolve(tempFilePath);
 							}
 						});
@@ -168,6 +172,7 @@ export class Utils {
 		} else if (typeof param === "object" && param instanceof Uri) {
 			pomPath = param.fsPath;
 		}
+
 		if (!pomPath) {
 			throw new Error("Corresponding pom.xml file not found.");
 		}
@@ -179,6 +184,7 @@ export class Utils {
 		}
 
 		const uri = effectivePomContentUri(pomPath);
+
 		await window.showTextDocument(uri);
 	}
 
@@ -194,14 +200,18 @@ export class Utils {
 			pomPathOrMavenProject instanceof MavenProject
 		) {
 			const mavenProject: MavenProject = pomPathOrMavenProject;
+
 			pomPath = mavenProject.pomPath;
+
 			name = mavenProject.name;
 		} else if (typeof pomPathOrMavenProject === "string") {
 			pomPath = pomPathOrMavenProject;
+
 			name = pomPath;
 		} else {
 			return undefined;
 		}
+
 		const task = async (p: Progress<{ message?: string }>) => {
 			p.report({ message: `Generating Effective POM: ${name}` });
 
@@ -266,6 +276,7 @@ export class Utils {
 		if (!pomPath) {
 			return;
 		}
+
 		const inputGoals: string | undefined = await window.showInputBox({
 			placeHolder: "e.g. clean package -DskipTests",
 			ignoreFocusOut: true,
@@ -290,6 +301,7 @@ export class Utils {
 			[],
 			await Promise.all(projectPomPaths.map(getLRUCommands)),
 		) as ICommandHistoryEntry[];
+
 		candidates.sort((a, b) => b.timestamp - a.timestamp);
 
 		const selected:
@@ -326,9 +338,11 @@ export class Utils {
 
 		if (node instanceof LifecyclePhase) {
 			selectedProject = node.project;
+
 			selectedCommand = node.phase;
 		} else if (node instanceof FavoriteCommand) {
 			selectedProject = node.project;
+
 			selectedCommand = node.command;
 		} else if (node && node.uri) {
 			// for nodes from Project Manager
@@ -336,6 +350,7 @@ export class Utils {
 				Uri.parse(node.uri).fsPath,
 				"pom.xml",
 			);
+
 			selectedProject = MavenProjectManager.projects.find(
 				(project) =>
 					project.pomPath.toLowerCase() === pomPath.toLowerCase(),
@@ -356,6 +371,7 @@ export class Utils {
 			const LABEL_CUSTOM = "Custom ...";
 
 			const LABEL_FAVORITES = "Favorites ...";
+
 			selectedCommand = await window.showQuickPick(
 				[LABEL_FAVORITES, LABEL_CUSTOM, ...DEFAULT_MAVEN_LIFECYCLES],
 				{
@@ -430,6 +446,7 @@ export class Utils {
 						active,
 						source,
 					);
+
 					profiles.push(profile);
 				}
 			}

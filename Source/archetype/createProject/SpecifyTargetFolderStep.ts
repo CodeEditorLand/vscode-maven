@@ -27,6 +27,7 @@ export class SpecifyTargetFolderStep implements IProjectCreationStep {
 
 			return StepResult.NEXT;
 		}
+
 		const LABEL_CHOOSE_FOLDER = "Select Destination Folder";
 
 		const OPTION_CONTINUE = "Continue";
@@ -74,6 +75,7 @@ export class SpecifyTargetFolderStep implements IProjectCreationStep {
 		if (targetFolder === undefined) {
 			return StepResult.STOP;
 		}
+
 		metadata.targetFolder = targetFolder;
 
 		return StepResult.NEXT;

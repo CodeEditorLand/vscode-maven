@@ -51,6 +51,7 @@ export function getChildrenByTags(
 			ret.push(child);
 		}
 	}
+
 	return ret;
 }
 
@@ -91,6 +92,7 @@ export function detectDocumentIndent(
 		} else {
 			indentChar = " ";
 		}
+
 		indent++;
 	}
 
@@ -109,6 +111,7 @@ export function getNodesByTag(text: string, tag: string): Element[] {
 	});
 
 	const ret: Element[] = [];
+
 	dfs(document, (node) => isTag(node) && node.tagName === tag, ret);
 
 	return ret;
@@ -123,6 +126,7 @@ export function getCurrentNode(text: string, offset: number): Node | undefined {
 	});
 
 	const ret: Node[] = [];
+
 	dfs(
 		document,
 		(node) =>
@@ -146,8 +150,10 @@ export function getNodePath(node: Node) {
 		if (isTag(cur)) {
 			parents.unshift(cur.tagName);
 		}
+
 		cur = cur.parent;
 	}
+
 	return parents.join(".");
 }
 
@@ -181,8 +187,10 @@ export function getEnclosingTag(node: Node): Element | null {
 		if (isTag(currentNode)) {
 			return currentNode;
 		}
+
 		currentNode = currentNode.parent;
 	}
+
 	return null;
 }
 
@@ -199,6 +207,7 @@ function dfs(
 			return;
 		}
 	}
+
 	if (node instanceof NodeWithChildren) {
 		for (const child of (node as NodeWithChildren).children) {
 			dfs(child, pred, result, includeAll);

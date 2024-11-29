@@ -17,16 +17,22 @@ export class SpecifyArtifactIdStep implements IProjectCreationStep {
 
 		const quickInputPromise = new Promise<StepResult>((resolve) => {
 			const inputBox: InputBox = window.createInputBox();
+
 			inputBox.title = metadata.title;
+
 			inputBox.placeholder = "e.g. demo";
+
 			inputBox.prompt = metadata.parentProject
 				? "Input the module name."
 				: "Input artifact Id (also as project name) of your project.";
+
 			inputBox.value = metadata.artifactId ?? "demo";
+
 			inputBox.ignoreFocusOut = true;
 
 			if (this.previousStep) {
 				inputBox.buttons = [QuickInputButtons.Back];
+
 				disposables.push(
 					inputBox.onDidTriggerButton((item) => {
 						if (item === QuickInputButtons.Back) {
@@ -35,15 +41,18 @@ export class SpecifyArtifactIdStep implements IProjectCreationStep {
 					}),
 				);
 			}
+
 			disposables.push(
 				inputBox.onDidChangeValue(() => {
 					const validationMessage: string | undefined =
 						this.artifactIdValidation(inputBox.value);
+
 					inputBox.validationMessage = validationMessage;
 				}),
 				inputBox.onDidAccept(() => {
 					if (!inputBox.validationMessage) {
 						metadata.artifactId = inputBox.value;
+
 						resolve(StepResult.NEXT);
 					}
 				}),
@@ -51,7 +60,9 @@ export class SpecifyArtifactIdStep implements IProjectCreationStep {
 					resolve(StepResult.STOP);
 				}),
 			);
+
 			disposables.push(inputBox);
+
 			inputBox.show();
 		});
 

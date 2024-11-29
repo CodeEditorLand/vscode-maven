@@ -37,13 +37,16 @@ export class WorkspaceFolder implements ITreeItem {
 
 				break;
 			}
+
 			case "flat": {
 				ret.push(...this.sortByName(allProjects));
 
 				break;
 			}
+
 			default:
 		}
+
 		return ret;
 	}
 

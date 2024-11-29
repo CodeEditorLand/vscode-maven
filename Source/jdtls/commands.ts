@@ -18,6 +18,7 @@ export function executeJavaLanguageServerCommand<R>(
 			`Cannot execute command ${JAVA_EXECUTE_WORKSPACE_COMMAND}, VS Code Java Extension is not enabled.`,
 		);
 	}
+
 	return vscode.commands.executeCommand<R>(
 		JAVA_EXECUTE_WORKSPACE_COMMAND,
 		...rest,

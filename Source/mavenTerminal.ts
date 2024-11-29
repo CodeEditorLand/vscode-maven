@@ -11,9 +11,13 @@ import { executeCommand } from "./utils/cpUtils";
 
 export interface ITerminalOptions {
 	addNewLine?: boolean;
+
 	name: string;
+
 	cwd?: string;
+
 	env?: { [key: string]: string };
+
 	workspaceFolder?: vscode.WorkspaceFolder;
 }
 
@@ -53,6 +57,7 @@ class MavenTerminal implements vscode.Disposable {
 				...Settings.getEnvironment(terminalCwd),
 				...options.env,
 			};
+
 			this.terminals[name] = vscode.window.createTerminal({
 				name,
 				env,
@@ -64,11 +69,13 @@ class MavenTerminal implements vscode.Disposable {
 				setupEnvForWSL(this.terminals[name], env);
 			}
 		}
+
 		this.terminals[name].show();
 
 		if (cwd) {
 			this.terminals[name].sendText(await getCDCommand(cwd), true);
 		}
+
 		this.terminals[name].sendText(getCommand(command), addNewLine);
 
 		return this.terminals[name];
@@ -100,8 +107,10 @@ class MavenTerminal implements vscode.Disposable {
 						}
 					}
 				}
+
 				return filepath;
 			}
+
 			default:
 				return filepath;
 		}
@@ -112,10 +121,12 @@ class MavenTerminal implements vscode.Disposable {
 			// If the name is not passed, dispose all.
 			Object.keys(this.terminals).forEach((id: string) => {
 				this.terminals[id].dispose();
+
 				delete this.terminals[id];
 			});
 		} else if (this.terminals[terminalName] !== undefined) {
 			this.terminals[terminalName].dispose();
+
 			delete this.terminals[terminalName];
 		}
 	}
@@ -126,6 +137,7 @@ class MavenTerminal implements vscode.Disposable {
 				return name;
 			}
 		}
+
 		return;
 	}
 }
@@ -150,6 +162,7 @@ async function getCDCommand(cwd: string): Promise<string> {
 
 				return `cd "${escaped}"`; // PowerShell
 			}
+
 			case ShellType.CMD:
 				return `cd /d "${cwd}"`; // CMD
 			case ShellType.WSL:

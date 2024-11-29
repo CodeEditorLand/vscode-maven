@@ -29,6 +29,7 @@ export class SelectParentPom implements IProjectCreationStep {
 				parentProject: undefined,
 			},
 		];
+
 		MavenProjectManager.projects
 			.filter(
 				(project) => project.pomPath && pathExistsSync(project.pomPath),
@@ -57,14 +58,20 @@ export class SelectParentPom implements IProjectCreationStep {
 			return await new Promise<StepResult>((resolve) => {
 				const pickBox: QuickPick<ParentPomPickItem> =
 					window.createQuickPick<ParentPomPickItem>();
+
 				pickBox.title = metadata.title;
+
 				pickBox.placeholder = "Select the parent...";
+
 				pickBox.matchOnDescription = true;
+
 				pickBox.ignoreFocusOut = true;
+
 				pickBox.items = items;
 
 				if (this.previousStep) {
 					pickBox.buttons = [QuickInputButtons.Back];
+
 					disposables.push(
 						pickBox.onDidTriggerButton((item) => {
 							if (item === QuickInputButtons.Back) {
@@ -73,20 +80,26 @@ export class SelectParentPom implements IProjectCreationStep {
 						}),
 					);
 				}
+
 				disposables.push(
 					pickBox.onDidAccept(() => {
 						metadata.parentProject =
 							pickBox.selectedItems[0].parentProject;
+
 						metadata.groupId = metadata.parentProject?.groupId;
+
 						resolve(StepResult.NEXT);
 					}),
 				);
+
 				disposables.push(
 					pickBox.onDidHide(() => {
 						resolve(StepResult.STOP);
 					}),
 				);
+
 				disposables.push(pickBox);
+
 				pickBox.show();
 			});
 		} finally {

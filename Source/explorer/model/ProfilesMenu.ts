@@ -9,6 +9,7 @@ import { ProjectMenu } from "./Menu";
 export class ProfilesMenu extends ProjectMenu implements ITreeItem {
 	constructor(project: MavenProject) {
 		super(project);
+
 		this.name = "Profiles";
 	}
 
@@ -20,6 +21,7 @@ export class ProfilesMenu extends ProjectMenu implements ITreeItem {
 		if (this.project.profiles === undefined) {
 			await this.project.refreshProfiles();
 		}
+
 		return this.project.profiles;
 	}
 

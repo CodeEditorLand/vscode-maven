@@ -12,6 +12,7 @@ export async function showDependenciesHandler(
 	project: MavenProject,
 ): Promise<void> {
 	const uri = dependenciesContentUri(project.pomPath);
+
 	await vscode.window.showTextDocument(uri);
 }
 
@@ -27,10 +28,13 @@ export async function getDependencyTree(
 		pomPathOrMavenProject instanceof MavenProject
 	) {
 		const mavenProject: MavenProject = pomPathOrMavenProject;
+
 		pomPath = mavenProject.pomPath;
+
 		name = mavenProject.name;
 	} else if (typeof pomPathOrMavenProject === "string") {
 		pomPath = pomPathOrMavenProject;
+
 		name = pomPath;
 	} else {
 		return undefined;

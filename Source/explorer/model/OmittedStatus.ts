@@ -3,6 +3,8 @@
 
 export interface IOmittedStatus {
 	status: "conflict" | "duplicate";
+
 	effectiveVersion: string;
+
 	description: string;
 }

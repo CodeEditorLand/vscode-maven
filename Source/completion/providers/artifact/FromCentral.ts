@@ -49,8 +49,11 @@ export class FromCentral implements IArtifactCompletionProvider {
 				gid,
 				vscode.CompletionItemKind.Module,
 			);
+
 			item.insertText = gid;
+
 			item.detail = "From Central Repository";
+
 			item.command = commandOnSelection;
 
 			return item;
@@ -88,9 +91,12 @@ export class FromCentral implements IArtifactCompletionProvider {
 				},
 				vscode.CompletionItemKind.Field,
 			);
+
 			item.insertText = doc.a;
+
 			item.detail = `GroupId: ${doc.g}`;
 			(item as any).data = { groupId: doc.g };
+
 			item.command = commandOnSelection;
 
 			return item;
@@ -129,9 +135,13 @@ export class FromCentral implements IArtifactCompletionProvider {
 				},
 				vscode.CompletionItemKind.Constant,
 			);
+
 			item.insertText = doc.v;
+
 			item.detail = updateDate;
+
 			item.sortText = getSortText(doc.v);
+
 			item.command = commandOnSelection;
 
 			return item;

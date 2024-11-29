@@ -14,13 +14,17 @@ export const MAVEN_DEPENDENCY_CONFLICT = "Maven dependency conflict";
 
 class DiagnosticProvider {
 	private _collection: vscode.DiagnosticCollection;
+
 	public map: Map<vscode.Diagnostic, Dependency> = new Map();
 
 	public initialize(context: vscode.ExtensionContext): void {
 		const dependencyCollection =
 			vscode.languages.createDiagnosticCollection("Dependency");
+
 		this._collection = dependencyCollection;
+
 		context.subscriptions.push(this._collection);
+
 		context.subscriptions.push(
 			vscode.workspace.onDidChangeTextDocument(async (e) => {
 				if (e.document.fileName.endsWith("pom.xml")) {
@@ -31,20 +35,26 @@ class DiagnosticProvider {
 	}
 
 	private updateNodeForDocumentTimeout: NodeJS.Timer;
+
 	private async debouncedRefresh(uri: vscode.Uri): Promise<void> {
 		if (this.updateNodeForDocumentTimeout) {
 			clearTimeout(this.updateNodeForDocumentTimeout);
 		}
+
 		const timeout: number = getRequestDelay(uri);
+
 		this.updateNodeForDocumentTimeout = setTimeout(async () => {
 			const startTime: number = performance.now();
+
 			await this.refreshDiagnostics(uri);
 
 			const executionTime: number = performance.now() - startTime;
 
 			const movingAverage: MovingAverage =
 				lruCache.get(uri) || new MovingAverage();
+
 			movingAverage.update(executionTime);
+
 			lruCache.set(uri, movingAverage);
 		}, timeout);
 	}
@@ -57,6 +67,7 @@ class DiagnosticProvider {
 
 			return;
 		}
+
 		const project: MavenProject | undefined = MavenProjectManager.get(
 			uri.fsPath,
 		);
@@ -72,9 +83,11 @@ class DiagnosticProvider {
 
 			if (diagnostic) {
 				diagnostics.push(diagnostic);
+
 				this.map.set(diagnostic, node);
 			}
 		}
+
 		this._collection.set(uri, diagnostics);
 	}
 
@@ -100,6 +113,7 @@ class DiagnosticProvider {
 			message,
 			vscode.DiagnosticSeverity.Warning,
 		);
+
 		diagnostic.code = MAVEN_DEPENDENCY_CONFLICT;
 
 		return diagnostic;

@@ -29,12 +29,14 @@ export function registerProjectCreationEndListener(
 
 					return;
 				}
+
 				const { targetFolder, artifactId } =
 					e.execution.task.definition;
 
 				const projectFolder = path.join(targetFolder, artifactId);
 
 				importProjectOnDemand(projectFolder);
+
 				await promptOnDidProjectCreated(artifactId, projectFolder);
 			}
 		}),
@@ -85,6 +87,7 @@ async function specifyOpenMethod(
 	let openMethod = vscode.workspace
 		.getConfiguration("maven")
 		.get<string>("projectOpenBehavior");
+
 	sendInfo(
 		"",
 		{
@@ -104,16 +107,19 @@ async function specifyOpenMethod(
 		) {
 			alreadyInCurrentWorkspace = true;
 		}
+
 		const candidates: string[] = alreadyInCurrentWorkspace
 			? ["OK"]
 			: ([
 					OPEN_IN_NEW_WORKSPACE,
 					hasOpenFolder ? OPEN_IN_CURRENT_WORKSPACE : undefined,
 				].filter(Boolean) as string[]);
+
 		openMethod = await vscode.window.showInformationMessage(
 			`Maven project [${projectName}] is created under: ${projectLocation}`,
 			...candidates,
 		);
+
 		sendInfo(
 			"",
 			{
@@ -123,6 +129,7 @@ async function specifyOpenMethod(
 			{},
 		);
 	}
+
 	return openMethod;
 }
 

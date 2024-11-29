@@ -11,14 +11,23 @@ import { IOmittedStatus } from "./OmittedStatus";
 export class Dependency implements ITreeItem, ITreeNode {
 	public fullArtifactName = ""; // groupId:artifactId:version:scope
 	public projectPomPath: string;
+
 	public groupId: string;
+
 	public artifactId: string;
+
 	public version: string;
+
 	public scope: string;
+
 	public omittedStatus?: IOmittedStatus;
+
 	public uri: vscode.Uri;
+
 	public children: Dependency[] = [];
+
 	public root: Dependency;
+
 	public parent: Dependency;
 
 	constructor(
@@ -30,16 +39,23 @@ export class Dependency implements ITreeItem, ITreeNode {
 		omittedStatus?: IOmittedStatus,
 	) {
 		this.groupId = gid;
+
 		this.artifactId = aid;
+
 		this.version = version;
+
 		this.scope = scope;
+
 		this.fullArtifactName = [gid, aid, version, scope].join(":");
+
 		this.projectPomPath = projectPomPath;
+
 		this.omittedStatus = omittedStatus;
 	}
 
 	public addChild(node: Dependency): void {
 		node.parent = this;
+
 		this.children.push(node);
 	}
 
@@ -51,9 +67,11 @@ export class Dependency implements ITreeItem, ITreeNode {
 		if (root.fullArtifactName === this.fullArtifactName) {
 			contextValue = `${contextValue}+root`;
 		}
+
 		if (this.omittedStatus?.status === "conflict") {
 			contextValue = `${contextValue}+conflict`;
 		}
+
 		return contextValue;
 	}
 
@@ -65,7 +83,9 @@ export class Dependency implements ITreeItem, ITreeNode {
 		const label = [this.groupId, this.artifactId, this.version].join(":");
 
 		const treeItem: vscode.TreeItem = new vscode.TreeItem(label);
+
 		treeItem.resourceUri = this.uri;
+
 		treeItem.tooltip = this.fullArtifactName;
 
 		if (this.children.length !== 0) {
@@ -80,6 +100,7 @@ export class Dependency implements ITreeItem, ITreeNode {
 			treeItem.iconPath = new vscode.ThemeIcon("library");
 		} else if (this.omittedStatus.status === "duplicate") {
 			const iconFile = "LibraryDuplicate.svg";
+
 			treeItem.iconPath = {
 				light: getPathToExtensionRoot(
 					"resources",
@@ -96,6 +117,7 @@ export class Dependency implements ITreeItem, ITreeNode {
 			};
 		} else if (this.omittedStatus.status === "conflict") {
 			const iconFile = "LibraryConflict.svg";
+
 			treeItem.iconPath = {
 				light: getPathToExtensionRoot(
 					"resources",
@@ -118,9 +140,11 @@ export class Dependency implements ITreeItem, ITreeNode {
 		if (!this.scope.includes("compile")) {
 			descriptions.push(`(${this.scope})`);
 		}
+
 		if (this.omittedStatus !== undefined) {
 			descriptions.push(this.omittedStatus.description);
 		}
+
 		treeItem.description = descriptions.join(" ");
 
 		return treeItem;

@@ -51,6 +51,7 @@ class DefinitionProvider implements vscode.DefinitionProvider {
 				if (!parentNode || !isTag(parentNode)) {
 					return undefined;
 				}
+
 				if (
 					parentNode.name === XmlTagName.Dependency ||
 					parentNode.name === XmlTagName.Plugin
@@ -72,16 +73,20 @@ class DefinitionProvider implements vscode.DefinitionProvider {
 					return undefined;
 				}
 			}
+
 			case XmlTagName.Module: {
 				return getModuleDefinitionLink(tagNode, document, position);
 			}
+
 			case XmlTagName.Parent: {
 				return getParentDefinitionLink(tagNode, document, position);
 			}
+
 			case XmlTagName.Dependency:
 			case XmlTagName.Plugin: {
 				return getDependencyDefinitionLink(tagNode, document, position);
 			}
+
 			default:
 				return undefined;
 		}
@@ -127,6 +132,7 @@ function getParentDefinitionLinkFromRelativePath(
 
 		return [definitionLink];
 	}
+
 	return undefined;
 }
 
@@ -212,10 +218,12 @@ function getDependencyDefinitionLink(
 						});
 					}
 				}
+
 				return links;
 			}
 		}
 	}
+
 	return undefined;
 }
 

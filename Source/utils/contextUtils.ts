@@ -34,9 +34,13 @@ export async function loadPackageInfo(
 	const { publisher, name, version, aiKey } = await fse.readJSON(
 		context.asAbsolutePath("./package.json"),
 	);
+
 	EXTENSION_AI_KEY = aiKey;
+
 	EXTENSION_PUBLISHER = publisher;
+
 	EXTENSION_NAME = name;
+
 	EXTENSION_VERSION = version;
 
 	TEMP_FOLDER_PER_USER = path.join(
@@ -60,6 +64,7 @@ export async function loadMavenSettingsFilePath(): Promise<void> {
 		if (!userSettingsPath) {
 			userSettingsPath = path.join(os.homedir(), ".m2", "settings.xml");
 		}
+
 		const userSettings: unknown =
 			await Utils.parseXmlFile(userSettingsPath);
 
@@ -70,6 +75,7 @@ export async function loadMavenSettingsFilePath(): Promise<void> {
 
 		if (localRepository) {
 			MAVEN_LOCAL_REPOSITORY = path.resolve(localRepository);
+
 			mavenOutputChannel.appendLine(
 				`local repository: ${MAVEN_LOCAL_REPOSITORY}`,
 			);
@@ -111,6 +117,7 @@ export function getPathToExtensionRoot(...args: string[]): string {
 	if (!EXTENSION_CONTEXT) {
 		throw new Error("Cannot identify Maven extension.");
 	}
+
 	return EXTENSION_CONTEXT.asAbsolutePath(path.join(...args));
 }
 
@@ -120,6 +127,7 @@ export function getPathToWorkspaceStorage(
 	if (EXTENSION_CONTEXT?.storagePath === undefined) {
 		return undefined;
 	}
+
 	fse.ensureDirSync(EXTENSION_CONTEXT.storagePath);
 
 	return path.join(EXTENSION_CONTEXT.storagePath, ...args);

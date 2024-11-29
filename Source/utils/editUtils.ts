@@ -38,6 +38,7 @@ export async function applyWorkspaceEdit(
 			) {
 				return;
 			}
+
 			const cursorPostion: Position = currentEditor.selection.active;
 			// Get the array of all the changes
 			const changes: TextEdit[] = workspaceEdit.entries()[0][1];
@@ -58,14 +59,18 @@ export async function applyWorkspaceEdit(
 						startPosition,
 						lineOffsets,
 					);
+
 					startPosition = new Position(
 						changes[i].range.start.line,
 						changes[i].range.start.character,
 					);
+
 					lineOffsets = 0;
 				}
+
 				lineOffsets += changes[i].newText.split(/\r?\n/).length - 1;
 			}
+
 			await executeRangeFormat(currentEditor, startPosition, lineOffsets);
 			// Recover the cursor's original position
 			currentEditor.selection = new Selection(
@@ -88,7 +93,9 @@ async function executeRangeFormat(
 			new Position(startPosition.line + lineOffset + 1, 0),
 		) - 1,
 	);
+
 	editor.selection = new Selection(startPosition, endPosition);
+
 	await commands.executeCommand("editor.action.formatSelection");
 }
 
@@ -108,13 +115,19 @@ export function getIndentation(
 
 export function constructDependencyNode(options: {
 	gid: string;
+
 	aid: string;
+
 	version?: string;
+
 	dtype?: string;
 
 	classifier?: string;
+
 	baseIndent: string;
+
 	indent: string;
+
 	eol: string;
 }): string {
 	const { gid, aid, version, dtype, classifier, baseIndent, indent, eol } =
@@ -149,13 +162,19 @@ export function constructDependencyNode(options: {
 
 export function constructDependenciesNode(options: {
 	gid: string;
+
 	aid: string;
+
 	version?: string;
+
 	dtype?: string;
 
 	classifier?: string;
+
 	baseIndent: string;
+
 	indent: string;
+
 	eol: string;
 }): string {
 	const { gid, aid, version, dtype, classifier, baseIndent, indent, eol } =
@@ -184,13 +203,19 @@ export function constructDependenciesNode(options: {
 
 export function constructDependencyManagementNode(options: {
 	gid: string;
+
 	aid: string;
+
 	version: string;
+
 	dtype?: string;
 
 	classifier?: string;
+
 	baseIndent: string;
+
 	indent: string;
+
 	eol: string;
 }): string {
 	const { gid, aid, version, dtype, classifier, baseIndent, indent, eol } =

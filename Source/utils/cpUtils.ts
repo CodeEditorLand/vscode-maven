@@ -22,10 +22,13 @@ export async function executeCommand(
 			if (childProc.stdout !== null) {
 				childProc.stdout.on("data", (data: string | Buffer) => {
 					data = data.toString();
+
 					result = result.concat(data);
 				});
 			}
+
 			childProc.on("error", reject);
+
 			childProc.on("close", (code: number) => {
 				if (code !== 0 || result.indexOf("ERROR") > -1) {
 					reject(
@@ -48,6 +51,7 @@ export async function executeCommandWithProgress(
 	options: cp.SpawnOptions = { shell: true },
 ): Promise<string> {
 	let result = "";
+
 	await vscode.window.withProgress<void>(
 		{ location: vscode.ProgressLocation.Window },
 		async (
@@ -57,9 +61,11 @@ export async function executeCommandWithProgress(
 
 			return new Promise<void>((resolve, reject) => {
 				p.report({ message });
+
 				executeCommand(command, args, options)
 					.then((value) => {
 						result = value;
+
 						resolve();
 					})
 					.catch(reject);

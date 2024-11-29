@@ -46,7 +46,9 @@ export class Settings {
 	public static storeFavorite(favorite: FavoriteFormat): void {
 		const favorites: FavoriteFormat[] =
 			workspace.getConfiguration().get("maven.terminal.favorites") ?? [];
+
 		favorites.push(favorite);
+
 		workspace
 			.getConfiguration()
 			.update("maven.terminal.favorites", favorites);
@@ -82,6 +84,7 @@ export class Settings {
 		public static customEnv(resourceOrFilepath?: Uri | string):
 			| {
 					environmentVariable: string;
+
 					value: string;
 			  }[]
 			| undefined {
@@ -107,12 +110,14 @@ export class Settings {
 			);
 		}
 	};
+
 	public static Executable = class {
 		public static path(
 			resourceOrFilepath?: Uri | string,
 		): string | undefined {
 			return _getMavenSection("executable.path", resourceOrFilepath);
 		}
+
 		public static options(
 			resourceOrFilepath?: Uri | string,
 		): string | undefined {
@@ -124,8 +129,10 @@ export class Settings {
 			if (Array.isArray(options)) {
 				return options.join(" ");
 			}
+
 			return options;
 		}
+
 		public static preferMavenWrapper(
 			resourceOrFilepath?: Uri | string,
 		): boolean {
@@ -161,8 +168,10 @@ export class Settings {
 	} {
 		const customEnv: { [key: string]: string } =
 			_getJavaHomeEnvIfAvailable();
+
 		type EnvironmentSetting = {
 			environmentVariable: string;
+
 			value: string;
 		};
 
@@ -174,6 +183,7 @@ export class Settings {
 				customEnv[s.environmentVariable] = s.value;
 			});
 		}
+
 		return customEnv;
 	}
 
@@ -183,9 +193,13 @@ export class Settings {
 	 */
 	public static getExploreProjectName(project: {
 		pomPath?: string;
+
 		artifactId: string;
+
 		groupId: string;
+
 		version: string;
+
 		name: string;
 	}) {
 		const template = _getMavenSection<string>(
@@ -216,6 +230,7 @@ function _getMavenSection<T>(
 	} else if (resourceOrFilepath instanceof Uri) {
 		resource = resourceOrFilepath;
 	}
+
 	return workspace.getConfiguration("maven", resource).get<T>(section);
 }
 

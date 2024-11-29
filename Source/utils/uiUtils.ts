@@ -97,9 +97,11 @@ export async function selectProjectIfNecessary(): Promise<
 	) {
 		return undefined;
 	}
+
 	if (MavenProjectManager.projects.length === 1) {
 		return MavenProjectManager.projects[0];
 	}
+
 	return await window
 		.showQuickPick(
 			MavenProjectManager.projects.map((item) => ({
@@ -132,6 +134,7 @@ export function registerCommand(
 				}
 			},
 		);
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(
 			commandName,
@@ -153,6 +156,7 @@ export function registerCommandRequiringTrust(
 			await promptToManageWorkspaceTrust();
 		}
 	};
+
 	registerCommand(
 		context,
 		commandName,

@@ -8,12 +8,15 @@ import { getPathToTempFolder } from "./contextUtils";
 
 export interface ICommandHistory {
 	pomPath: string;
+
 	timestamps: { [command: string]: number };
 }
 
 export interface ICommandHistoryEntry {
 	command: string;
+
 	pomPath: string;
+
 	timestamp: number;
 }
 
@@ -22,6 +25,7 @@ export async function updateLRUCommands(
 	pomPath: string,
 ): Promise<void> {
 	const historyFilePath: string = getCommandHistoryCachePath(pomPath);
+
 	await fse.ensureFile(historyFilePath);
 
 	const content: string = (await fse.readFile(historyFilePath)).toString();
@@ -30,12 +34,16 @@ export async function updateLRUCommands(
 
 	try {
 		historyObject = JSON.parse(content) as ICommandHistory;
+
 		historyObject.pomPath = pomPath;
+
 		historyObject.timestamps[command] = Date.now();
 	} catch (error) {
 		historyObject = { pomPath, timestamps: {} };
+
 		historyObject.timestamps[command] = Date.now();
 	}
+
 	await fse.writeFile(historyFilePath, JSON.stringify(historyObject));
 }
 
@@ -54,6 +62,7 @@ export async function getLRUCommands(
 		} catch (error) {
 			historyObject = { pomPath, timestamps: {} };
 		}
+
 		const timestamps: { [command: string]: number } =
 			historyObject.timestamps;
 
@@ -70,6 +79,7 @@ export async function getLRUCommands(
 				}) as ICommandHistoryEntry,
 		);
 	}
+
 	return [];
 }
 

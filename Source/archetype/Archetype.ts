@@ -3,9 +3,13 @@
 
 export class Archetype {
 	public artifactId: string;
+
 	public groupId: string;
+
 	public repository?: string;
+
 	public description?: string;
+
 	public versions: string[];
 
 	constructor(
@@ -16,9 +20,13 @@ export class Archetype {
 		versions: string[] = [],
 	) {
 		this.artifactId = aid;
+
 		this.groupId = gid;
+
 		this.versions = versions;
+
 		this.description = desc;
+
 		this.repository = repo;
 	}
 

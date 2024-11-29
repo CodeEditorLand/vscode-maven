@@ -9,14 +9,18 @@ import { IEffectivePom } from "./model/IEffectivePom";
 
 export class EffectivePomProvider {
 	private pomPath: string;
+
 	private emitter: EventEmitter = new EventEmitter();
+
 	private isCalculating = false;
 
 	constructor(pomPath: string) {
 		this.pomPath = pomPath;
+
 		this.emitter.on("complete", (_resp: IEffectivePom) => {
 			this.isCalculating = false;
 		});
+
 		this.emitter.on("error", (_error) => {
 			this.isCalculating = false;
 		});
@@ -28,6 +32,7 @@ export class EffectivePomProvider {
 		if (this.isCalculating) {
 			return new Promise<void>((resolve, reject) => {
 				this.emitter.once("complete", resolve);
+
 				this.emitter.once("error", reject);
 			});
 		}
@@ -46,6 +51,7 @@ export class EffectivePomProvider {
 				this.emitter.emit("complete", undefined);
 			} else {
 				const ePom: any = await Utils.parseXmlContent(ePomString);
+
 				this.emitter.emit("complete", {
 					pomPath,
 					ePomString,
@@ -65,6 +71,7 @@ export class EffectivePomProvider {
 				this.emitter.once("complete", (resp: IEffectivePom) => {
 					resolve(resp);
 				});
+
 				this.emitter.once("error", (error) => {
 					reject(error);
 				});

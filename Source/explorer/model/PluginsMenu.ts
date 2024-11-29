@@ -12,6 +12,7 @@ import { ProjectMenu } from "./Menu";
 export class PluginsMenu extends ProjectMenu implements ITreeItem {
 	constructor(project: MavenProject) {
 		super(project);
+
 		this.name = "Plugins";
 	}
 
@@ -26,6 +27,7 @@ export class PluginsMenu extends ProjectMenu implements ITreeItem {
 			this.name,
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
+
 		treeItem.iconPath = new vscode.ThemeIcon("extensions");
 
 		return treeItem;
@@ -33,6 +35,7 @@ export class PluginsMenu extends ProjectMenu implements ITreeItem {
 
 	public async refresh(): Promise<void> {
 		this.project.refreshEffectivePom().catch(console.error);
+
 		MavenExplorerProvider.getInstance().refresh(this);
 	}
 }

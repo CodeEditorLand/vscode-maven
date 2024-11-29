@@ -37,8 +37,10 @@ export const runSteps = async (
 ): Promise<boolean> => {
 	for (let i = 0; i < steps.length; i += 1) {
 		steps[i].nextStep = steps[i + 1];
+
 		steps[i].previousStep = steps[i - 1];
 	}
+
 	let step: IProjectCreationStep | undefined = steps[0];
 
 	while (step !== undefined) {
@@ -61,5 +63,6 @@ export const runSteps = async (
 				throw new Error("invalid StepResult returned.");
 		}
 	}
+
 	return true;
 };

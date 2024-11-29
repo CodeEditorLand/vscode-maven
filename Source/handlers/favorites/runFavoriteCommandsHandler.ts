@@ -20,9 +20,11 @@ export async function runFavoriteCommandsHandler(
 	if (!selectedProject) {
 		selectedProject = await selectProjectIfNecessary();
 	}
+
 	if (!selectedProject) {
 		return;
 	}
+
 	const favorites: FavoriteCommand[] | undefined =
 		Settings.Terminal.favorites(selectedProject);
 
@@ -41,6 +43,7 @@ export async function runFavoriteCommandsHandler(
 				"maven.terminal.favorites",
 			);
 		}
+
 		return;
 	}
 
@@ -62,6 +65,7 @@ export async function runFavoriteCommandsHandler(
 			)
 			.then((item) => (item ? item.value : undefined));
 	}
+
 	if (!selectedCommand) {
 		return;
 	}

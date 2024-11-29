@@ -3,6 +3,8 @@
 
 export interface IEffectivePom {
 	pomPath: string;
+
 	ePomString?: string;
+
 	ePom?: any;
 }

@@ -12,6 +12,7 @@ import { ProjectMenu } from "./Menu";
 export class LifecycleMenu extends ProjectMenu implements ITreeItem {
 	constructor(project: MavenProject) {
 		super(project);
+
 		this.name = "Lifecycle";
 	}
 
@@ -26,6 +27,7 @@ export class LifecycleMenu extends ProjectMenu implements ITreeItem {
 			this.name,
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
+
 		treeItem.iconPath = new vscode.ThemeIcon("sync");
 
 		return treeItem;

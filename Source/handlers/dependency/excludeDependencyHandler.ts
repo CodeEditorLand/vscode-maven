@@ -21,6 +21,7 @@ export async function excludeDependencyHandler(
 	if (toExclude === undefined) {
 		throw new UserError("Only Dependency can be excluded.");
 	}
+
 	const root: Dependency = toExclude.root;
 
 	if (
@@ -33,6 +34,7 @@ export async function excludeDependencyHandler(
 
 		return;
 	}
+
 	const pomPath: string = toExclude.projectPomPath;
 
 	if (!(await fse.pathExists(pomPath))) {
@@ -40,6 +42,7 @@ export async function excludeDependencyHandler(
 			"Specified POM file does not exist on file system.",
 		);
 	}
+
 	await excludeDependency(
 		pomPath,
 		toExclude.groupId,
@@ -77,6 +80,7 @@ async function insertExcludeDependency(
 	if (targetNode.children.length === 0) {
 		throw new UserError("Invalid target XML node to delete dependency.");
 	}
+
 	const currentDocument: vscode.TextDocument =
 		await vscode.workspace.openTextDocument(pomPath);
 
@@ -110,20 +114,26 @@ async function insertExcludeDependency(
 		insertPosition = currentDocument.positionAt(
 			getInnerEndIndex(targetNode),
 		);
+
 		targetText = constructExclusionsNode(gid, aid, baseIndent, indent, eol);
 	} else {
 		insertPosition = currentDocument.positionAt(
 			getInnerStartIndex(exclusionNode),
 		);
+
 		targetText = constructExclusionNode(gid, aid, baseIndent, indent, eol);
 	}
+
 	const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
+
 	edit.insert(currentDocument.uri, insertPosition, targetText);
+
 	await vscode.workspace.applyEdit(edit);
 
 	const endingPosition: vscode.Position = currentDocument.positionAt(
 		currentDocument.offsetAt(insertPosition) + targetText.length,
 	);
+
 	textEditor.revealRange(new vscode.Range(insertPosition, endingPosition));
 }
 

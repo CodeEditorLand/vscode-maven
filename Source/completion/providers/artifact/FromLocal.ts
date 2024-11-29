@@ -19,6 +19,7 @@ export class FromLocal implements IArtifactCompletionProvider {
 		groupIdHint: string,
 	): Promise<vscode.CompletionItem[]> {
 		const packageSegments: string[] = groupIdHint.split(".");
+
 		packageSegments.pop();
 
 		const validGroupIds: string[] =
@@ -41,8 +42,11 @@ export class FromLocal implements IArtifactCompletionProvider {
 				gid,
 				vscode.CompletionItemKind.Module,
 			);
+
 			item.insertText = gid;
+
 			item.detail = "From Local Repository";
+
 			item.command = commandOnSelection;
 
 			return item;
@@ -79,9 +83,12 @@ export class FromLocal implements IArtifactCompletionProvider {
 				},
 				vscode.CompletionItemKind.Field,
 			);
+
 			item.insertText = aid;
+
 			item.detail = `GroupId: ${groupId}`;
 			(item as any).data = { groupId };
+
 			item.command = commandOnSelection;
 
 			return item;
@@ -118,9 +125,13 @@ export class FromLocal implements IArtifactCompletionProvider {
 				v,
 				vscode.CompletionItemKind.Constant,
 			);
+
 			item.insertText = v;
+
 			item.detail = "From Local Repository";
+
 			item.sortText = getSortText(v);
+
 			item.command = commandOnSelection;
 
 			return item;

@@ -18,6 +18,7 @@ export class HintNode implements ITreeItem {
 
 	public getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		const treeItem: vscode.TreeItem = new vscode.TreeItem("");
+
 		treeItem.description = this._msg;
 
 		return treeItem;

@@ -14,6 +14,7 @@ export async function addFavoriteHandler() {
 			if (text.trim().length < 2) {
 				return "Command is too short.";
 			}
+
 			return undefined;
 		},
 	});

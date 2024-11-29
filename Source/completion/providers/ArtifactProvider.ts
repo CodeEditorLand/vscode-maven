@@ -15,12 +15,16 @@ const DEFAULT_GROUP_ID = "org.apache.maven.plugins";
 
 export class ArtifactProvider implements IXmlCompletionProvider {
 	private centralProvider;
+
 	private indexProvider;
+
 	private localProvider;
 
 	constructor() {
 		this.centralProvider = new FromCentral();
+
 		this.indexProvider = new FromIndex();
+
 		this.localProvider = new FromLocal();
 	}
 
@@ -89,10 +93,12 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 					localItems,
 					(item) => item.insertText,
 				);
+
 				mergedItems.forEach((item) => (item.range = targetRange));
 
 				return mergedItems;
 			}
+
 			case XmlTagName.ArtifactId: {
 				const artifactIdTextNode = tagNode.firstChild;
 
@@ -140,6 +146,7 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 				let mergedItems: vscode.CompletionItem[] = [];
 
 				const ID_SEPARATOR = ":";
+
 				mergedItems = _.unionBy(
 					centralItems,
 					indexItems,
@@ -149,6 +156,7 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 						ID_SEPARATOR +
 						item.insertText,
 				);
+
 				mergedItems = dedupItemsWithGroupId(mergedItems, groupIdHint);
 
 				// also update corresponding groupId node
@@ -178,10 +186,12 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 						}
 					}
 				}
+
 				mergedItems.forEach((item) => (item.range = targetRange));
 
 				return mergedItems;
 			}
+
 			case XmlTagName.Version: {
 				const versionTextNode = tagNode.firstChild;
 
@@ -244,11 +254,13 @@ export class ArtifactProvider implements IXmlCompletionProvider {
 					localItems,
 					(item) => item.insertText,
 				);
+
 				mergedItems.forEach((item) => (item.range = targetRange));
 
 				return mergedItems;
 			}
 		}
+
 		return [];
 	}
 }

@@ -13,19 +13,24 @@ import { WorkspaceFolder } from "./model/WorkspaceFolder";
 
 export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 	private static INSTANCE: MavenExplorerProvider;
+
 	public static getInstance() {
 		if (!this.INSTANCE) {
 			this.INSTANCE = new MavenExplorerProvider();
 		}
+
 		return this.INSTANCE;
 	}
 
 	public readonly onDidChangeTreeData: vscode.Event<ITreeItem | undefined>;
+
 	private _onDidChangeTreeData: vscode.EventEmitter<ITreeItem | undefined>;
 
 	private constructor() {
 		this._onDidChangeTreeData = new vscode.EventEmitter<ITreeItem>();
+
 		this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+
 		this.refresh();
 	}
 
@@ -35,11 +40,13 @@ export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 
 	public addProject(pomPath: string): void {
 		MavenProjectManager.add(pomPath);
+
 		this.refresh();
 	}
 
 	public removeProject(pomPath: string): void {
 		MavenProjectManager.remove(pomPath);
+
 		this.refresh();
 	}
 
@@ -47,6 +54,7 @@ export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 		folder: vscode.WorkspaceFolder,
 	): Promise<void> {
 		await MavenProjectManager.loadProjects(folder);
+
 		this.refresh();
 	}
 
@@ -54,6 +62,7 @@ export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 		folder: vscode.WorkspaceFolder,
 	): Promise<void> {
 		await MavenProjectManager.removeAllFrom(folder);
+
 		this.refresh();
 	}
 
@@ -66,17 +75,20 @@ export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 			return item;
 		});
 	}
+
 	public async getChildren(
 		element?: ITreeItem,
 	): Promise<ITreeItem[] | undefined> {
 		if (!vscode.workspace.isTrusted) {
 			return undefined;
 		}
+
 		if (element === undefined) {
 			// Top level elements
 			if (!vscode.workspace.workspaceFolders) {
 				return undefined;
 			}
+
 			if (vscode.workspace.workspaceFolders.length === 1) {
 				// single root workspace
 				return await new WorkspaceFolder(
@@ -92,6 +104,7 @@ export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 			return element.getChildren ? element.getChildren() : undefined;
 		}
 	}
+
 	public async getParent(element: ITreeItem): Promise<ITreeItem | undefined> {
 		if (element instanceof Dependency) {
 			return element.parent;
@@ -106,6 +119,7 @@ export class MavenExplorerProvider implements TreeDataProvider<ITreeItem> {
 				.refreshEffectivePom()
 				.catch(console.error);
 		}
+
 		this._onDidChangeTreeData.fire(item);
 	}
 }

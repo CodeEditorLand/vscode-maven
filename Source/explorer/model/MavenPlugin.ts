@@ -14,11 +14,15 @@ const CONTEXT_VALUE = "maven:plugin";
 
 export class MavenPlugin implements ITreeItem {
 	public project: MavenProject;
+
 	public groupId: string;
+
 	public artifactId: string;
+
 	public version: string;
 
 	public prefix: string | undefined;
+
 	public goals: string[] | undefined;
 
 	constructor(
@@ -28,9 +32,13 @@ export class MavenPlugin implements ITreeItem {
 		version: string,
 	) {
 		this.project = project;
+
 		this.groupId = groupId;
+
 		this.artifactId = artifactId;
+
 		this.version = version;
+
 		taskExecutor.execute(async () => await this.fetchPrefix());
 	}
 
@@ -40,6 +48,7 @@ export class MavenPlugin implements ITreeItem {
 		if (this.version !== undefined) {
 			pluginId += `:${this.version}`;
 		}
+
 		return pluginId;
 	}
 
@@ -54,11 +63,13 @@ export class MavenPlugin implements ITreeItem {
 			label,
 			vscode.TreeItemCollapsibleState.Collapsed,
 		);
+
 		treeItem.iconPath = new vscode.ThemeIcon("symbol-property");
 
 		if (this.prefix) {
 			treeItem.description = this.pluginId;
 		}
+
 		return treeItem;
 	}
 
@@ -68,6 +79,7 @@ export class MavenPlugin implements ITreeItem {
 		} catch (error) {
 			return [];
 		}
+
 		return this.goals
 			? this.goals.map((goal) => new PluginGoal(this, goal))
 			: [];
@@ -81,11 +93,14 @@ export class MavenPlugin implements ITreeItem {
 		if (this.prefix !== undefined) {
 			return;
 		}
+
 		const prefix = await pluginInfoProvider.getPluginPrefix(
 			this.groupId,
 			this.artifactId,
 		);
+
 		this.prefix = prefix;
+
 		MavenExplorerProvider.getInstance().refresh(this); // update label/description of current tree item.
 	}
 
@@ -93,12 +108,14 @@ export class MavenPlugin implements ITreeItem {
 		if (this.goals !== undefined) {
 			return;
 		}
+
 		const goals = await pluginInfoProvider.getPluginGoals(
 			this.project.pomPath,
 			this.groupId,
 			this.artifactId,
 			this.version,
 		);
+
 		this.goals = goals;
 	}
 }

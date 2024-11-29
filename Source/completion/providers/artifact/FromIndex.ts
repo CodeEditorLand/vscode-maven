@@ -27,6 +27,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 		if (!isJavaLanguageServerStandard()) {
 			return [];
 		}
+
 		const searchParam: ISearchArtifactParam = {
 			searchType: SearchType.identifier,
 			groupId: groupIdHint,
@@ -58,8 +59,11 @@ export class FromIndex implements IArtifactCompletionProvider {
 				gid,
 				vscode.CompletionItemKind.Module,
 			);
+
 			item.insertText = gid;
+
 			item.detail = "index";
+
 			item.command = commandOnSelection;
 
 			return item;
@@ -73,6 +77,7 @@ export class FromIndex implements IArtifactCompletionProvider {
 		if (!isJavaLanguageServerStandard()) {
 			return [];
 		}
+
 		const searchParam: ISearchArtifactParam = {
 			searchType: SearchType.identifier,
 			groupId: groupIdHint,
@@ -106,9 +111,12 @@ export class FromIndex implements IArtifactCompletionProvider {
 				},
 				vscode.CompletionItemKind.Field,
 			);
+
 			item.insertText = doc.artifactId;
+
 			item.detail = `GroupId: ${doc.groupId}`;
 			(item as any).data = { groupId: doc.groupId };
+
 			item.command = commandOnSelection;
 
 			return item;
@@ -122,9 +130,11 @@ export class FromIndex implements IArtifactCompletionProvider {
 		if (!groupId && !artifactId) {
 			return [];
 		}
+
 		if (!isJavaLanguageServerStandard()) {
 			return [];
 		}
+
 		const searchParam: ISearchArtifactParam = {
 			searchType: SearchType.identifier,
 			groupId,
@@ -154,8 +164,11 @@ export class FromIndex implements IArtifactCompletionProvider {
 				doc.version,
 				vscode.CompletionItemKind.Constant,
 			);
+
 			item.insertText = doc.version;
+
 			item.sortText = getSortText(doc.version);
+
 			item.command = commandOnSelection;
 
 			return item;

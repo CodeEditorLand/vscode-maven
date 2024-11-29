@@ -43,6 +43,7 @@ export async function addDependencyHandler(options?: any): Promise<void> {
 		if (!selectedProject) {
 			return;
 		}
+
 		pomPath = selectedProject.pomPath;
 	}
 
@@ -72,6 +73,7 @@ export async function addDependencyHandler(options?: any): Promise<void> {
 					if (text.trim().length < 3) {
 						return "Keywords are too short.";
 					}
+
 					return undefined;
 				},
 			});
@@ -103,6 +105,7 @@ export async function addDependencyHandler(options?: any): Promise<void> {
 		if (!selectedDoc) {
 			return;
 		}
+
 		await addDependency(
 			pomPath,
 			selectedDoc.g,
@@ -206,6 +209,7 @@ async function insertDependency(
 		insertPosition = currentDocument.positionAt(
 			getInnerStartIndex(targetNode),
 		);
+
 		targetText = constructDependencyNode({
 			gid,
 			aid,
@@ -220,6 +224,7 @@ async function insertDependency(
 		insertPosition = currentDocument.positionAt(
 			getInnerEndIndex(targetNode),
 		);
+
 		targetText = constructDependenciesNode({
 			gid,
 			aid,
@@ -235,11 +240,14 @@ async function insertDependency(
 	}
 
 	const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
+
 	edit.insert(currentDocument.uri, insertPosition, targetText);
+
 	await vscode.workspace.applyEdit(edit);
 
 	const endingPosition: vscode.Position = currentDocument.positionAt(
 		currentDocument.offsetAt(insertPosition) + targetText.length,
 	);
+
 	textEditor.revealRange(new vscode.Range(insertPosition, endingPosition));
 }

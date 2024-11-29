@@ -29,6 +29,7 @@ export function getXsdElement(nodePath: string) {
 
 		return new XSDElement(obj, nodePath);
 	}
+
 	return undefined;
 }
 
@@ -75,12 +76,15 @@ export class XSDElement {
 		if (description) {
 			content += description;
 		}
+
 		if (version) {
 			content += EOL + EOL;
+
 			content += `Version: ${version}`;
 		}
 
 		const mdString = new MarkdownString(content);
+
 		mdString.supportHtml = true;
 
 		return mdString;

@@ -54,6 +54,7 @@ export class PropertiesProvider implements IXmlCompletionProvider {
 							documentText,
 							cursorOffset,
 						);
+
 						item.insertText = new vscode.SnippetString(
 							snippetContent,
 						);
@@ -62,10 +63,12 @@ export class PropertiesProvider implements IXmlCompletionProvider {
 					};
 
 					const items = props.map(propertyToCompletionItem);
+
 					ret.push(...items);
 				}
 			}
 		}
+
 		return ret;
 	}
 }

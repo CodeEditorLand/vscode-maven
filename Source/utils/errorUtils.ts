@@ -42,5 +42,6 @@ export async function generalErrorHandler(
 			`Command "${commandName}" fails. ${error.message}`,
 		);
 	}
+
 	throw error;
 }

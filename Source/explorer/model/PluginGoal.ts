@@ -8,16 +8,19 @@ import { MavenPlugin } from "./MavenPlugin";
 
 export class PluginGoal implements ITreeItem {
 	public plugin: MavenPlugin;
+
 	public name: string;
 
 	constructor(plugin: MavenPlugin, name: string) {
 		this.plugin = plugin;
+
 		this.name = name;
 	}
 
 	public getContextValue(): string {
 		return "maven:pluginGoal";
 	}
+
 	public getTreeItem(): vscode.TreeItem {
 		return new vscode.TreeItem(
 			this.name,
@@ -30,6 +33,7 @@ export class PluginGoal implements ITreeItem {
 			// workaround for compatibility in case the name already contains prefix
 			return this.name;
 		}
+
 		return `${this.plugin.prefix}:${this.name}`;
 	}
 }

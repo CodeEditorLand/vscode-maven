@@ -21,6 +21,7 @@ export class LifecyclePhase implements ITreeItem {
 			this.phase,
 			vscode.TreeItemCollapsibleState.None,
 		);
+
 		treeItem.iconPath = new vscode.ThemeIcon("gear");
 
 		return treeItem;

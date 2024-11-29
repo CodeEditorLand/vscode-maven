@@ -6,6 +6,7 @@ export function generateMavenDef() {
 	const schema = getSchema();
 
 	const dir = path.join(__dirname, "..", "resources");
+
 	writeFileSync(
 		path.join(dir, "maven-4.0.0.xsd.json"),
 		JSON.stringify(schema, null, 2),

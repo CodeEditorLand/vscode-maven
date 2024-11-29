@@ -11,6 +11,7 @@ import {
 
 export class SpecifyGroupIdStep implements IProjectCreationStep {
 	public previousStep?: IProjectCreationStep;
+
 	public nextStep?: IProjectCreationStep;
 
 	public async run(metadata: IProjectCreationMetadata): Promise<StepResult> {
@@ -20,6 +21,7 @@ export class SpecifyGroupIdStep implements IProjectCreationStep {
 			if (this.nextStep) {
 				this.nextStep.previousStep = this.previousStep;
 			}
+
 			return StepResult.NEXT;
 		}
 
@@ -31,18 +33,24 @@ export class SpecifyGroupIdStep implements IProjectCreationStep {
 
 		const specifyGroupIdPromise = new Promise<StepResult>((resolve) => {
 			const inputBox: InputBox = window.createInputBox();
+
 			inputBox.title = metadata.title;
+
 			inputBox.placeholder = "e.g. com.example";
+
 			inputBox.prompt = "Input group Id of your project.";
+
 			inputBox.value =
 				metadata.groupId ??
 				(metadata.parentProject
 					? metadata.parentProject.groupId
 					: "com.example");
+
 			inputBox.ignoreFocusOut = true;
 
 			if (this.previousStep) {
 				inputBox.buttons = [QuickInputButtons.Back];
+
 				disposables.push(
 					inputBox.onDidTriggerButton((item) => {
 						if (item === QuickInputButtons.Back) {
@@ -51,16 +59,19 @@ export class SpecifyGroupIdStep implements IProjectCreationStep {
 					}),
 				);
 			}
+
 			disposables.push(
 				inputBox.onDidChangeValue(() => {
 					const validationMessage: string | undefined =
 						this.groupIdValidation(inputBox.value);
 					// inputBox.enabled = validationMessage === undefined;
+
 					inputBox.validationMessage = validationMessage;
 				}),
 				inputBox.onDidAccept(() => {
 					if (!inputBox.validationMessage) {
 						metadata.groupId = inputBox.value;
+
 						resolve(StepResult.NEXT);
 					}
 				}),
@@ -68,7 +79,9 @@ export class SpecifyGroupIdStep implements IProjectCreationStep {
 					resolve(StepResult.STOP);
 				}),
 			);
+
 			disposables.push(inputBox);
+
 			inputBox.show();
 		});
 

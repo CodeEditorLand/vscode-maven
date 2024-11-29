@@ -15,18 +15,27 @@ const MAVEN_METADATA_FILENAME = "maven-metadata.xml";
 
 export interface IArtifactMetadata {
 	id: string;
+
 	g: string;
+
 	a: string;
+
 	latestVersion: string;
+
 	versionCount: number;
+
 	p: string;
 }
 
 export interface IVersionMetadata {
 	id: string;
+
 	g: string;
+
 	a: string;
+
 	v: string;
+
 	timestamp: number;
 }
 
@@ -113,16 +122,20 @@ async function httpsGet(urlString: string): Promise<string> {
 		let result = "";
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const options: any = url.parse(urlString);
+
 		options.headers = {
 			"User-Agent": "vscode-maven/0.1",
 		};
+
 		https.get(options, (res: http.IncomingMessage) => {
 			res.on("data", (chunk) => {
 				result = result.concat(chunk.toString());
 			});
+
 			res.on("end", () => {
 				resolve(result);
 			});
+
 			res.on("error", (err) => {
 				reject(err);
 			});

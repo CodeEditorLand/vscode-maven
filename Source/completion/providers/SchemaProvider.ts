@@ -44,16 +44,19 @@ export class SchemaProvider implements IXmlCompletionProvider {
 				// </complexNode>
 				insertText = [`<${name}>`, "\t$0", `</${name}>`].join(eol);
 			}
+
 			const snippetContent: string = trimBrackets(
 				insertText,
 				documentText,
 				cursorOffset,
 			);
+
 			item.insertText = new vscode.SnippetString(snippetContent);
 
 			if (e.isDeprecated) {
 				item.tags = [vscode.CompletionItemTag.Deprecated];
 			}
+
 			item.documentation = e.markdownString;
 
 			// trigger completion again immediately for non-leaf node
@@ -63,6 +66,7 @@ export class SchemaProvider implements IXmlCompletionProvider {
 					title: "Trigger Suggest",
 				};
 			}
+
 			return item;
 		};
 

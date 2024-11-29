@@ -21,6 +21,7 @@ interface IPluginCache {
 
 interface IPluginInfo {
 	prefix?: string;
+
 	versions?: {
 		[version: string]: string[]; // goals
 	};
@@ -32,6 +33,7 @@ interface PluginInfoDict {
 
 interface PluginDescription {
 	goalPrefix: string;
+
 	goals: string[];
 }
 
@@ -61,11 +63,14 @@ class PluginInfoProvider {
 		const xml: any = await Utils.parseXmlContent(metadataXml);
 
 		const plugins: any[] = _.get(xml, "metadata.plugins[0].plugin");
+
 		plugins.forEach((plugin) => {
 			const a: string = _.get(plugin, "artifactId[0]");
 
 			const p: string = _.get(plugin, "prefix[0]");
+
 			infos[a] = infos[a] ?? {};
+
 			infos[a].prefix = p;
 		});
 
@@ -86,6 +91,7 @@ class PluginInfoProvider {
 			_.get(this.getPluginCache(), [groupId]) ?? {};
 
 		const info: IPluginInfo = _.get(infos, [artifactId]) ?? {};
+
 		info.versions = info.versions ?? {};
 
 		const goalsFromCache: string[] | undefined = _.get(info.versions, [
@@ -106,6 +112,7 @@ class PluginInfoProvider {
 
 		if (desc) {
 			info.prefix = desc.goalPrefix;
+
 			info.versions[version] = desc.goals;
 		} else {
 			// get plugin goals using maven-help-plugin, i.e. mvn help:describe
@@ -115,7 +122,9 @@ class PluginInfoProvider {
 				artifactId,
 				version,
 			);
+
 			info.prefix = info.prefix ?? prefix;
+
 			info.versions[version] = goals ?? [];
 		}
 
@@ -134,7 +143,9 @@ class PluginInfoProvider {
 		infos: PluginInfoDict,
 	): Promise<void> {
 		const plugins: any = this._context.globalState.get(KEY_PLUGINS) ?? {};
+
 		_.set(plugins, [gid], infos);
+
 		await this._context.globalState.update(KEY_PLUGINS, plugins);
 	}
 
@@ -144,7 +155,9 @@ class PluginInfoProvider {
 		info: IPluginInfo,
 	): Promise<void> {
 		const plugins: any = this._context.globalState.get(KEY_PLUGINS) ?? {};
+
 		_.set(plugins, [gid, aid], info);
+
 		await this._context.globalState.update(KEY_PLUGINS, plugins);
 	}
 

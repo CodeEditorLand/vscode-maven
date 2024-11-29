@@ -77,7 +77,9 @@ export async function activate(
 	if (getAiKey()) {
 		initialize(getExtensionId(), getExtensionVersion(), getAiKey());
 	}
+
 	await initExpService(context);
+
 	await instrumentOperation("activation", doActivate)(context);
 }
 
@@ -90,6 +92,7 @@ async function doActivate(
 	context: vscode.ExtensionContext,
 ): Promise<void> {
 	pluginInfoProvider.initialize(context);
+
 	await vscode.commands.executeCommand(
 		"setContext",
 		"vscode-maven:activated",
@@ -105,12 +108,15 @@ async function doActivate(
 		treeDataProvider: mavenExplorerProvider,
 		showCollapseAll: true,
 	});
+
 	context.subscriptions.push(view);
+
 	registerCommand(
 		context,
 		"maven.dependency.goToEffective",
 		(node?: Dependency) => goToEffectiveHandler(view, node),
 	);
+
 	context.subscriptions.push(
 		vscode.workspace.onDidGrantWorkspaceTrust(() => {
 			MavenExplorerProvider.getInstance().refresh();
@@ -129,6 +135,7 @@ async function doActivate(
 				executeInTerminal({ command: goal, pomfile: node.pomPath }),
 		);
 	});
+
 	registerCommand(
 		context,
 		"maven.explorer.refresh",
@@ -138,18 +145,21 @@ async function doActivate(
 				: MavenExplorerProvider.getInstance().refresh(item);
 		},
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.project.effectivePom",
 		async (projectOrUri: Uri | MavenProject) =>
 			await Utils.showEffectivePom(projectOrUri),
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.goal.custom",
 		async (node: MavenProject) =>
 			await Utils.executeCustomGoal(node.pomPath),
 	);
+
 	registerCommand(context, "maven.project.openPom", openPomHandler);
 	// create project from archetype
 	registerCommand(
@@ -157,16 +167,19 @@ async function doActivate(
 		"maven.archetype.generate",
 		ArchetypeModule.createMavenProject,
 	);
+
 	registerCommand(
 		context,
 		"maven.new.module",
 		ArchetypeModule.createMavenModule,
 	);
+
 	registerCommand(
 		context,
 		"maven.archetype.update",
 		updateArchetypeCatalogHandler,
 	);
+
 	registerProjectCreationEndListener(context);
 
 	registerCommandRequiringTrust(
@@ -174,31 +187,37 @@ async function doActivate(
 		"maven.history",
 		mavenHistoryHandler,
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.favorites",
 		runFavoriteCommandsHandler,
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.goal.execute",
 		Utils.executeMavenCommand,
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.goal.execute.fromProjectManager",
 		Utils.executeMavenCommand,
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.goal.execute.fromLifecycleMenu",
 		Utils.executeMavenCommand,
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.goal.execute.fromFavoritesMenu",
 		Utils.executeMavenCommand,
 	);
+
 	registerCommandRequiringTrust(
 		context,
 		"maven.plugin.execute",
@@ -208,9 +227,11 @@ async function doActivate(
 				pomfile: pluginGoal.plugin.project.pomPath,
 			}),
 	);
+
 	registerCommand(context, "maven.view.flat", () =>
 		Settings.changeToFlatView(),
 	);
+
 	registerCommand(context, "maven.view.hierarchical", () =>
 		Settings.changeToHierarchicalView(),
 	);
@@ -218,10 +239,13 @@ async function doActivate(
 	// commands for (un)selecting profiles
 	registerCommand(context, "maven.profile.select", (p: MavenProfile) => {
 		p.selected = true;
+
 		MavenExplorerProvider.getInstance().refresh(p);
 	});
+
 	registerCommand(context, "maven.profile.deselect", (p: MavenProfile) => {
 		p.selected = false;
+
 		MavenExplorerProvider.getInstance().refresh(p);
 	});
 
@@ -247,6 +271,7 @@ async function doActivate(
 						removedWorkspaceFolder,
 					);
 				}
+
 				for (const addedWorkspaceFolder of e.added) {
 					await mavenExplorerProvider.addWorkspaceFolder(
 						addedWorkspaceFolder,
@@ -263,21 +288,25 @@ async function doActivate(
 		"maven.project.addDependency",
 		addDependencyHandler,
 	);
+
 	registerCommand(
 		context,
 		"maven.project.showDependencies",
 		showDependenciesHandler,
 	);
+
 	registerCommand(
 		context,
 		"maven.project.excludeDependency",
 		excludeDependencyHandler,
 	);
+
 	registerCommand(
 		context,
 		"maven.project.setDependencyVersion",
 		setDependencyVersionHandler,
 	);
+
 	registerCommand(
 		context,
 		"maven.project.goToDefinition",
@@ -289,6 +318,7 @@ async function doActivate(
 
 	// debug
 	registerCommand(context, "maven.plugin.debug", debugHandler);
+
 	vscode.debug.onDidTerminateDebugSession((session) => {
 		if (session.type === "java") {
 			const terminalName: string = session.configuration.terminalName;
@@ -339,11 +369,13 @@ function registerPomFileWatcher(context: vscode.ExtensionContext): void {
 		vscode.workspace.createFileSystemWatcher(
 			Settings.Pomfile.globPattern(),
 		);
+
 	watcher.onDidCreate(
 		(e: Uri) => MavenExplorerProvider.getInstance().addProject(e.fsPath),
 		null,
 		context.subscriptions,
 	);
+
 	watcher.onDidChange(
 		async (e: Uri) => {
 			const project: MavenProject | undefined = MavenProjectManager.get(
@@ -355,6 +387,7 @@ function registerPomFileWatcher(context: vscode.ExtensionContext): void {
 				contentProvider.invalidate(
 					effectivePomContentUri(project.pomPath),
 				);
+
 				contentProvider.invalidate(
 					dependenciesContentUri(project.pomPath),
 				);
@@ -364,6 +397,7 @@ function registerPomFileWatcher(context: vscode.ExtensionContext): void {
 				if (Settings.Pomfile.autoUpdateEffectivePOM()) {
 					taskExecutor.execute(async () => {
 						await project.refreshEffectivePom();
+
 						MavenExplorerProvider.getInstance().refresh(project);
 					});
 				}
@@ -372,11 +406,13 @@ function registerPomFileWatcher(context: vscode.ExtensionContext): void {
 		null,
 		context.subscriptions,
 	);
+
 	watcher.onDidDelete(
 		(e: Uri) => MavenExplorerProvider.getInstance().removeProject(e.fsPath),
 		null,
 		context.subscriptions,
 	);
+
 	context.subscriptions.push(watcher);
 }
 
@@ -393,6 +429,7 @@ function registerConfigChangeListener(context: vscode.ExtensionContext): void {
 				) {
 					mavenTerminal.dispose();
 				}
+
 				if (
 					e.affectsConfiguration("maven.view") ||
 					e.affectsConfiguration("maven.pomfile.globPattern") ||
@@ -401,6 +438,7 @@ function registerConfigChangeListener(context: vscode.ExtensionContext): void {
 				) {
 					MavenExplorerProvider.getInstance().refresh();
 				}
+
 				if (
 					e.affectsConfiguration(
 						"maven.executable.preferMavenWrapper",
@@ -417,6 +455,7 @@ function registerConfigChangeListener(context: vscode.ExtensionContext): void {
 				}
 			},
 		);
+
 	context.subscriptions.push(configChangeListener);
 }
 
@@ -440,6 +479,7 @@ function registerPomFileAuthoringHelpers(
 			"<",
 		),
 	);
+
 	registerCommand(context, "maven.completion.selected", sendInfo, true);
 	// hover
 	context.subscriptions.push(
@@ -497,7 +537,9 @@ async function updateArchetypeCatalogHandler(): Promise<void> {
 		{ location: vscode.ProgressLocation.Notification },
 		async (p: Progress<{ message: string }>) => {
 			p.report({ message: "updating archetype catalog ..." });
+
 			await ArchetypeModule.updateArchetypeCatalog();
+
 			p.report({ message: "finished." });
 		},
 	);
@@ -517,6 +559,7 @@ async function openPomHandler(
 				Uri.parse(node.uri).fsPath,
 				"pom.xml",
 			);
+
 			await openFileIfExists(pomPath);
 		}
 	}

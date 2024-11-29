@@ -45,16 +45,23 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 			new Promise<StepResult>((resolve) => {
 				const pickBox: QuickPick<IArchetypePickItem> =
 					window.createQuickPick<IArchetypePickItem>();
+
 				pickBox.title = metadata.title;
+
 				pickBox.placeholder = "Select an archetype ...";
+
 				pickBox.matchOnDescription = true;
+
 				pickBox.ignoreFocusOut = true;
+
 				pickBox.items = items;
+
 				disposables.push(
 					pickBox.onDidTriggerButton(async (item) => {
 						if (item === QuickInputButtons.Back) {
 							pickBox.items =
 								await this.getArchetypePickItems(false);
+
 							pickBox.buttons = [];
 						}
 					}),
@@ -72,6 +79,7 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 								// More archetypes...
 								pickBox.items =
 									await this.getArchetypePickItems(true);
+
 								pickBox.buttons = [QuickInputButtons.Back];
 							} else {
 								// IMPOSSIBLE
@@ -83,10 +91,13 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 						} else {
 							metadata.archetypeArtifactId =
 								pickBox.selectedItems[0].archetype.artifactId;
+
 							metadata.archetypeGroupId =
 								pickBox.selectedItems[0].archetype.groupId;
+
 							metadata.archetype =
 								pickBox.selectedItems[0].archetype;
+
 							resolve(StepResult.NEXT);
 						}
 					}),
@@ -94,7 +105,9 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 						resolve(StepResult.STOP);
 					}),
 				);
+
 				disposables.push(pickBox);
+
 				pickBox.show();
 			});
 
@@ -187,6 +200,7 @@ export class SelectArchetypeStep implements IProjectCreationStep {
 		} catch (error) {
 			console.error(error);
 		}
+
 		if (!fixedList) {
 			return [];
 		} else {

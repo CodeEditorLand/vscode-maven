@@ -22,12 +22,14 @@ export async function jumpToDefinitionHandler(
 		selectedPath = node.projectPomPath;
 	} else {
 		const parent: Dependency = node.parent;
+
 		selectedPath = localPomPath(
 			parent.groupId,
 			parent.artifactId,
 			parent.version,
 		);
 	}
+
 	await goToDefinition(selectedPath, node.groupId, node.artifactId);
 }
 
@@ -52,6 +54,7 @@ async function locateInFile(
 	if (targetNode.startIndex === null || targetNode.endIndex === null) {
 		throw new UserError("Invalid target XML node to locate.");
 	}
+
 	const currentDocument: vscode.TextDocument =
 		await vscode.workspace.openTextDocument(pomPath);
 
@@ -59,12 +62,15 @@ async function locateInFile(
 		currentDocument,
 		{ preview: false },
 	);
+
 	vscode.languages.setTextDocumentLanguage(currentDocument, "xml");
 
 	const start = currentDocument.positionAt(targetNode.startIndex);
 
 	const end = currentDocument.positionAt(targetNode.endIndex);
+
 	textEditor.selection = new vscode.Selection(start, end);
+
 	textEditor.revealRange(
 		new vscode.Range(start, end),
 		vscode.TextEditorRevealType.InCenter,

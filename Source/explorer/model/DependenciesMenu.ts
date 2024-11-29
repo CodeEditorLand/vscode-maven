@@ -16,6 +16,7 @@ import { ProjectMenu } from "./Menu";
 export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 	constructor(project: MavenProject) {
 		super(project);
+
 		this.name = "Dependencies";
 	}
 
@@ -25,6 +26,7 @@ export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 
 	public async getChildren(): Promise<Dependency[] | HintNode[]> {
 		const treeNodes = await parseRawDependencyDataHandler(this.project);
+
 		await diagnosticProvider.refreshDiagnostics(
 			vscode.Uri.file(this.project.pomPath),
 		);
@@ -45,10 +47,12 @@ export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 		);
 
 		const uri: vscode.Uri = vscode.Uri.file("");
+
 		treeItem.resourceUri = uri.with({ authority: this.project.pomPath }); // distinguish dependenciesMenu in multi-module project
 		treeItem.tooltip = this.name;
 		// TODO: switch to codicon folder-library after vscode's next release in early Sept.
 		const iconFile = "library-folder.svg";
+
 		treeItem.iconPath = {
 			light: getPathToExtensionRoot(
 				"resources",
@@ -69,6 +73,7 @@ export class DependenciesMenu extends ProjectMenu implements ITreeItem {
 
 	public refresh(): void {
 		this._savePom();
+
 		MavenExplorerProvider.getInstance().refresh(this);
 	}
 

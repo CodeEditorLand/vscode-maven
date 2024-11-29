@@ -8,11 +8,17 @@ export interface IProjectCreationMetadata {
 	title: string; // Project creation title name
 	archetype?: Archetype; // temporary cached data between steps, used to select versions
 	archetypeArtifactId?: string;
+
 	archetypeGroupId?: string;
+
 	archetypeVersion?: string;
+
 	groupId?: string;
+
 	artifactId?: string;
+
 	targetFolder?: string;
+
 	targetFolderHint?: string; // default value for folder picker dialog
 	parentProject?: MavenProject;
 }

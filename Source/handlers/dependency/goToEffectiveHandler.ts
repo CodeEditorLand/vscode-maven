@@ -16,6 +16,7 @@ export async function goToEffectiveHandler(
 	if (node === undefined || node.omittedStatus === undefined) {
 		throw new Error("No conflict dependency node specified.");
 	}
+
 	const fullArtifactName: string = [
 		node.groupId,
 		node.artifactId,
@@ -41,6 +42,7 @@ export async function goToEffectiveHandler(
 	if (treeItem === undefined) {
 		throw new Error("Failed to find dependency.");
 	}
+
 	view.reveal(treeItem, { focus: true });
 }
 
@@ -55,22 +57,26 @@ async function searchFirstEffective(
 	for (const child of dependencyNodes) {
 		queue.push(child);
 	}
+
 	while (queue.empty() === false) {
 		const node: Dependency | undefined = queue.pop();
 
 		if (node === undefined) {
 			throw new Error("Failed to find dependency.");
 		}
+
 		if (node.fullArtifactName === fullArtifactName) {
 			targetItem = node;
 
 			break;
 		}
+
 		const children = node.children;
 
 		for (const child of children) {
 			queue.push(child);
 		}
 	}
+
 	return targetItem;
 }

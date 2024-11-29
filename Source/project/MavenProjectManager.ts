@@ -8,12 +8,14 @@ import { Settings } from "../Settings";
 
 export class MavenProjectManager {
 	private static INSTANCE: MavenProjectManager;
+
 	private _projectMap: Map<string, MavenProject> = new Map();
 
 	public static getInstance() {
 		if (!this.INSTANCE) {
 			this.INSTANCE = new MavenProjectManager();
 		}
+
 		return this.INSTANCE;
 	}
 
@@ -32,13 +34,17 @@ export class MavenProjectManager {
 
 			if (!currentProject) {
 				currentProject = new MavenProject(pomPath);
+
 				newProjects.push(currentProject);
 			}
+
 			allProjects.push(currentProject);
 		}
 
 		await Promise.all(newProjects.map(async (elem) => elem.parsePom()));
+
 		MavenProjectManager.update(...newProjects);
+
 		newProjects.forEach((p) => {
 			p.modules.forEach((m) => {
 				const moduleNode: MavenProject | undefined =
@@ -74,7 +80,9 @@ export class MavenProjectManager {
 
 	public static add(pomPath: string): void {
 		const newProject = new MavenProject(pomPath);
+
 		newProject.parsePom();
+
 		MavenProjectManager.getInstance()._projectMap.set(pomPath, newProject);
 	}
 
@@ -111,11 +119,13 @@ async function getAllPomPaths(
 			for (const poms of arrayOfPoms) {
 				ret.push(...poms);
 			}
+
 			return ret;
 		} else {
 			return [];
 		}
 	}
+
 	const exclusions: string[] = Settings.excludedFolders(workspaceFolder.uri);
 
 	const pattern: string = Settings.Pomfile.globPattern();

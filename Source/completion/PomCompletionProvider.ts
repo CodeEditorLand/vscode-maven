@@ -63,6 +63,7 @@ export class PomCompletionProvider implements vscode.CompletionItemProvider {
 				...(await provider.provide(document, position, currentNode)),
 			);
 		}
+
 		return ret;
 	}
 }

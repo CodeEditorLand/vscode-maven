@@ -59,6 +59,7 @@ export async function rawEffectivePom(
 		`-B -Doutput="${epomPath}" help:effective-pom`,
 		pomPath,
 	);
+
 	await fse.writeFile(mtimePath, mtimeMs);
 
 	return await readFileIfExists(epomPath);
@@ -74,6 +75,7 @@ export async function rawDependencyTree(
 	const outputDirectory: string = path.dirname(dependencyGraphPath);
 
 	const outputFileName: string = path.basename(dependencyGraphPath);
+
 	await executeInBackground(
 		`-B -N ${OPTIONS_DEPENDENCY_GRAPH} -DoutputDirectory="${outputDirectory}" -DoutputFileName="${outputFileName}" ${GOAL_DEPENDENCY_GRAPH}`,
 		pomPath,
@@ -102,6 +104,7 @@ export async function rawProfileList(
 	const outputPath: string = getTempFolder(pomPath);
 
 	const profileListPath = `${outputPath}.profiles.txt`;
+
 	await executeInBackground(
 		`-B -Doutput="${profileListPath}" help:all-profiles`,
 		pomPath,
@@ -147,6 +150,7 @@ async function executeInBackground(
 	if (pomfile) {
 		args.push("-f", `"${pomfile}"`);
 	}
+
 	const spawnOptions: child_process.SpawnOptions = {
 		cwd,
 		env: Object.assign({}, process.env, Settings.getEnvironment(pomfile)),
@@ -167,6 +171,7 @@ async function executeInBackground(
 				args,
 				spawnOptions,
 			);
+
 			proc.on("error", (err: Error) => {
 				reject(
 					new Error(
@@ -174,6 +179,7 @@ async function executeInBackground(
 					),
 				);
 			});
+
 			proc.on("exit", (code: number, signal: string) => {
 				if (code !== null) {
 					if (code === 0) {
@@ -199,6 +205,7 @@ async function executeInBackground(
 					mavenOutputChannel.append(chunk.toString());
 				});
 			}
+
 			if (proc.stderr !== null) {
 				proc.stderr.on("data", (chunk: Buffer) => {
 					mavenOutputChannel.append(chunk.toString());
@@ -210,10 +217,15 @@ async function executeInBackground(
 
 export async function executeInTerminal(options: {
 	command: string;
+
 	mvnPath?: string;
+
 	pomfile?: string;
+
 	cwd?: string;
+
 	env?: { [key: string]: string };
+
 	terminalName?: string;
 }): Promise<vscode.Terminal | undefined> {
 	const { command, mvnPath, pomfile, cwd, env, terminalName } = options;
@@ -257,6 +269,7 @@ export async function executeInTerminal(options: {
 				"-P=" + selectedIds.concat(unselectedIds).join(",");
 		}
 	}
+
 	const fullCommand: string = [
 		mvnString,
 		mvnSettingsFile &&
@@ -282,6 +295,7 @@ export async function executeInTerminal(options: {
 	if (pomfile) {
 		await updateLRUCommands(command, pomfile);
 	}
+
 	return terminal;
 }
 
@@ -330,6 +344,7 @@ async function getLocalMavenWrapper(
 		if (await fse.pathExists(potentialMvnwPath)) {
 			return potentialMvnwPath;
 		}
+
 		current = path.dirname(current);
 
 		const folderUri = vscode.Uri.file(current);
@@ -339,6 +354,7 @@ async function getLocalMavenWrapper(
 			return undefined;
 		}
 	}
+
 	return undefined;
 }
 
@@ -351,6 +367,7 @@ async function defaultMavenExecutable(): Promise<string | undefined> {
 				mavenOutputChannel.appendLine(
 					"Maven executable not found in PATH.",
 				);
+
 				resolve(undefined);
 			}
 		});
@@ -369,6 +386,7 @@ async function readFileIfExists(filepath: string): Promise<string | undefined> {
 	if (await fse.pathExists(filepath)) {
 		return (await fse.readFile(filepath)).toString();
 	}
+
 	return undefined;
 }
 
@@ -405,17 +423,21 @@ export async function promptToSettingMavenExecutable(): Promise<void> {
 
 			break;
 		}
+
 		case BUTTON_BROWSE_FOR_MAVEN: {
 			const mvnPath = await browseForMavenBinary();
 
 			if (mvnPath) {
 				Settings.setMavenExecutablePath(mvnPath);
+
 				await vscode.window.showInformationMessage(
 					`Successfully set "${SETTING_MAVEN_EXECUTABLE_PATH}" to: ${mvnPath}`,
 				);
 			}
+
 			break;
 		}
+
 		default:
 			break;
 	}

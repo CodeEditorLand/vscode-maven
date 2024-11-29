@@ -29,17 +29,26 @@ const CONTEXT_VALUE = "maven:project";
 export class MavenProject implements ITreeItem {
 	public parent?: MavenProject; // assigned if it's specified as one of parent project's modules
 	public pomPath: string;
+
 	public _fullDependencyText: string;
+
 	public _conflictNodes: Dependency[];
+
 	public dependencyNodes: Dependency[];
+
 	private ePomProvider: EffectivePomProvider;
+
 	private _ePom: any;
+
 	private _pom: any;
+
 	private properties: Map<string, string> = new Map();
+
 	public profiles: MavenProfile[];
 
 	constructor(pomPath: string) {
 		this.pomPath = pomPath;
+
 		this.ePomProvider = new EffectivePomProvider(pomPath);
 	}
 
@@ -115,6 +124,7 @@ export class MavenProject implements ITreeItem {
 			// single-project
 			plugins = _.get(this._ePom, "project.build[0].plugins[0].plugin");
 		}
+
 		return this._convertXmlPlugin(plugins);
 	}
 
@@ -134,6 +144,7 @@ export class MavenProject implements ITreeItem {
 			// single-project
 			deps = _.get(this._ePom, "project.dependencies[0].dependency");
 		}
+
 		return deps;
 	}
 
@@ -174,6 +185,7 @@ export class MavenProject implements ITreeItem {
 				return path.join(path.dirname(this.pomPath), relativePath);
 			}
 		}
+
 		return undefined;
 	}
 
@@ -196,6 +208,7 @@ export class MavenProject implements ITreeItem {
 			this.packaging === "pom" ? "root.svg" : "project.svg";
 
 		const treeItem: vscode.TreeItem = new vscode.TreeItem(label);
+
 		treeItem.iconPath = {
 			light: getPathToExtensionRoot(
 				"resources",
@@ -210,8 +223,11 @@ export class MavenProject implements ITreeItem {
 				iconFile,
 			),
 		};
+
 		treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+
 		treeItem.description = this.id;
+
 		treeItem.tooltip = this.pomPath;
 
 		return treeItem;
@@ -223,10 +239,15 @@ export class MavenProject implements ITreeItem {
 
 	public getChildren(): ITreeItem[] {
 		const ret: ITreeItem[] = [];
+
 		ret.push(new LifecycleMenu(this));
+
 		ret.push(new PluginsMenu(this));
+
 		ret.push(new DependenciesMenu(this));
+
 		ret.push(new FavoritesMenu(this));
+
 		ret.push(new ProfilesMenu(this));
 
 		if (
@@ -236,8 +257,10 @@ export class MavenProject implements ITreeItem {
 			const projects: MavenProject[] = this.modules
 				.map((m) => MavenProjectManager.get(m))
 				.filter(Boolean) as MavenProject[];
+
 			ret.push(...projects);
 		}
+
 		return ret;
 	}
 
@@ -252,6 +275,7 @@ export class MavenProject implements ITreeItem {
 
 		try {
 			res = await this.ePomProvider.getEffectivePom(options);
+
 			this._ePom = res?.ePom;
 		} catch (error) {
 			console.error(error);
@@ -260,6 +284,7 @@ export class MavenProject implements ITreeItem {
 				"Failed to calculate Effective POM. Please check output window 'Maven for Java' for more details.",
 			);
 		}
+
 		return res;
 	}
 
@@ -270,6 +295,7 @@ export class MavenProject implements ITreeItem {
 	public async parsePom(): Promise<void> {
 		try {
 			this._pom = await Utils.parseXmlFile(this.pomPath);
+
 			this.updateProperties();
 		} catch (error) {
 			this._pom = undefined;
@@ -297,11 +323,13 @@ export class MavenProject implements ITreeItem {
 		if (targetNode?.version) {
 			return targetNode.version;
 		}
+
 		return undefined;
 	}
 
 	private async _refreshPom(): Promise<void> {
 		await this.parsePom();
+
 		MavenExplorerProvider.getInstance().refresh(this);
 	}
 
@@ -319,6 +347,7 @@ export class MavenProject implements ITreeItem {
 					),
 			);
 		}
+
 		return [];
 	}
 
@@ -354,6 +383,7 @@ export class MavenProject implements ITreeItem {
 				name = name.replace(placeholder, value);
 			}
 		}
+
 		return name;
 	}
 
@@ -376,11 +406,13 @@ export class MavenProject implements ITreeItem {
 			if (cur.properties.has(key)) {
 				return cur.properties.get(key);
 			}
+
 			cur =
 				(cur.parentPomPath
 					? MavenProjectManager.get(cur.parentPomPath)
 					: undefined) ?? cur.parent;
 		}
+
 		return undefined;
 	}
 
@@ -402,6 +434,7 @@ export class MavenProject implements ITreeItem {
 
 		if (output) {
 			const profiles = Utils.parseProfilesOutput(this, output);
+
 			this.profiles = profiles;
 		}
 	}

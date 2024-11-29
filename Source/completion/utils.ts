@@ -45,5 +45,6 @@ export function trimBrackets(
 	if (postChar === ">") {
 		ret = ret.slice(0, ret.length - 1);
 	}
+
 	return ret;
 }

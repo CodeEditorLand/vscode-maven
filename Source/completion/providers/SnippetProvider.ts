@@ -61,8 +61,11 @@ export class SnippetProvider implements IXmlCompletionProvider {
 
 				const dependencySnippet: vscode.SnippetString =
 					new vscode.SnippetString(snippetContent);
+
 				snippetItem.insertText = dependencySnippet;
+
 				snippetItem.detail = "Maven Snippet";
+
 				snippetItem.command = {
 					title: "selected",
 					command: COMMAND_COMPLETION_ITEM_SELECTED,
@@ -70,10 +73,12 @@ export class SnippetProvider implements IXmlCompletionProvider {
 						{ completeFor: "dependency", source: "snippet" },
 					],
 				};
+
 				ret.push(snippetItem);
 
 				break;
 			}
+
 			case XmlTagName.Plugins: {
 				const snippetItem: vscode.CompletionItem =
 					new vscode.CompletionItem(
@@ -89,19 +94,25 @@ export class SnippetProvider implements IXmlCompletionProvider {
 
 				const pluginSnippet: vscode.SnippetString =
 					new vscode.SnippetString(snippetContent);
+
 				snippetItem.insertText = pluginSnippet;
+
 				snippetItem.detail = "Maven Snippet";
+
 				snippetItem.command = {
 					title: "selected",
 					command: COMMAND_COMPLETION_ITEM_SELECTED,
 					arguments: [{ completeFor: "plugin", source: "snippet" }],
 				};
+
 				ret.push(snippetItem);
 
 				break;
 			}
+
 			default:
 		}
+
 		return ret;
 	}
 }
