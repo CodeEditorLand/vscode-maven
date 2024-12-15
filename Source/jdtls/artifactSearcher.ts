@@ -281,9 +281,7 @@ async function getArtifactsPickItems(
 
 	for (
 		let i: number = Math.min(Math.round(response.length / 5), 5);
-
 		i < response.length;
-
 		i += 1
 	) {
 		const arr: string[] = [
